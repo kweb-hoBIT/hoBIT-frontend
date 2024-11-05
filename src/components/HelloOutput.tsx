@@ -5,7 +5,7 @@ interface HelloOutputProps {
 }
 
 const HelloOutput: React.FC<HelloOutputProps> = ({ message }) => {
-  return <div>Ouput {message}</div>;
+  return <div className="text-blue-500">Ouput {message}</div>;
 };
 
 export default HelloOutput;
