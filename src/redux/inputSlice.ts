@@ -1,13 +1,18 @@
-// src/redux/inputSlice.js
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+interface InputState {
+  value: string;
+}
+
+const initialState: InputState = {
+  value: '',
+};
 
 const inputSlice = createSlice({
   name: 'input',
-  initialState: {
-    value: '',
-  },
+  initialState,
   reducers: {
-    setInputValue: (state, action) => {
+    setInputValue: (state, action: PayloadAction<string>) => {
       state.value = action.payload;
     },
     clearInputValue: (state) => {

@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { IoClose } from 'react-icons/io5';
 
-const Header = () => {
-  const [isKorean, setIsKorean] = useState(true);
+const Header: React.FC = () => {
+  const [isKorean, setIsKorean] = useState<boolean>(true);
+
   return (
     <div className="h-[70px] bg-white fixed top-0 w-full border-b-2 border-[#bbbbbb] flex items-center relative px-[20px]">
       <div className="relative w-[88px] h-[36px] bg-[#D9D9D9] rounded-[20px] flex items-center">

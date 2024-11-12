@@ -4,7 +4,7 @@ import store from './redux/store';
 
 import MainPage from './pages/MainPage';
 
-function App() {
+const App: React.FC = () => {
   return (
     <Provider store={store}>
       <Router>
@@ -14,6 +14,6 @@ function App() {
       </Router>
     </Provider>
   );
-}
+};
 
 export default App;
