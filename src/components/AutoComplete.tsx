@@ -1,10 +1,9 @@
 import { LuLightbulb } from 'react-icons/lu';
 import { LuLightbulbOff } from 'react-icons/lu';
-
 import { useState } from 'react';
 
-const AutoComplete = () => {
-  const [isAutocompleteOn, setIsAutocompleteOn] = useState(true);
+const AutoComplete: React.FC = () => {
+  const [isAutocompleteOn, setIsAutocompleteOn] = useState<boolean>(true);
 
   const toggleAutocomplete = () => {
     setIsAutocompleteOn(!isAutocompleteOn);

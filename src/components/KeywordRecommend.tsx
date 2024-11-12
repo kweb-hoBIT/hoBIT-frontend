@@ -1,4 +1,6 @@
-const KeywordRecommend = () => {
+import React from 'react';
+
+const KeywordRecommend: React.FC = () => {
   return (
     <div
       className="w-full h-[70px] bg-[#EEEEEE] rounded-t-[30px] fixed bottom-[80px] px-[20px] flex justify-center items-center"

@@ -2,13 +2,14 @@ import { FaRobot } from 'react-icons/fa6';
 import { TbSend2 } from 'react-icons/tb';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { setInputValue, clearInputValue } from '../redux/inputSlice';
+import { setInputValue } from '../redux/inputSlice';
+import { RootState } from '../redux/store';
 
-const Input = () => {
+const Input: React.FC = () => {
   const dispatch = useDispatch();
-  const inputValue = useSelector((state) => state.input.value);
+  const inputValue = useSelector((state: RootState) => state.input.value);
 
-  const handleChange = (event) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(setInputValue(event.target.value));
   };
 
@@ -19,6 +20,7 @@ const Input = () => {
         <input
           type="text"
           placeholder="호빗에게 물어보세요!"
+          value={inputValue}
           onChange={handleChange}
           className="bg-transparent w-full outline-none placeholder-[#aaaaaa] font-6semibold text-[20px]"
         />
