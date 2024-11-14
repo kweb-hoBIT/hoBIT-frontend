@@ -11,9 +11,11 @@ const MainPage: React.FC = () => {
   const inputValue = useSelector((state: RootState) => state.input.value);
 
   return (
-    <div>
+    <div className="flex flex-col h-screen overflow-hidden">
       <Header />
-      <Chatting />
+      <div>
+        <Chatting />
+      </div>
       {inputValue === '' ? <KeywordRecommend /> : <AutoComplete />}
       <Input />
     </div>
