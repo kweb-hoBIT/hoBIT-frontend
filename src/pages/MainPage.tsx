@@ -8,7 +8,7 @@ import AutoComplete from '../components/AutoComplete';
 import Chatting from '../components/Chatting';
 
 const MainPage: React.FC = () => {
-  const inputValue = useSelector((state: RootState) => state.input.value);
+  const isEmpty = useSelector((state: RootState) => state.input.isEmpty);
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -16,7 +16,7 @@ const MainPage: React.FC = () => {
       <div>
         <Chatting />
       </div>
-      {inputValue === '' ? <KeywordRecommend /> : <AutoComplete />}
+      {isEmpty ? <KeywordRecommend /> : <AutoComplete />}
       <Input />
     </div>
   );

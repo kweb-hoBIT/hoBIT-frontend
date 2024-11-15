@@ -1,7 +1,11 @@
-const Query: React.FC = () => {
+interface QueryProps {
+  text: string;
+}
+
+const Query: React.FC<QueryProps> = ({ text }) => {
   return (
-    <span className="inline-block self-start ml-auto bg-[#750E21] w-auto font-6semibold text-[20px] text-white px-[20px] py-[5px] rounded-[20px]">
-      자주 묻는 질문
+    <span className="inline-block max-w-[350px] break-words self-start ml-auto bg-[#750E21] w-auto font-5medium text-[20px] text-white px-[20px] py-[7px] rounded-[20px] my-[20px]">
+      {text}
     </span>
   );
 };
