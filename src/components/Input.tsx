@@ -1,16 +1,34 @@
 import { FaRobot } from 'react-icons/fa6';
 import { TbSend2 } from 'react-icons/tb';
 
-import { useDispatch, useSelector } from 'react-redux';
-import { setInputValue } from '../redux/inputSlice';
-import { RootState } from '../redux/store';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+
+import { setIsEmpty, sendInputValue } from '../redux/inputSlice';
 
 const Input: React.FC = () => {
   const dispatch = useDispatch();
-  const inputValue = useSelector((state: RootState) => state.input.value);
+  const [inputValue, setInputValue] = useState('');
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setInputValue(event.target.value));
+    const value = event.target.value;
+    setInputValue(value);
+
+    dispatch(setIsEmpty(value === ''));
+  };
+
+  const handleSend = () => {
+    if (inputValue.trim() !== '') {
+      dispatch(sendInputValue(inputValue));
+      setInputValue('');
+      dispatch(setIsEmpty(true));
+    }
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      handleSend();
+    }
   };
 
   return (
@@ -22,9 +40,13 @@ const Input: React.FC = () => {
           placeholder="호빗에게 물어보세요!"
           value={inputValue}
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
           className="bg-transparent w-full outline-none placeholder-[#aaaaaa] font-6semibold text-[20px]"
         />
-        <TbSend2 className="text-[24px] text-[#aaaaaa] hover:text-[#000000] cursor-pointer" />
+        <TbSend2
+          onClick={handleSend}
+          className="ml-[10px] text-[24px] text-[#aaaaaa] hover:text-[#000000] cursor-pointer"
+        />
       </div>
     </div>
   );

@@ -23,7 +23,7 @@ const AutoComplete: React.FC = () => {
             onClick={toggleAutocomplete}
             className="flex items-center px-[15px] bg-black rounded-[20px] py-[5px] hover:bg-[#aaa]"
           >
-            <LuLightbulb className="text-white text-[18px] mr-[10px]" />
+            <LuLightbulbOff className="text-white text-[18px] mr-[10px]" />
             <p className="text-white font-6semibold text-[18px]">
               자동완성 끄기
             </p>
@@ -35,7 +35,7 @@ const AutoComplete: React.FC = () => {
             onClick={toggleAutocomplete}
             className="flex items-center px-[15px] bg-black rounded-[20px] py-[5px] hover:bg-[#aaa]"
           >
-            <LuLightbulbOff className="text-white text-[18px] mr-[10px]" />
+            <LuLightbulb className="text-white text-[18px] mr-[10px]" />
             <p className="text-white font-6semibold text-[18px]">
               자동완성 켜기
             </p>

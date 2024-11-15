@@ -1,25 +1,33 @@
+// inputSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface InputState {
-  value: string;
+  isEmpty: boolean;
+  sentValue: string;
 }
 
 const initialState: InputState = {
-  value: '',
+  isEmpty: true,
+  sentValue: '',
 };
 
 const inputSlice = createSlice({
   name: 'input',
   initialState,
   reducers: {
-    setInputValue: (state, action: PayloadAction<string>) => {
-      state.value = action.payload;
+    setIsEmpty: (state, action: PayloadAction<boolean>) => {
+      state.isEmpty = action.payload;
     },
-    clearInputValue: (state) => {
-      state.value = '';
+    sendInputValue: (state, action: PayloadAction<string>) => {
+      state.sentValue = action.payload;
+      state.isEmpty = true;
+    },
+    clearSentValue: (state) => {
+      state.sentValue = '';
     },
   },
 });
 
-export const { setInputValue, clearInputValue } = inputSlice.actions;
+export const { setIsEmpty, sendInputValue, clearSentValue } =
+  inputSlice.actions;
 export const inputReducer = inputSlice.reducer;
