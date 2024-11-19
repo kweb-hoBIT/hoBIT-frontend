@@ -51,7 +51,7 @@ const Input: React.FC = () => {
     });
 
     if (error) {
-      console.log('Error, ', error);
+      console.error('Error, ', error);
       return;
     }
 

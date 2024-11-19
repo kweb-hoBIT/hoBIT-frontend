@@ -1,6 +1,6 @@
 import { LuLightbulb } from 'react-icons/lu';
 import { LuLightbulbOff } from 'react-icons/lu';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { Trie } from '../lib/Trie';
@@ -11,27 +11,28 @@ const AutoComplete: React.FC = () => {
   const [isAutocompleteOn, setIsAutocompleteOn] = useState<boolean>(true);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [trie, setTrie] = useState<Trie | null>(null);
+  const trieInitFlag = useRef(false);
+
   const { data: questionsData } = useHobitQueryApi('all_questions');
   const questions = questionsData?.payload?.questions ?? [];
 
   const toggleAutocomplete = () => setIsAutocompleteOn(!isAutocompleteOn);
 
-  React.useEffect(() => {
-    if (questions.length > 0) {
+  useEffect(() => {
+    if (!trieInitFlag.current && questions.length > 0) {
       const newTrie = new Trie();
       questions.forEach((question) => {
         newTrie.insert(question.question_en);
-        newTrie.insert(question.question_en);
+        newTrie.insert(question.question_ko);
       });
       setTrie(newTrie);
+      trieInitFlag.current = true;
     }
   }, [questions]);
 
-  React.useEffect(() => {
-    console.log(56, inputValue);
+  useEffect(() => {
     if (trie && inputValue.trim() && isAutocompleteOn) {
-      let suggestions = trie.getSuggestions(inputValue.trim());
-      console.log(7000, suggestions);
+      let suggestions = trie.getSuggestions(inputValue);
       setSuggestions(suggestions);
     } else {
       setSuggestions([]);

@@ -22,7 +22,7 @@ export function useHobitMutateApi<
 >(type: C) {
   const { mutateAsync } = useMutation({
     mutationFn: async (req?: Omit<T, 'type'>) => {
-      const resp = await hobitApi<T, R>({ type, ...req } as T);
+      const resp = await hobitApi<T, R>({ type, ...req } as T, 'POST');
       return resp;
     },
   });

@@ -14,12 +14,6 @@ const FAQCard: React.FC = () => {
     <div className="w-full max-w-[1200px] mx-auto mt-20 p-10 bg-gray-50 rounded-2xl shadow-2xl">
       <h2 className="text-4xl font-extrabold mb-8">{i18n.answerLabel}</h2>
       <div className="mb-8">
-        <p className="text-2xl font-bold mb-4">{i18n.questionLabel}</p>
-        <p className="text-gray-800 text-xl leading-relaxed">
-          {isKorean ? cardPayload.question_ko : cardPayload.question_en}
-        </p>
-      </div>
-      <div className="mb-8">
         <p className="text-2xl font-bold mb-4">{i18n.answerLabel}</p>
         <p className="text-gray-800 text-xl leading-relaxed whitespace-pre-line">
           {isKorean ? cardPayload.answer_ko : cardPayload.answer_en}

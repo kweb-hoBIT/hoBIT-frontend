@@ -12,7 +12,7 @@ const endpoint = `${envs.HOBIT_BACKEND_ENDPOINT!}/api/v0`;
 export async function hobitApi<
   T extends HobitApiRequest,
   R extends { type: T['type'] } & HobitApiResponse,
->(req: T, method: 'GET' | 'POST' = 'POST'): Promise<ApiResponse<R>> {
+>(req: T, method: 'GET' | 'POST'): Promise<ApiResponse<R>> {
   const headers: Record<string, string> = {
     'Content-type': 'application/json',
   };
