@@ -1,6 +1,7 @@
+import React from 'react';
 import { LuLightbulb } from 'react-icons/lu';
 import { LuLightbulbOff } from 'react-icons/lu';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { Trie } from '../lib/Trie';

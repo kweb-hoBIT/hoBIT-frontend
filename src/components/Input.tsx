@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FaRobot } from 'react-icons/fa6';
 import { TbSend2 } from 'react-icons/tb';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,7 +15,7 @@ const Input: React.FC = () => {
   const requestQuestion = useHobitMutateApi('question');
   const inputRef = React.useRef<HTMLInputElement>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (inputRef.current) inputRef.current.focus();
   }, [inputValue]);
 
