@@ -6,11 +6,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { Trie } from '../lib/Trie';
 import { useHobitQueryApi } from '../hooks/hobit';
-import { setInputValue } from '../redux/inputSlice';
+import { sendInputValue } from '../redux/inputSlice';
 
 const AutoComplete: React.FC = () => {
   const dispatch = useDispatch();
-  const inputValue = useSelector((state: RootState) => state.input.value);
+  const inputValue = useSelector((state: RootState) => state.input.sentValue);
   const [isAutocompleteOn, setIsAutocompleteOn] = useState<boolean>(true);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [trie, setTrie] = useState<Trie | null>(null);
@@ -42,7 +42,7 @@ const AutoComplete: React.FC = () => {
   }, [inputValue, trie, isAutocompleteOn]);
 
   const handleSuggestionClick = (suggestion: string) => {
-    dispatch(setInputValue(suggestion));
+    dispatch(sendInputValue(suggestion));
     setSuggestions([]);
   };
 
