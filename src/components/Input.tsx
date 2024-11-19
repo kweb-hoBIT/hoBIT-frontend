@@ -1,14 +1,16 @@
 import { FaRobot } from 'react-icons/fa6';
 import { TbSend2 } from 'react-icons/tb';
 
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-
-import { setIsEmpty, sendInputValue } from '../redux/inputSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { setInputValue } from '../redux/inputSlice';
+import { RootState } from '../redux/store';
+import { useHobitMutateApi } from '../hooks/hobit';
+import { QuestionRequest } from '../types/question';
 
 const Input: React.FC = () => {
   const dispatch = useDispatch();
-  const [inputValue, setInputValue] = useState('');
+  const inputValue = useSelector((state: RootState) => state.input.value);
+  const requestQuestion = useHobitMutateApi('question');
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -29,6 +31,34 @@ const Input: React.FC = () => {
     if (event.key === 'Enter') {
       handleSend();
     }
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter' && inputValue.trim() !== '') {
+      questionHandler(inputValue);
+    }
+  };
+
+  const questionHandler = async (question: string) => {
+    const req: QuestionRequest = {
+      question: question,
+    };
+
+    const { payload, error } = await requestQuestion({
+      type: 'question',
+      ...req,
+    });
+
+    if (error) {
+      console.log('Error, ', error);
+      return;
+    }
+
+    if (payload) {
+      console.log('Response Payload:', payload);
+    }
+
+    dispatch(setInputValue(''));
   };
 
   return (

@@ -2,7 +2,6 @@ import JSONbig from 'json-bigint';
 import { envs } from '../envs';
 import {
   ApiResponse,
-  fetchErrorPayload,
   HobitApiRequest,
   HobitApiResponse,
   jsonParseFailPayload,
@@ -30,14 +29,18 @@ export async function hobitApi<
     });
   } catch (err) {
     return {
-      error: fetchErrorPayload,
+      error: {
+        code: 'FETCH_ERROR',
+        msg: String(err),
+        note: null,
+      },
       payload: null,
     };
   }
 
   try {
     const json = await resp.json();
-    return json;
+    return { error: null, payload: json };
   } catch (err) {
     return { error: jsonParseFailPayload, payload: null };
   }
