@@ -1,11 +1,9 @@
-export class Node {
-  children: Record<string, Node>;
-  val: string;
-  char: string;
+export class TrieNode {
+  children: Map<string, TrieNode>;
+  isEndOfWord: boolean;
 
-  constructor(val = '', char = '') {
-    this.val = val;
-    this.children = {};
-    this.char = char;
+  constructor() {
+    this.children = new Map();
+    this.isEndOfWord = false;
   }
 }

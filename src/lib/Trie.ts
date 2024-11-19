@@ -1,84 +1,56 @@
-import { Node } from './TrieNode';
+import { TrieNode } from './TrieNode';
 
 export class Trie {
-  root: Node;
+  root: TrieNode;
 
   constructor() {
-    this.root = new Node('', '');
+    this.root = new TrieNode();
   }
 
   insert(word: string): void {
-    let curNode = this.root;
-    word.split('').forEach((w, i) => {
-      const isFinalChar = i === word.length - 1;
-      const hasNode = curNode.children[w];
-      if (hasNode) {
-        curNode = hasNode;
-      } else {
-        const newNode = new Node('', w);
-        curNode.children[w] = newNode;
-        curNode = newNode;
+    let current = this.root;
+
+    for (const char of word) {
+      if (!current.children.has(char)) {
+        current.children.set(char, new TrieNode());
       }
-      if (isFinalChar) {
-        curNode.val = word;
-      }
-    });
+      current = current.children.get(char)!;
+    }
+
+    current.isEndOfWord = true;
   }
 
-  search(word: string): boolean {
-    let curNode = this.root;
-    const array = word.split('');
-    let i = 0;
-    while (i < array.length) {
-      const w = array[i];
-      curNode = curNode.children[w];
-      if (curNode === undefined) {
-        return false;
-      }
-      i++;
-    }
-    return curNode ? curNode.val === word : false;
-  }
+  find(prefix: string): TrieNode | null {
+    let current = this.root;
 
-  startsWith(prefix: string): boolean {
-    let curNode = this.root;
-    const array = prefix.split('');
-    let i = 0;
-    while (i < array.length) {
-      const w = array[i];
-      curNode = curNode.children[w];
-      if (curNode === undefined) {
-        return false;
-      }
-      i++;
+    for (const char of prefix) {
+      if (!current.children.has(char)) return null;
+      current = current.children.get(char)!;
     }
-    return curNode
-      ? curNode.val === prefix || Object.keys(curNode.children).length > 0
-      : false;
+
+    return current;
   }
 
   getSuggestions(prefix: string): string[] {
-    let curNode = this.root;
-    const array = prefix.split('');
+    const node = this.find(prefix);
     const suggestions: string[] = [];
 
-    for (const char of array) {
-      curNode = curNode.children[char];
-      if (!curNode) {
-        return suggestions;
-      }
+    if (node) {
+      this.collectAllWords(node, prefix, suggestions);
     }
 
-    this.collectWords(curNode, suggestions);
     return suggestions;
   }
 
-  private collectWords(node: Node, suggestions: string[]): void {
-    if (node.val) {
-      suggestions.push(node.val);
-    }
-    for (const child in node.children) {
-      this.collectWords(node.children[child], suggestions);
+  private collectAllWords(
+    node: TrieNode,
+    prefix: string,
+    suggestions: string[]
+  ): void {
+    if (node.isEndOfWord) suggestions.push(prefix);
+
+    for (const [char, childNode] of node.children) {
+      this.collectAllWords(childNode, prefix + char, suggestions);
     }
   }
 }

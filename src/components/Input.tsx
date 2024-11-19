@@ -1,7 +1,8 @@
+import React from 'react';
 import { FaRobot } from 'react-icons/fa6';
 import { TbSend2 } from 'react-icons/tb';
-
 import { useDispatch, useSelector } from 'react-redux';
+
 import { setInputValue } from '../redux/inputSlice';
 import { RootState } from '../redux/store';
 import { useHobitMutateApi } from '../hooks/hobit';
@@ -12,6 +13,11 @@ const Input: React.FC = () => {
   const dispatch = useDispatch();
   const inputValue = useSelector((state: RootState) => state.input.value);
   const requestQuestion = useHobitMutateApi('question');
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (inputRef.current) inputRef.current.focus();
+  }, [inputValue]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -68,6 +74,7 @@ const Input: React.FC = () => {
       <div className="bg-[#DDDDDD] w-full h-[48px] px-4 rounded-[30px] flex flex-row items-center">
         <input
           type="text"
+          ref={inputRef}
           placeholder="호빗에게 물어보세요!"
           value={inputValue}
           onChange={handleChange}
