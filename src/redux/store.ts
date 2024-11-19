@@ -1,9 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { inputReducer } from './inputSlice';
+import { faqCardReducer } from './faqCardSlice';
+import { languageReducer } from './languageSlice';
 
 const store = configureStore({
   reducer: {
     input: inputReducer,
+    faqCard: faqCardReducer,
+    language: languageReducer,
   },
 });
 

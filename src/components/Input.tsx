@@ -6,6 +6,7 @@ import { setInputValue } from '../redux/inputSlice';
 import { RootState } from '../redux/store';
 import { useHobitMutateApi } from '../hooks/hobit';
 import { QuestionRequest } from '../types/question';
+import { openCard } from '../redux/faqCardSlice';
 
 const Input: React.FC = () => {
   const dispatch = useDispatch();
@@ -55,7 +56,7 @@ const Input: React.FC = () => {
     }
 
     if (payload) {
-      console.log('Response Payload:', payload);
+      dispatch(openCard(payload.faq));
     }
 
     dispatch(setInputValue(''));
