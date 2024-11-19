@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import Faq from '../types/faq';
+import { Faq } from '../types/faq';
 
 interface FAQCardState {
   isCardVisible: boolean;

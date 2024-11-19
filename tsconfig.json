@@ -15,7 +15,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "preserve",
-    "types": ["node", "eslint"]
+    "types": ["node", "eslint", "jest"]
   },
   "include": ["src"]
 }

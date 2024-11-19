@@ -11,14 +11,14 @@ export const lang = {
     faq: '자주 묻는 질문',
   },
   en: {
-    headerTitle: 'Information College Chatbot Hobbit',
+    headerTitle: 'Information Department Chatbot Hobit',
     questionLabel: 'Question:',
     answerLabel: 'Answer:',
     managerContact: 'Manager Contact:',
     recommendKeywords: 'Recommended Keywords',
     backToHome: 'Back to Home',
     admin: 'Admin',
-    life: 'Life',
+    life: 'Lifestyle',
     faq: 'Frequently Asked Questions',
   },
 };

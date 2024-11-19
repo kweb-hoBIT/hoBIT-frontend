@@ -1,13 +1,20 @@
-import { RateFaqRequest, RateFaqResponse } from './faq';
+import {
+  AllQuestionsRequest,
+  AllQuestionsResponse,
+  RateFaqRequest,
+  RateFaqResponse,
+} from './faq';
 import { QuestionRequest, QuestionResponse } from './question';
 
 export type HobitApiRequest =
   | ({ type: 'question' } & QuestionRequest)
-  | ({ type: 'rate_faq' } & RateFaqRequest);
+  | ({ type: 'rate_faq' } & RateFaqRequest)
+  | ({ type: 'all_questions' } & AllQuestionsRequest);
 
 export type HobitApiResponse =
   | ({ type: 'question' } & QuestionResponse)
-  | ({ type: 'rate' } & RateFaqResponse);
+  | ({ type: 'rate' } & RateFaqResponse)
+  | ({ type: 'all_questions' } & AllQuestionsResponse);
 
 export type ApiResponse<P> = {
   error: ApiErrorPayload | null;
