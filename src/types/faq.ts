@@ -22,4 +22,14 @@ export type Faq = {
   updated_by: number | null;
 };
 
-export default Faq;
+export type Question = {
+  faq_id: number;
+  question_ko: string;
+  question_en: string;
+};
+
+export type AllQuestionsRequest = {};
+
+export type AllQuestionsResponse = {
+  questions: Question[];
+};

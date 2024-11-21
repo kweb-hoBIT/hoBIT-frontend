@@ -1,5 +1,5 @@
-import Faq from './faq';
+import { Faq } from './faq';
 
-export type GetQuestionRequest = { question: string };
+export type QuestionRequest = { question: string };
 
-export type GetQuestionResponse = { faq: Faq };
+export type QuestionResponse = { faq: Faq };

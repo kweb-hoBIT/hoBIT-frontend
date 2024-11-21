@@ -1,14 +1,18 @@
+import React, { useEffect, useState } from 'react';
 import { FaRobot } from 'react-icons/fa6';
 import { TbSend2 } from 'react-icons/tb';
-
-import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { setIsEmpty, sendInputValue } from '../redux/inputSlice';
+import { sendInputValue, setIsEmpty } from '../redux/inputSlice';
 
 const Input: React.FC = () => {
   const dispatch = useDispatch();
   const [inputValue, setInputValue] = useState('');
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (inputRef.current) inputRef.current.focus();
+  }, [inputValue]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -37,6 +41,7 @@ const Input: React.FC = () => {
       <div className="bg-[#DDDDDD] w-full h-[48px] px-4 rounded-[30px] flex flex-row items-center">
         <input
           type="text"
+          ref={inputRef}
           placeholder="호빗에게 물어보세요!"
           value={inputValue}
           onChange={handleChange}

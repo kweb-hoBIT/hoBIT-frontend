@@ -1,11 +1,12 @@
 import { useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
 
+import { RootState } from '../redux/store';
 import Header from '../components/Header';
 import Input from '../components/Input';
-import KeywordRecommend from '../components/KeywordRecommend';
 import AutoComplete from '../components/AutoComplete';
 import Chatting from '../components/Chatting';
+import FAQCard from '../components/FAQCard';
+import KeywordRecommend from '../components/KeywordRecommend';
 
 const MainPage: React.FC = () => {
   const isEmpty = useSelector((state: RootState) => state.input.isEmpty);
@@ -17,6 +18,7 @@ const MainPage: React.FC = () => {
         <Chatting />
       </div>
       {isEmpty ? <KeywordRecommend /> : <AutoComplete />}
+      <FAQCard />
       <Input />
     </div>
   );

@@ -2,7 +2,6 @@ import JSONbig from 'json-bigint';
 import { envs } from '../envs';
 import {
   ApiResponse,
-  fetchErrorPayload,
   HobitApiRequest,
   HobitApiResponse,
   jsonParseFailPayload,
@@ -13,7 +12,7 @@ const endpoint = `${envs.HOBIT_BACKEND_ENDPOINT!}/api/v0`;
 export async function hobitApi<
   T extends HobitApiRequest,
   R extends { type: T['type'] } & HobitApiResponse,
->(req: T): Promise<ApiResponse<R>> {
+>(req: T, method: 'GET' | 'POST'): Promise<ApiResponse<R>> {
   const headers: Record<string, string> = {
     'Content-type': 'application/json',
   };
@@ -22,22 +21,37 @@ export async function hobitApi<
 
   let resp;
   try {
-    resp = await fetch(`${endpoint}/${path}`, {
-      method: 'POST',
-      mode: 'cors',
-      headers,
-      body: JSONbig.stringify(req),
-    });
+    if (method === 'GET') {
+      const queryParams = new URLSearchParams(
+        req as Record<string, string>
+      ).toString();
+      resp = await fetch(`${endpoint}/${path}?${queryParams}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers,
+      });
+    } else {
+      resp = await fetch(`${endpoint}/${path}`, {
+        method: 'POST',
+        mode: 'cors',
+        headers,
+        body: JSONbig.stringify(req),
+      });
+    }
   } catch (err) {
     return {
-      error: fetchErrorPayload,
+      error: {
+        code: 'FETCH_ERROR',
+        msg: String(err),
+        note: null,
+      },
       payload: null,
     };
   }
 
   try {
     const json = await resp.json();
-    return json;
+    return { error: null, payload: json };
   } catch (err) {
     return { error: jsonParseFailPayload, payload: null };
   }
