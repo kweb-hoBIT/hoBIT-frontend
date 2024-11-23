@@ -1,5 +1,5 @@
 export type RateFaqRequest = {
-  faq_id: string;
+  faq_id: number;
   rating: number;
 };
 

@@ -2,24 +2,51 @@ import { TbThumbUpFilled } from 'react-icons/tb';
 import { TbThumbDownFilled } from 'react-icons/tb';
 
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 
-const Survey: React.FC = () => {
+import { rateFAQ } from '../../api/query';
+import { RootState } from '../../redux/store';
+
+type SurveyProps = {
+  id: number;
+};
+
+const Survey: React.FC<SurveyProps> = ({ id }) => {
+  const isKorean = useSelector((state: RootState) => state.language.isKorean);
   const [thumbUp, setThumbUp] = useState(false);
   const [thumbDown, setThumbDown] = useState(false);
 
-  const handleThumbUpClick = () => {
-    setThumbUp(!thumbUp);
-    if (thumbDown) setThumbDown(false);
+  const handleThumbUpClick = async () => {
+    try {
+      setThumbUp(!thumbUp);
+      if (thumbDown) setThumbDown(false);
+      if (!thumbUp) {
+        const response = await rateFAQ({ faq_id: id, rating: 1 });
+        console.log(response);
+      }
+    } catch (error) {
+      console.error('Error rating FAQ (Thumb Up):', error);
+    }
   };
 
-  const handleThumbDownClick = () => {
-    setThumbDown(!thumbDown);
-    if (thumbUp) setThumbUp(false);
+  const handleThumbDownClick = async () => {
+    try {
+      setThumbDown(!thumbDown);
+      if (thumbUp) setThumbUp(false);
+      if (!thumbDown) {
+        const response = await rateFAQ({ faq_id: id, rating: -1 });
+        console.log(response);
+      }
+    } catch (error) {
+      console.error('Error rating FAQ (Thumb Down):', error);
+    }
   };
 
   return (
-    <div className="flex flex-row w-[365px] items-center bg-[#eeeeee] font-5medium text-[#686D76] text-[20px] mt-[10px] rounded-[20px] px-[20px] py-[10px] ">
-      <p>호빗의 응답이 도움이 되었어요!</p>
+    <div className="flex flex-row w-[365px] items-center bg-gray-100 font-5medium text-[#686D76] text-[20px] mt-[10px] rounded-[20px] px-[20px] py-[10px] ">
+      <p>
+        {isKorean ? '호빗의 응답이 도움이 되었어요!' : 'Was HoBIT helpful?'}
+      </p>
       <div className="bg-white p-[10px] rounded-full ml-[20px]">
         <TbThumbUpFilled
           onClick={handleThumbUpClick}

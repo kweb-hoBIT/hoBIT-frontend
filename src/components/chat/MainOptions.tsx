@@ -1,11 +1,13 @@
 import { CiImageOn } from 'react-icons/ci';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { sendInputValue, clearSentValue } from '../../redux/inputSlice';
+import { RootState } from '../../redux/store';
 
 const MainOptions: React.FC = () => {
   const dispatch = useDispatch();
+  const isKorean = useSelector((state: RootState) => state.language.isKorean);
 
   const handleSendOption = (message: string) => {
     dispatch(sendInputValue(message));
@@ -16,20 +18,25 @@ const MainOptions: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#eeeeee] w-[265px] h-auto mt-[20px] rounded-[20px] flex flex-col items-center p-[20px]">
+    <div className="bg-gray-100 w-[330px] h-auto mt-[20px] rounded-[20px] flex flex-col items-center p-[20px]">
       <CiImageOn className="text-[#686D76] text-[50px] my-[40px]" />
-      <button
-        onClick={() => handleSendOption('자주 묻는 질문')}
-        className="w-full bg-[#F3D0D7] text-[#686D76] font-6semibold text-[20px] py-[5px] rounded-[20px] mb-[10px] hover:bg-[#e8b9c2]"
-      >
-        자주 묻는 질문
-      </button>
-      <button
-        onClick={() => handleSendOption('할 수 있는 일')}
-        className="w-full bg-[#F3D0D7] text-[#686D76] font-6semibold text-[20px] py-[5px] rounded-[20px] hover:bg-[#e8b9c2]"
-      >
-        할 수 있는 일
-      </button>
+      <div className="flex w-full justify-between items-center">
+        <button
+          onClick={() => handleSendOption(isKorean ? '자주 묻는 질문' : 'FAQ')}
+          className="w-full text-[#686D76] font-6semibold text-[20px] py-[5px] hover:text-black"
+        >
+          {isKorean ? '자주 묻는 질문' : 'FAQ'}
+        </button>
+        <span className="text-[28px] text-gray-400 font-1thin">|</span>
+        <button
+          onClick={() =>
+            handleSendOption(isKorean ? '할 수 있는 일' : 'What I Can Do')
+          }
+          className="w-full text-[#686D76] font-6semibold text-[20px] py-[5px] hover:text-black"
+        >
+          {isKorean ? '할 수 있는 일' : 'What I Can Do'}
+        </button>
+      </div>
     </div>
   );
 };
