@@ -1,8 +1,14 @@
-import { useState } from 'react';
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../redux/store';
 import { IoClose } from 'react-icons/io5';
+import { lang } from '../i18n/lang';
+import { setEnglish, setKorean } from '../redux/languageSlice';
 
 const Header: React.FC = () => {
-  const [isKorean, setIsKorean] = useState<boolean>(true);
+  const dispatch = useDispatch();
+  const isKorean = useSelector((state: RootState) => state.language.isKorean);
+  const i18n = isKorean ? lang.ko : lang.en;
 
   return (
     <div className="h-[70px] bg-white fixed top-0 w-full border-b-2 border-[#bbbbbb] flex items-center relative px-[20px] py-[20px]">
@@ -14,7 +20,7 @@ const Header: React.FC = () => {
         ></div>
 
         <button
-          onClick={() => setIsKorean(true)}
+          onClick={() => dispatch(setKorean())}
           className={`w-[50px] h-full z-10 text-[16px] font-6semibold rounded-full transition-colors duration-500 ${
             isKorean ? 'text-white' : 'text-[#aaaaaa]'
           }`}
@@ -23,7 +29,7 @@ const Header: React.FC = () => {
         </button>
 
         <button
-          onClick={() => setIsKorean(false)}
+          onClick={() => dispatch(setEnglish())}
           className={`w-[38px] h-full z-10 text-[16px] font-6semibold rounded-full transition-colors duration-500 ${
             !isKorean ? 'text-white' : 'text-[#aaaaaa]'
           }`}
@@ -33,7 +39,7 @@ const Header: React.FC = () => {
       </div>
 
       <p className="absolute left-1/2 transform -translate-x-1/2 font-7bold text-[26px]">
-        정보대학 챗봇 호빗
+        {i18n.headerTitle}
       </p>
       <IoClose className="text-[#aaaaaa] absolute right-4 text-[28px] hover:text-[#000000]" />
     </div>

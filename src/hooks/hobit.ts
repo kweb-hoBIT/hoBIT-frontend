@@ -4,13 +4,13 @@ import { HobitApiRequest, HobitApiResponse } from '../types/api';
 
 export function useHobitQueryApi<
   T extends HobitApiRequest,
-  R extends { type: T['type'] } & HobitApiResponse,
->(req: T, queryKey?: any[]) {
+  C extends T['type'],
+  R extends { type: C } & HobitApiResponse,
+>(type: C, req?: Omit<T, 'type'>, queryKey?: any[]) {
   return useQuery({
-    queryKey: queryKey ?? [req.type],
+    queryKey: queryKey ?? [type, req],
     queryFn: async () => {
-      // return hobitApi<T, R>(req);
-      return;
+      return hobitApi<T, R>({ type, ...req } as T, 'GET');
     },
   });
 }
@@ -22,9 +22,8 @@ export function useHobitMutateApi<
 >(type: C) {
   const { mutateAsync } = useMutation({
     mutationFn: async (req?: Omit<T, 'type'>) => {
-      // const resp = await hobitApi<T, R>({ type, ...req } as T);
-      // return resp;
-      return;
+      const resp = await hobitApi<T, R>({ type, ...req } as T, 'POST');
+      return resp;
     },
   });
 
