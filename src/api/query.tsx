@@ -1,10 +1,11 @@
 import apiClient from './apiClient';
 import { RateFaqRequest } from '../types/faq';
 
-export const sendQuestion = async (question: string) => {
+export const sendQuestion = async (question: string, language: 'KO' | 'EN') => {
   try {
     const response = await apiClient.post('/question', {
       question,
+      language,
     });
     return response.data;
   } catch (error: any) {

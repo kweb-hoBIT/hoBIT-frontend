@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { HobitApiRequest, HobitApiResponse } from '../types/api';
-// import { hobitApi } from '../api/api';
+import { hobitApi } from '../api/api';
 
 export function useHobitQueryApi<
   T extends HobitApiRequest,
