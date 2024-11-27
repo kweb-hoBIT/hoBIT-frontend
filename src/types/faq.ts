@@ -33,3 +33,9 @@ export type AllQuestionsRequest = {};
 export type AllQuestionsResponse = {
   questions: Question[];
 };
+
+export type AllFaqsRequest = {};
+
+export type AllFaqsResponse = {
+  faqs: Faq[];
+};
