@@ -7,12 +7,17 @@ import MultipleResponse from './MultipleResponse';
 import Survey from './Survey';
 import { Faq } from '../../types/faq';
 import { RootState } from '../../redux/store';
+import Loading from './Loading';
 
 type HobitResponseProps = {
   faqs: Faq[];
+  loading: boolean;
 };
 
-const GeneralResponse: React.FC<HobitResponseProps> = ({ faqs: newFaqs }) => {
+const GeneralResponse: React.FC<HobitResponseProps> = ({
+  faqs: newFaqs,
+  loading,
+}) => {
   const [faqs, setFaqs] = useState<Faq[]>([]);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
 
@@ -21,6 +26,15 @@ const GeneralResponse: React.FC<HobitResponseProps> = ({ faqs: newFaqs }) => {
       setFaqs(newFaqs);
     }
   }, [newFaqs]);
+
+  if (loading) {
+    return (
+      <div>
+        <HobitProfile />
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <div>

@@ -42,6 +42,16 @@ const AutoComplete: React.FC = () => {
   }, [inputValue, trie, isAutocompleteOn]);
 
   const handleSuggestionClick = (suggestion: string) => {
+    const controlCharPattern = /[\x00-\x1F\x7F]/g;
+    const invalidChars = suggestion.match(controlCharPattern);
+
+    if (invalidChars) {
+      console.warn('Invalid Characters Found:', invalidChars);
+    } else {
+      console.log('No Invalid Characters Found.');
+    }
+
+    console.log('Suggestion Value:', suggestion);
     dispatch(sendInputValue(suggestion));
     dispatch(updateLiveValue(''));
     setSuggestions([]);
@@ -49,67 +59,45 @@ const AutoComplete: React.FC = () => {
 
   return (
     <>
-      {isAutocompleteOn ? (
-        <div
-          className="w-full h-[70px] bg-gray-100 rounded-t-[30px] fixed bottom-[80px] px-[20px] flex flex-col items-center h-fit max-h-[250px] overflow-y-auto"
-          style={{
-            boxShadow: '0 -6px 15px rgba(0, 0, 0, 0.3)',
-          }}
-        >
-          <div className="flex w-full py-[15px]">
-            <div
-              onClick={toggleAutocomplete}
-              className="flex justify-end ml-auto font-6semibold text-[18px] px-[10px] text-[#686D76] rounded-[20px] py-[5px] hover:bg-[#aaa]"
-            >
-              {isKorean ? '자동완성 끄기' : 'Autocomplete OFF'}
-            </div>
-          </div>
+      <div
+        className="w-full h-[70px] bg-gray-100 rounded-t-[30px] fixed bottom-[80px] px-[20px] flex flex-col items-center h-fit max-h-[250px] overflow-y-auto"
+        style={{
+          boxShadow: '0 -6px 15px rgba(0, 0, 0, 0.3)',
+        }}
+      >
+        {suggestions.length > 0 && (
+          <div className="w-full divide-y divide-gray-300 py-[10px]">
+            {suggestions.map((suggestion, index) => {
+              const matchIndex = suggestion
+                .toLowerCase()
+                .indexOf(inputValue.toLowerCase());
 
-          {suggestions.length > 0 && (
-            <div className="w-full divide-y divide-gray-300 pb-[10px]">
-              {suggestions.map((suggestion, index) => {
-                const matchIndex = suggestion
-                  .toLowerCase()
-                  .indexOf(inputValue.toLowerCase());
-
-                return (
-                  <div
-                    key={index}
-                    className="w-full font-5medium text-[20px] px-[15px] cursor-pointer hover:bg-white py-[10px]"
-                    onClick={() => handleSuggestionClick(suggestion)}
-                  >
-                    {matchIndex !== -1 ? (
-                      <>
-                        {suggestion.slice(0, matchIndex)}
-                        <span className="font-bold">
-                          {suggestion.slice(
-                            matchIndex,
-                            matchIndex + inputValue.length
-                          )}
-                        </span>
-                        {suggestion.slice(matchIndex + inputValue.length)}
-                      </>
-                    ) : (
-                      suggestion
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="w-full h-[70px] fixed bottom-[80px] px-[20px] flex items-end justify-end">
-          <div className="flex w-full py-[15px]">
-            <div
-              onClick={toggleAutocomplete}
-              className="flex bg-gray-200 justify-end ml-auto font-6semibold text-[18px] px-[15px] text-[#686D76] rounded-[20px] py-[5px] hover:bg-[#aaa]"
-            >
-              {isKorean ? '자동완성 끄기' : 'Autocomplete ON'}
-            </div>
+              return (
+                <div
+                  key={index}
+                  className="w-full font-5medium text-[20px] px-[15px] cursor-pointer hover:bg-white py-[10px]"
+                  onClick={() => handleSuggestionClick(suggestion)}
+                >
+                  {matchIndex !== -1 ? (
+                    <>
+                      {suggestion.slice(0, matchIndex)}
+                      <span className="font-bold">
+                        {suggestion.slice(
+                          matchIndex,
+                          matchIndex + inputValue.length
+                        )}
+                      </span>
+                      {suggestion.slice(matchIndex + inputValue.length)}
+                    </>
+                  ) : (
+                    suggestion
+                  )}
+                </div>
+              );
+            })}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 };

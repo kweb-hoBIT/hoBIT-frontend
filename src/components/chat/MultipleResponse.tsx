@@ -33,15 +33,15 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
             )}
       </div>
       {faqs.length > 0 && (
-        <div>
+        <div className="flex flex-col">
           {faqs.map((faq, index) => (
             <div
               key={index}
               onClick={() =>
                 handleSendKeyword(isKorean ? faq.question_ko : faq.question_en)
               }
-              className="border border-gray-300 font-5medium text-[20px] mt-[10px] rounded-[20px] px-[20px] py-[15px] max-w-[400px] break-words inline-block
-              hover:bg-gray-100 transition-colors"
+              className="border border-gray-300 font-5medium text-[20px] mt-[10px] rounded-[20px] px-[20px] py-[15px] w-fit max-w-[400px] break-words inline-block
+              hover:bg-gray-100 transition-colors mr-[10px] cursor-pointer"
             >
               <p>{isKorean ? faq.question_ko : faq.question_en}</p>
             </div>

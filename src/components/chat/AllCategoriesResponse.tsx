@@ -1,256 +1,4 @@
-// import { useState } from 'react';
-// import { useDispatch, useSelector } from 'react-redux';
-
-// import { sendInputValue, clearSentValue } from '../../redux/inputSlice';
-// import { RootState } from '../../redux/store';
-
-// import HobitProfile from './HobitProfile';
-// import Response from './Response';
-// import { Faq } from '../../types/faq';
-
-// const AllCategoriesResponse: React.FC = () => {
-//   const dispatch = useDispatch();
-//   const [faqs, setFaqs] = useState<Faq[]>([]);
-//   const isKorean = useSelector((state: RootState) => state.language.isKorean);
-
-//   const handleSendKeyword = (message: string) => {
-//     dispatch(sendInputValue(message));
-
-//     setTimeout(() => {
-//       dispatch(clearSentValue());
-//     }, 100);
-//   };
-
-//   return (
-//     <div>
-//       <HobitProfile />
-//       <Response
-//         text={
-//           isKorean
-//             ? `할 수 있는 일 카테고리예요!\n궁금한 점이 있으면 추가로 질문해주세요!`
-//             : `Here's what I can do!\nFeel free to ask more if you have any other questions.`
-//         }
-//         faqs={faqs}
-//       />
-//       {isKorean ? (
-//         <>
-//           <div className="mt-[10px]">
-//             <button className="bg-[#F3D0D7] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px]">
-//               행정💼
-//             </button>
-//           </div>
-//           <div className="mt-[5px]">
-//             <button
-//               onClick={() => handleSendKeyword('수업')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               수업
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('융합전공')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               융합전공
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('이중전공')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               이중전공
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('ETC')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               ETC
-//             </button>
-//           </div>
-//           <div className="mt-[5px]">
-//             <button
-//               onClick={() => handleSendKeyword('졸업')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               졸업
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('학적')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               학적
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('현장실습')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               현장실습
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('복수전공')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               복수전공
-//             </button>
-//           </div>
-
-//           <div className="mt-[10px]">
-//             <button className="bg-[#F3D0D7] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px]">
-//               생활🪴
-//             </button>
-//           </div>
-//           <div className="mt-[5px]">
-//             <button
-//               onClick={() => handleSendKeyword('수강신청')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               수강신청
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('건물')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               건물
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('동아리')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               동아리
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('학교축제')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               학교축제
-//             </button>
-//           </div>
-//           <div className="mt-[5px]">
-//             <button
-//               onClick={() => handleSendKeyword('스터디')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               스터디
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('교환학생')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               교환학생
-//             </button>
-//           </div>
-//         </>
-//       ) : (
-//         <>
-//           <div className="mt-[10px]">
-//             <button className="bg-[#F3D0D7] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px]">
-//               Administration 💼
-//             </button>
-//           </div>
-//           <div className="mt-[5px]">
-//             <button
-//               onClick={() => handleSendKeyword('Class')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               Class
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('Interdisciplinary Major')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               Interdisciplinary Major
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('Double Major')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               Double Major
-//             </button>
-//           </div>
-//           <div className="mt-[5px]">
-//             <button
-//               onClick={() => handleSendKeyword('ETC')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               ETC
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('Graduation')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               Graduation
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('Academic Status')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               Academic Status
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('Internship')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               Internship
-//             </button>
-//           </div>
-//           <div className="mt-[5px]">
-//             <button
-//               onClick={() => handleSendKeyword('Minor')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               Minor
-//             </button>
-//           </div>
-//           <div className="mt-[10px]">
-//             <button className="bg-[#F3D0D7] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px]">
-//               Campus Life 🪴
-//             </button>
-//           </div>
-//           <div className="mt-[5px]">
-//             <button
-//               onClick={() => handleSendKeyword('Course Registration')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               Course Registration
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('Buildings')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               Buildings
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('Clubs')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               Clubs
-//             </button>
-//           </div>
-//           <div className="mt-[5px]">
-//             <button
-//               onClick={() => handleSendKeyword('School Festival')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               School Festival
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('Study Groups')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               Study Groups
-//             </button>
-//             <button
-//               onClick={() => handleSendKeyword('Exchange Student')}
-//               className="bg-[#DDDDDD] font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-//             >
-//               Exchange Student
-//             </button>
-//           </div>
-//         </>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default AllCategoriesResponse;
+import { IoChevronBackOutline } from 'react-icons/io5';
 
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -275,134 +23,532 @@ const AllCategoriesResponse: React.FC = () => {
     }, 100);
   };
 
+  const [showAllCategories, setShowAllCategories] = useState(true);
+
+  const [visibleCategories, setVisibleCategories] = useState<boolean[]>(
+    Array(8).fill(false)
+  );
+
+  const showAll = () => {
+    setShowAllCategories(true);
+    setVisibleCategories(Array(8).fill(false));
+  };
+
+  const toggleCategory = (index: number) => {
+    setVisibleCategories((prev) => prev.map((_, i) => i === index));
+    if (showAllCategories) {
+      setShowAllCategories(false);
+    }
+    console.log(visibleCategories);
+  };
+
   return (
     <div>
       <HobitProfile />
-      <Response
-        text={
-          isKorean
-            ? `할 수 있는 일 카테고리예요!\n궁금한 점이 있으면 추가로 질문해주세요!`
-            : `Here's what I can do!\nFeel free to ask more if you have any other questions.`
-        }
-        faqs={faqs}
-      />
-      <div className="bg-gray-100 rounded-[20px] px-[20px] pt-[15px] pb-[10px] mt-[10px] w-[350px]">
-        <div>
-          <button className="font-6semibold text-[20px] inline-block">
-            행정💼
-          </button>
+      {showAllCategories && (
+        <Response
+          text={
+            isKorean
+              ? `할 수 있는 일 카테고리예요!\n카테고리를 클릭해서 세부 카테고리를 확인해보세요`
+              : `Here's what I can do!\nFeel free to ask more if you have any other questions.`
+          }
+          faqs={faqs}
+        />
+      )}
+      {!showAllCategories && (
+        <div
+          onClick={showAll}
+          className="bg-gray-100 pl-[15px] pr-[20px] rounded-[20px] w-fit flex flex-row items-center py-[10px] mt-[10px] text-[20px] font-6semibold text-[#686D76] hover:bg-gray-200"
+        >
+          <IoChevronBackOutline className="text-[18px] mr-[10px]" />
+          전체 카테고리 보기
         </div>
-        <div className="w-full h-[1px] bg-gray-400 mt-[5px]" />
-        <div className="mt-[5px] w-full flex flew-row">
-          <div className="w-full text-left flex flex-col">
-            <button
-              onClick={() => handleSendKeyword('수업')}
-              className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-            >
-              수업
-            </button>
-            <button
-              onClick={() => handleSendKeyword('융합전공')}
-              className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-            >
-              융합전공
-            </button>
-            <button
-              onClick={() => handleSendKeyword('이중전공')}
-              className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-            >
-              이중전공
-            </button>
+      )}
+      {showAllCategories && (
+        <>
+          <div className="flex flex-row mt-[10px]">
+            {[
+              { index: 0, emoji: '👨‍🏫', label: '수업' },
+              { index: 1, emoji: '📄', label: '학적' },
+              { index: 2, emoji: '📚', label: '복수전공' },
+              { index: 3, emoji: '📖', label: '융합전공' },
+            ].map((category, index) => (
+              <div
+                key={index}
+                className="bg-gray-100 w-[100px] h-[100px] flex flex-col items-center justify-center rounded-[20px] mr-[10px] hover:bg-gray-200 cursor-pointer"
+                onClick={() => toggleCategory(category.index)}
+              >
+                <span className="text-[30px]">{category.emoji}</span>
+                <span className="text-[18px] font-6semibold">
+                  {category.label}
+                </span>
+              </div>
+            ))}
           </div>
-          <div className="w-full text-left flex flex-col">
-            <button
-              onClick={() => handleSendKeyword('ETC')}
-              className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-            >
-              ETC
-            </button>
-            <button
-              onClick={() => handleSendKeyword('졸업')}
-              className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-            >
-              졸업
-            </button>
-            <button
-              onClick={() => handleSendKeyword('학적')}
-              className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-            >
-              학적
-            </button>
-          </div>
-          <div className="w-full mr-[-60px] text-left flex flex-col">
-            <button
-              onClick={() => handleSendKeyword('현장실습')}
-              className="font-6semibold w-[100px] text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-            >
-              현장실습
-            </button>
-            <button
-              onClick={() => handleSendKeyword('복수전공')}
-              className="font-6semibold w-[100px] text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-            >
-              복수전공
-            </button>
-          </div>
-        </div>
-      </div>
 
-      <div className="bg-gray-100 rounded-[20px] px-[20px] pt-[15px] pb-[10px] mt-[10px] w-[350px]">
-        <div>
-          <button className="font-6semibold text-[20px] inline-block">
-            생활🪴
-          </button>
+          <div className="flex flex-row mt-[10px]">
+            {[
+              { index: 4, emoji: '💰', label: '장학' },
+              { index: 5, emoji: '🎓', label: '졸업' },
+              { index: 6, emoji: '🏙️', label: '현장실습' },
+              { index: 7, emoji: '', label: 'ETC.' },
+            ].map((category, index) => (
+              <div
+                key={index}
+                className="bg-gray-100 w-[100px] h-[100px] flex flex-col items-center justify-center rounded-[20px] mr-[10px] hover:bg-gray-200 cursor-pointer"
+                onClick={() => toggleCategory(category.index)}
+              >
+                <span className="text-[30px]">{category.emoji}</span>
+                <span className="text-[18px] font-6semibold">
+                  {category.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {visibleCategories[0] && (
+        <div className="bg-gray-100 rounded-[20px] px-[20px] pt-[15px] pb-[10px] mt-[10px] w-[500px]">
+          <div>
+            <button className="font-6semibold text-[20px] inline-block">
+              수업👨‍🏫
+            </button>
+          </div>
+          <div className="w-full h-[1px] bg-gray-400 mt-[5px]" />
+          <div className="mt-[5px] w-full flex flew-row">
+            <div className="w-full text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('출석인정')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                출석인정
+              </button>
+            </div>
+            <div className="w-full text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('불응시 성적인정')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                불응시 성적인정
+              </button>
+            </div>
+            <div className="w-full mr-[-60px] text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('수강신청')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                수강신청
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="w-full h-[1px] bg-gray-400 mt-[5px]" />
-        <div className="mt-[5px] w-full flex flew-row">
-          <div className="w-full text-left flex flex-col">
-            <button
-              onClick={() => handleSendKeyword('수강신청')}
-              className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-            >
-              수강신청
-            </button>
-            <button
-              onClick={() => handleSendKeyword('건물')}
-              className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-            >
-              건물
+      )}
+
+      {visibleCategories[1] && (
+        <div className="bg-gray-100 rounded-[20px] px-[20px] pt-[15px] pb-[10px] mt-[10px] w-[500px]">
+          <div>
+            <button className="font-6semibold text-[20px] inline-block">
+              학적📄
             </button>
           </div>
-          <div className="w-full text-left flex flex-col">
-            <button
-              onClick={() => handleSendKeyword('학교축제')}
-              className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-            >
-              학교축제
-            </button>
-            <button
-              onClick={() => handleSendKeyword('스터디')}
-              className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-            >
-              스터디
-            </button>
-          </div>
-          <div className="w-full mr-[-60px] text-left flex flex-col">
-            <button
-              onClick={() => handleSendKeyword('동아리')}
-              className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-            >
-              동아리
-            </button>
-            <button
-              onClick={() => handleSendKeyword('교환학생')}
-              className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:bg-[#ccc]"
-            >
-              교환학생
-            </button>
+          <div className="w-full h-[1px] bg-gray-400 mt-[5px]" />
+          <div className="mt-[5px] w-full flex flew-row">
+            <div className="w-full text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('계좌번호 변경')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                계좌번호 변경
+              </button>
+              <button
+                onClick={() => handleSendKeyword('융합전공/전과')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                융합전공/전과
+              </button>
+            </div>
+            <div className="w-full text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('휴학')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                휴학
+              </button>
+              <button
+                onClick={() => handleSendKeyword('기재사항 정정')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                기재사항 정정
+              </button>
+            </div>
+            <div className="w-full mr-[-60px] text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('학점인정')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                학점인정
+              </button>
+              <button
+                onClick={() => handleSendKeyword('등록금 환불')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                등록금 환불
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {visibleCategories[2] && (
+        <div className="bg-gray-100 rounded-[20px] px-[20px] pt-[15px] pb-[10px] mt-[10px] w-[500px]">
+          <div>
+            <button className="font-6semibold text-[20px] inline-block">
+              복수전공📚
+            </button>
+          </div>
+          <div className="w-full h-[1px] bg-gray-400 mt-[5px]" />
+          <div className="mt-[5px] w-full flex flew-row">
+            <div className="w-full text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('졸업')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                졸업
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {visibleCategories[3] && (
+        <div className="bg-gray-100 rounded-[20px] px-[20px] pt-[15px] pb-[10px] mt-[10px] w-[500px]">
+          <div>
+            <button className="font-6semibold text-[20px] inline-block">
+              융합전공📖
+            </button>
+          </div>
+          <div className="w-full h-[1px] bg-gray-400 mt-[5px]" />
+          <div className="mt-[5px] w-full flex flew-row">
+            <div className="w-full text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('중복인정')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                중복인정
+              </button>
+              <button
+                onClick={() => handleSendKeyword('포기신청')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                포기신청
+              </button>
+              <button
+                onClick={() => handleSendKeyword('지원방법')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                지원방법
+              </button>
+              <button
+                onClick={() => handleSendKeyword('교육과정')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                교육과정
+              </button>
+              <button
+                onClick={() => handleSendKeyword('휴학')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                휴학
+              </button>
+            </div>
+            <div className="w-full text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('소벤융')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                소벤융
+              </button>
+              <button
+                onClick={() => handleSendKeyword('이수요건')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                이수요건
+              </button>
+              <button
+                onClick={() => handleSendKeyword('신청')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                신청
+              </button>
+              <button
+                onClick={() => handleSendKeyword('이수구분 변경')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                이수구분 변경
+              </button>
+              <button
+                onClick={() => handleSendKeyword('학점인정')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                학점인정
+              </button>
+            </div>
+            <div className="w-full mr-[-60px] text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('융합전공 지원')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                융합전공 지원
+              </button>
+              <button
+                onClick={() => handleSendKeyword('중복인정')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                중복인정
+              </button>
+              <button
+                onClick={() => handleSendKeyword('졸업사정')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                졸업사정
+              </button>
+              <button
+                onClick={() => handleSendKeyword('졸업요건')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                졸업요건
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {visibleCategories[4] && (
+        <div className="bg-gray-100 rounded-[20px] px-[20px] pt-[15px] pb-[10px] mt-[10px] w-[500px]">
+          <div>
+            <button className="font-6semibold text-[20px] inline-block">
+              장학💰
+            </button>
+          </div>
+          <div className="w-full h-[1px] bg-gray-400 mt-[5px]" />
+          <div className="mt-[5px] w-full flex flew-row">
+            <div className="w-full text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('추천서/직인 날인')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                추천서/직인 날인
+              </button>
+              <button
+                onClick={() => handleSendKeyword('외국인 장학')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                외국인 장학
+              </button>
+            </div>
+            <div className="w-full text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('국가장학금')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                국가장학금
+              </button>
+            </div>
+            <div className="w-full mr-[-60px] text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('성적우수장학금')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                성적우수장학금
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {visibleCategories[5] && (
+        <div className="bg-gray-100 rounded-[20px] px-[20px] pt-[15px] pb-[10px] mt-[10px] w-[500px]">
+          <div>
+            <button className="font-6semibold text-[20px] inline-block">
+              졸업🎓
+            </button>
+          </div>
+          <div className="w-full h-[1px] bg-gray-400 mt-[5px]" />
+          <div className="mt-[5px] w-full flex flew-row">
+            <div className="w-full text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('학위기')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                학위기
+              </button>
+              <button
+                onClick={() => handleSendKeyword('졸업식')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                졸업식
+              </button>
+              <button
+                onClick={() => handleSendKeyword('학위복')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                학위복
+              </button>
+            </div>
+            <div className="w-full text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('졸업사정')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                졸업사정
+              </button>
+              <button
+                onClick={() => handleSendKeyword('졸업요건 제출')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                졸업요건 제출
+              </button>
+            </div>
+            <div className="w-full mr-[-60px] text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('대체과목')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                대체과목
+              </button>
+              <button
+                onClick={() => handleSendKeyword('재수강')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                재수강
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {visibleCategories[6] && (
+        <div className="bg-gray-100 rounded-[20px] px-[20px] pt-[15px] pb-[10px] mt-[10px] w-[500px]">
+          <div>
+            <button className="font-6semibold text-[20px] inline-block">
+              현장실습🏙️
+            </button>
+          </div>
+          <div className="w-full h-[1px] bg-gray-400 mt-[5px]" />
+          <div className="mt-[5px] w-full flex flew-row">
+            <div className="w-full text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('신청')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                신청
+              </button>
+              <button
+                onClick={() => handleSendKeyword('수강신청')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                수강신청
+              </button>
+              <button
+                onClick={() => handleSendKeyword('학점인정')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                학점인정
+              </button>
+            </div>
+            <div className="w-full text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('성적')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                성적
+              </button>
+              <button
+                onClick={() => handleSendKeyword('실습 중단')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                실습 중단
+              </button>
+            </div>
+            <div className="w-full mr-[-60px] text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('실습 기간')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                실습 기간
+              </button>
+              <button
+                onClick={() => handleSendKeyword('전공인정')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                전공인정
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {visibleCategories[7] && (
+        <div className="bg-gray-100 rounded-[20px] px-[20px] pt-[15px] pb-[10px] mt-[10px] w-[500px]">
+          <div>
+            <button className="font-6semibold text-[20px] inline-block">
+              ETC.
+            </button>
+          </div>
+          <div className="w-full h-[1px] bg-gray-400 mt-[5px]" />
+          <div className="mt-[5px] w-full flex flew-row">
+            <div className="w-full text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('실험실/안전교육')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                실험실/안전교육
+              </button>
+              <button
+                onClick={() => handleSendKeyword('학생증 발급')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                학생증 발급
+              </button>
+              <button
+                onClick={() => handleSendKeyword('외국인 상담')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                외국인 상담
+              </button>
+            </div>
+            <div className="w-full text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('교환학생')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                교환학생
+              </button>
+              <button
+                onClick={() => handleSendKeyword('포스터 게시')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                포스터 게시
+              </button>
+            </div>
+            <div className="w-full mr-[-60px] text-left flex flex-col">
+              <button
+                onClick={() => handleSendKeyword('학위기')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                학위기
+              </button>
+              <button
+                onClick={() => handleSendKeyword('취창업계')}
+                className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+              >
+                취창업계
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

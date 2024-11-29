@@ -1,10 +1,12 @@
 import apiClient from './apiClient';
 import { RateFaqRequest } from '../types/faq';
 
-export const sendQuestion = async (question: string) => {
+export const sendQuestion = async (question: string, language: string) => {
   try {
+    console.log({ question, language });
     const response = await apiClient.post('/question', {
       question,
+      language,
     });
     return response.data;
   } catch (error: any) {
@@ -29,6 +31,16 @@ export const rateFAQ = async ({ faq_id, rating }: RateFaqRequest) => {
     return response;
   } catch (error: any) {
     console.error('Error while rating FAQ:', error);
+    throw error.response?.data || error.message;
+  }
+};
+
+export const getFAQs = async () => {
+  try {
+    const response = await apiClient.get('/top_faqs');
+    return response.data;
+  } catch (error: any) {
+    console.error('Error while fetching top questions:', error);
     throw error.response?.data || error.message;
   }
 };

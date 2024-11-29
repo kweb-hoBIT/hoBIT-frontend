@@ -5,7 +5,6 @@ import Header from '../components/Header';
 import Input from '../components/Input';
 import AutoComplete from '../components/AutoComplete';
 import Chatting from '../components/Chatting';
-import FAQCard from '../components/FAQCard';
 import KeywordRecommend from '../components/KeywordRecommend';
 
 const MainPage: React.FC = () => {
@@ -17,8 +16,7 @@ const MainPage: React.FC = () => {
       <div>
         <Chatting />
       </div>
-      {isEmpty ? <KeywordRecommend /> : <AutoComplete />}
-      <FAQCard />
+      {isEmpty ? <></> : <AutoComplete />}
       <Input />
     </div>
   );

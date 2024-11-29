@@ -14,13 +14,14 @@ import { setQuestions } from '../redux/questionsSlice';
 interface ChatItem {
   query: string;
   response: Faq[];
+  loading: boolean; // 각 chatItem별 로딩 상태 추가
 }
 
 const Chatting: React.FC = () => {
   const dispatch = useDispatch();
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const lastMessageRef = useRef<HTMLDivElement>(null);
   const sentValue = useSelector((state: RootState) => state.input.sentValue);
+  const isKorean = useSelector((state: RootState) => state.language.isKorean);
 
   const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +50,6 @@ const Chatting: React.FC = () => {
             behavior: 'smooth',
           });
         }, 50);
-        console.log('Content fits within the container, no scroll needed.');
       }
     }
   }, [chatHistory]);
@@ -57,17 +57,28 @@ const Chatting: React.FC = () => {
   useEffect(() => {
     if (!sentValue) return;
 
+    const newChatItem: ChatItem = {
+      query: sentValue,
+      response: [],
+      loading: true,
+    };
+
+    setChatHistory((prevHistory) => [...prevHistory, newChatItem]);
+
     const fetchResponse = async () => {
       try {
-        const serverResponse = await sendQuestion(sentValue);
+        const language = isKorean ? 'KO' : 'EN';
+        const serverResponse = await sendQuestion(sentValue, language);
         console.log('Server Response:', serverResponse);
 
         if (serverResponse && Array.isArray(serverResponse.faqs)) {
-          const newChatItem: ChatItem = {
-            query: sentValue,
-            response: serverResponse.faqs,
-          };
-          setChatHistory((prevHistory) => [...prevHistory, newChatItem]);
+          setChatHistory((prevHistory) =>
+            prevHistory.map((item) =>
+              item.query === sentValue
+                ? { ...item, response: serverResponse.faqs, loading: false }
+                : item
+            )
+          );
         } else {
           console.error('Invalid response structure:', serverResponse);
           setError('Invalid response structure');
@@ -75,6 +86,11 @@ const Chatting: React.FC = () => {
       } catch (err) {
         console.error('Error while fetching response:', err);
         setError(err as string);
+        setChatHistory((prevHistory) =>
+          prevHistory.map((item) =>
+            item.query === sentValue ? { ...item, loading: false } : item
+          )
+        );
       }
     };
 
@@ -84,7 +100,7 @@ const Chatting: React.FC = () => {
   return (
     <div
       ref={chatContainerRef}
-      className="flex flex-col h-full max-h-[calc(100vh-220px)] overflow-y-auto px-[20px] py-[30px]"
+      className="flex flex-col h-full max-h-[calc(100vh-140px)] overflow-y-auto px-[20px] py-[30px]"
     >
       <HelloHobit />
       {chatHistory.map((chatItem, index) => (
@@ -96,7 +112,10 @@ const Chatting: React.FC = () => {
             chatItem.query === 'What I Can Do' ? (
             <AllCategoriesResponse />
           ) : (
-            <GeneralResponse faqs={chatItem.response} />
+            <GeneralResponse
+              faqs={chatItem.response}
+              loading={chatItem.loading}
+            />
           )}
         </div>
       ))}

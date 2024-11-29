@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { IoIosArrowForward } from 'react-icons/io';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { sendInputValue, clearSentValue } from '../../redux/inputSlice';
@@ -7,9 +8,11 @@ import { RootState } from '../../redux/store';
 import HobitProfile from './HobitProfile';
 import Response from './Response';
 import { Faq } from '../../types/faq';
+import { getFAQs } from '../../api/query';
 
 const FAQResponse: React.FC = () => {
   const dispatch = useDispatch();
+  const [mocks, setMocks] = useState<Faq[]>([]);
   const [faqs, setFaqs] = useState<Faq[]>([]);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
 
@@ -21,94 +24,45 @@ const FAQResponse: React.FC = () => {
     }, 100);
   };
 
+  useEffect(() => {
+    const fetchFAQs = async () => {
+      try {
+        const fetchedFaqs = await getFAQs();
+        console.log('Fetched FAQs:', fetchedFaqs);
+        setFaqs(fetchedFaqs.faqs);
+      } catch (error) {
+        console.error('Failed to fetch FAQs:', error);
+      }
+    };
+
+    fetchFAQs();
+  }, []);
+
   return (
     <div>
       <HobitProfile />
       <Response
         text={
           isKorean
-            ? `자주 묻는 질문 카테고리예요!\n궁금한 점이 있으면 추가로 질문해주세요!`
+            ? `자주 묻는 질문들이에요!\n궁금한 점이 있으면 추가로 질문해주세요`
             : `Here are some frequently asked questions!\nFeel free to ask more if you have any other questions.`
         }
-        faqs={faqs}
+        faqs={mocks}
       />
-      {isKorean ? (
-        <>
-          <div className="mt-[10px]">
-            <button
-              onClick={() => handleSendKeyword('공간예약🏫')}
-              className="border border-gray-300 font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-gray-300"
-            >
-              공간예약🏫
-            </button>
-            <button
-              onClick={() => handleSendKeyword('안전교육⛑️')}
-              className="border border-gray-300 font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-gray-300"
-            >
-              안전교육⛑️
-            </button>
-            <button
-              onClick={() => handleSendKeyword('학위기🎓')}
-              className="border border-gray-300 font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] hover:bg-gray-300"
-            >
-              학위기🎓
-            </button>
+      <div className="flex flex-col">
+        {faqs.map((faq, index) => (
+          <div
+            key={index}
+            onClick={() =>
+              handleSendKeyword(isKorean ? faq.question_ko : faq.question_en)
+            }
+            className="faq-item border border-gray-300 font-5medium text-[20px] w-fit mt-[10px] rounded-[20px] px-[20px] py-[15px] max-w-[400px] break-words inline-block
+              hover:bg-gray-100 transition-colors mr-[10px] cursor-pointer"
+          >
+            <h3>{isKorean ? faq.question_ko : faq.question_en}</h3>
           </div>
-          <div className="mt-[10px]">
-            <button
-              onClick={() => handleSendKeyword('졸업요건 확인✔️')}
-              className="border border-gray-300 font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-gray-300"
-            >
-              졸업요건 확인✔️
-            </button>
-            <button
-              onClick={() => handleSendKeyword('교환학생🌎')}
-              className="border border-gray-300 font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] hover:bg-gray-300"
-            >
-              교환학생🌎
-            </button>
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="mt-[10px]">
-            <button
-              onClick={() => handleSendKeyword('Space Reservation🏫')}
-              className="border border-gray-300 font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-gray-300"
-            >
-              Space Reservation🏫
-            </button>
-            <button
-              onClick={() => handleSendKeyword('Safety Education⛑️')}
-              className="border border-gray-300 font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-gray-300"
-            >
-              Safety Education⛑️
-            </button>
-          </div>
-          <div className="mt-[10px]">
-            <button
-              onClick={() => handleSendKeyword('Diploma🎓')}
-              className="border border-gray-300 font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-gray-300"
-            >
-              Diploma🎓
-            </button>
-            <button
-              onClick={() => handleSendKeyword('Graduation Requirements✔️')}
-              className="border border-gray-300 font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] mr-[5px] hover:bg-gray-300"
-            >
-              Graduation Requirements✔️
-            </button>
-          </div>
-          <div className="mt-[10px]">
-            <button
-              onClick={() => handleSendKeyword('Exchange Student🌎')}
-              className="border border-gray-300 font-6semibold text-[#686D76] text-[20px] inline-block px-[20px] py-[5px] rounded-[20px] hover:bg-gray-300"
-            >
-              Exchange Student🌎
-            </button>
-          </div>
-        </>
-      )}
+        ))}
+      </div>
     </div>
   );
 };

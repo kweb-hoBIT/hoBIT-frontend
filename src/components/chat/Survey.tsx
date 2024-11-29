@@ -43,17 +43,17 @@ const Survey: React.FC<SurveyProps> = ({ id }) => {
   };
 
   return (
-    <div className="flex flex-row w-[365px] items-center bg-gray-100 font-5medium text-[#686D76] text-[20px] mt-[10px] rounded-[20px] px-[20px] py-[10px] ">
+    <div className="flex flex-row w-[365px] items-center bg-gray-100 font-5medium text-[#686D76] text-[18px] mt-[10px] rounded-[20px] px-[20px] py-[10px] ">
       <p>
         {isKorean ? '호빗의 응답이 도움이 되었어요!' : 'Was HoBIT helpful?'}
       </p>
-      <div className="bg-white p-[10px] rounded-full ml-[20px]">
+      <div className="bg-white p-[10px] rounded-full ml-[40px] cursor-pointer">
         <TbThumbUpFilled
           onClick={handleThumbUpClick}
           className={thumbUp ? 'text-[#F075AA]' : 'text-[#ddd]'}
         />
       </div>
-      <div className="bg-white p-[10px] rounded-full ml-[10px]">
+      <div className="bg-white p-[10px] rounded-full ml-[15px] cursor-pointer">
         <TbThumbDownFilled
           onClick={handleThumbDownClick}
           className={thumbDown ? 'text-[#F075AA]' : 'text-[#ddd]'}
