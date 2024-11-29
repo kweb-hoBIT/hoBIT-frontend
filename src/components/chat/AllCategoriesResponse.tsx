@@ -58,7 +58,7 @@ const AllCategoriesResponse: React.FC = () => {
       {!showAllCategories && (
         <div
           onClick={showAll}
-          className="bg-gray-100 pl-[15px] pr-[20px] rounded-[20px] w-fit flex flex-row items-center py-[10px] mt-[10px] text-[20px] font-6semibold text-[#686D76] hover:bg-gray-200"
+          className="bg-gray-100 pl-[15px] pr-[20px] cursor-pointer rounded-[20px] w-fit flex flex-row items-center py-[10px] mt-[10px] text-[20px] font-6semibold text-[#686D76] hover:bg-gray-200"
         >
           <IoChevronBackOutline className="text-[18px] mr-[10px]" />
           전체 카테고리 보기
