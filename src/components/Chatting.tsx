@@ -30,6 +30,7 @@ const Chatting: React.FC = () => {
     const fetchAllQuestions = async () => {
       try {
         const response = await getAllQuestions();
+        console.log(333, response);
         dispatch(setQuestions(response.questions));
       } catch (err) {
         console.error('Error while fetching all questions:', err);

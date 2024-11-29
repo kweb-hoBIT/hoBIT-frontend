@@ -22,6 +22,15 @@ export type Faq = {
   updated_by: number | null;
 };
 
+export type FaqAnswer = FaqCard[];
+
+export type FaqCard = {
+  answer: string;
+  url: string;
+  email: string;
+  phone: string;
+};
+
 export type Question = {
   faq_id: number;
   question_ko: string;
@@ -32,4 +41,10 @@ export type AllQuestionsRequest = {};
 
 export type AllQuestionsResponse = {
   questions: Question[];
+};
+
+export type AllFaqsRequest = {};
+
+export type AllFaqsResponse = {
+  faqs: Faq[];
 };
