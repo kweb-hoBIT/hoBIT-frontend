@@ -61,17 +61,32 @@ const AllCategoriesResponse: React.FC = () => {
           className="bg-gray-100 pl-[15px] pr-[20px] cursor-pointer rounded-[20px] w-fit flex flex-row items-center py-[10px] mt-[10px] text-[20px] font-6semibold text-[#686D76] hover:bg-gray-200"
         >
           <IoChevronBackOutline className="text-[18px] mr-[10px]" />
-          전체 카테고리 보기
+          {isKorean ? '전체 카테고리 보기' : 'See All Categories'}
         </div>
       )}
       {showAllCategories && (
         <>
           <div className="flex flex-row mt-[10px]">
             {[
-              { index: 0, emoji: '👨‍🏫', label: '수업' },
-              { index: 1, emoji: '📄', label: '학적' },
-              { index: 2, emoji: '📚', label: '복수전공' },
-              { index: 3, emoji: '📖', label: '융합전공' },
+              { index: 0, emoji: '👨‍🏫', label_ko: '수업', label_en: 'Class' },
+              {
+                index: 1,
+                emoji: '📄',
+                label_ko: '학적',
+                label_en: 'Academic Status',
+              },
+              {
+                index: 2,
+                emoji: '📚',
+                label_ko: '복수전공',
+                label_en: 'Double Major',
+              },
+              {
+                index: 3,
+                emoji: '📖',
+                label_ko: '융합전공',
+                label_en: 'Integrated Major',
+              },
             ].map((category, index) => (
               <div
                 key={index}
@@ -79,8 +94,12 @@ const AllCategoriesResponse: React.FC = () => {
                 onClick={() => toggleCategory(category.index)}
               >
                 <span className="text-[30px]">{category.emoji}</span>
-                <span className="text-[18px] font-6semibold">
-                  {category.label}
+                <span
+                  className={`font-6semibold text-center mx-auto ${
+                    isKorean ? 'text-[18px]' : 'text-[16px]'
+                  }`}
+                >
+                  {isKorean ? category.label_ko : category.label_en}
                 </span>
               </div>
             ))}
@@ -88,10 +107,25 @@ const AllCategoriesResponse: React.FC = () => {
 
           <div className="flex flex-row mt-[10px]">
             {[
-              { index: 4, emoji: '💰', label: '장학' },
-              { index: 5, emoji: '🎓', label: '졸업' },
-              { index: 6, emoji: '🏙️', label: '현장실습' },
-              { index: 7, emoji: '', label: 'ETC.' },
+              {
+                index: 4,
+                emoji: '💰',
+                label_ko: '장학',
+                label_en: 'Scholarship',
+              },
+              {
+                index: 5,
+                emoji: '🎓',
+                label_ko: '졸업',
+                label_en: 'Graduation',
+              },
+              {
+                index: 6,
+                emoji: '🏙️',
+                label_ko: '현장실습',
+                label_en: 'Internship',
+              },
+              { index: 7, emoji: '', label_ko: 'ETC.', label_en: 'ETC.' },
             ].map((category, index) => (
               <div
                 key={index}
@@ -99,8 +133,12 @@ const AllCategoriesResponse: React.FC = () => {
                 onClick={() => toggleCategory(category.index)}
               >
                 <span className="text-[30px]">{category.emoji}</span>
-                <span className="text-[18px] font-6semibold">
-                  {category.label}
+                <span
+                  className={`font-6semibold ${
+                    isKorean ? 'text-[18px]' : 'text-[16px]'
+                  }`}
+                >
+                  {isKorean ? category.label_ko : category.label_en}
                 </span>
               </div>
             ))}

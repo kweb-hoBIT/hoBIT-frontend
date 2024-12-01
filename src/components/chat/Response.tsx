@@ -78,30 +78,38 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                         .map((line: string, lineIndex: number) => (
                           <p key={lineIndex}>{line}</p>
                         ))}
-                    <div className="w-full h-[1px] bg-gray-300 mt-[20px]" />
-                    <div className="flex flex-row items-center mt-[20px]">
-                      <FaLink className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
-                      <a
-                        href={
-                          item.url.startsWith('http')
-                            ? item.url
-                            : `http://${item.url}`
-                        }
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[18px] text-[#0A5EB0] cursor-pointer hover:underline"
-                      >
-                        {item.url}
-                      </a>
-                    </div>
-                    <div className="flex flex-row items-center mt-[10px]">
-                      <MdOutlineEmail className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
-                      <p className="text-[18px]">{item.email}</p>
-                    </div>
-                    <div className="flex flex-row items-center mt-[10px]">
-                      <FaPhoneVolume className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
-                      <p className="text-[18px]">{item.phone}</p>
-                    </div>
+                    {(item.url || item.email || item.phone) && (
+                      <div className="w-full h-[1px] bg-gray-300 mt-[20px]" />
+                    )}
+                    {item.url && (
+                      <div className="flex flex-row items-center mt-[20px]">
+                        <FaLink className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
+                        <a
+                          href={
+                            item.url.startsWith('http')
+                              ? item.url
+                              : `http://${item.url}`
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[18px] text-[#0A5EB0] cursor-pointer hover:underline"
+                        >
+                          {item.url}
+                        </a>
+                      </div>
+                    )}
+                    {item.email && (
+                      <div className="flex flex-row items-center mt-[10px]">
+                        <MdOutlineEmail className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
+                        <p className="text-[18px]">{item.email}</p>
+                      </div>
+                    )}
+                    {item.phone && (
+                      <div className="flex flex-row items-center mt-[10px]">
+                        <FaPhoneVolume className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
+                        <p className="text-[18px]">{item.phone}</p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

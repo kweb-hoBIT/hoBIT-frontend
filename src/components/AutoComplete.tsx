@@ -63,10 +63,12 @@ const AutoComplete: React.FC = () => {
         className="w-full h-[70px] bg-gray-100 rounded-t-[30px] fixed bottom-[80px] px-[20px] flex flex-col items-center h-fit max-h-[250px] overflow-y-auto"
         style={{
           boxShadow: '0 -6px 15px rgba(0, 0, 0, 0.3)',
+          // scrollbarWidth: 'none', // Firefox용
+          // msOverflowStyle: 'none', // IE 및 Edge용
         }}
       >
         {suggestions.length > 0 && (
-          <div className="w-full divide-y divide-gray-300 py-[10px]">
+          <div className="w-full divide-y divide-gray-300 pb-[10px] pt-[20px]">
             {suggestions.map((suggestion, index) => {
               const matchIndex = suggestion
                 .toLowerCase()
