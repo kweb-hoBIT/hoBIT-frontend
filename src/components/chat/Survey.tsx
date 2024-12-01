@@ -47,17 +47,19 @@ const Survey: React.FC<SurveyProps> = ({ id }) => {
       <p>
         {isKorean ? '호빗의 응답이 도움이 되었어요!' : 'Was HoBIT helpful?'}
       </p>
-      <div className="bg-white p-[10px] rounded-full ml-[40px] cursor-pointer hover:bg-gray-200">
-        <TbThumbUpFilled
-          onClick={handleThumbUpClick}
-          className={thumbUp ? 'text-[#F075AA]' : 'text-gray-400'}
-        />
-      </div>
-      <div className="bg-white p-[10px] rounded-full ml-[15px] cursor-pointer hover:bg-gray-200">
-        <TbThumbDownFilled
-          onClick={handleThumbDownClick}
-          className={thumbDown ? 'text-[#F075AA]' : 'text-gray-400'}
-        />
+      <div className="flex justify-end ml-auto">
+        <div className="bg-white p-[10px] rounded-full cursor-pointer hover:bg-gray-200">
+          <TbThumbUpFilled
+            onClick={handleThumbUpClick}
+            className={thumbUp ? 'text-[#F075AA]' : 'text-gray-400'}
+          />
+        </div>
+        <div className="bg-white p-[10px] rounded-full ml-[15px] cursor-pointer hover:bg-gray-200">
+          <TbThumbDownFilled
+            onClick={handleThumbDownClick}
+            className={thumbDown ? 'text-[#F075AA]' : 'text-gray-400'}
+          />
+        </div>
       </div>
     </div>
   );
