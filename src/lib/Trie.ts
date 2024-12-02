@@ -53,4 +53,30 @@ export class Trie {
       this.collectAllWords(childNode, prefix + char, suggestions);
     }
   }
+
+  getSuggestionsIncluding(input: string): string[] {
+    const suggestions: string[] = [];
+    this.collectAllWordsIncluding(this.root, '', input, suggestions);
+    return suggestions;
+  }
+
+  private collectAllWordsIncluding(
+    node: TrieNode,
+    currentWord: string,
+    input: string,
+    suggestions: string[]
+  ): void {
+    if (node.isEndOfWord && currentWord.includes(input)) {
+      suggestions.push(currentWord);
+    }
+
+    for (const [char, childNode] of node.children) {
+      this.collectAllWordsIncluding(
+        childNode,
+        currentWord + char,
+        input,
+        suggestions
+      );
+    }
+  }
 }

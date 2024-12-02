@@ -34,7 +34,7 @@ const AutoComplete: React.FC = () => {
 
   useEffect(() => {
     if (trie && inputValue.trim() && isAutocompleteOn) {
-      let suggestions = trie.getSuggestions(inputValue);
+      let suggestions = trie.getSuggestionsIncluding(inputValue);
       setSuggestions(suggestions);
     } else {
       setSuggestions([]);
