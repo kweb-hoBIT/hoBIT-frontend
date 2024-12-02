@@ -1,34 +1,61 @@
 import { Faq } from '../types/faq';
 
-interface IFaqTree {
-  [mainCategory: string]: {
-    [subCategory: string]: Faq[];
-  };
+export interface Category {
+  category_ko: string;
+  category_en: string;
 }
 
 export class FaqTree {
-  public tree: IFaqTree;
+  public tree: Map<Category, Map<Category, Faq[]>>;
 
   constructor(faqs: Faq[]) {
-    this.tree = {};
+    this.tree = new Map();
     this.initializeTree(faqs);
   }
 
   private initializeTree(faqs: Faq[]) {
     faqs.forEach((faq) => {
-      this.addToTree(faq.maincategory_ko, faq.subcategory_ko, faq);
+      this.addToTree(
+        { category_ko: faq.maincategory_ko, category_en: faq.maincategory_en },
+        { category_ko: faq.subcategory_ko, category_en: faq.subcategory_en },
+        faq
+      );
     });
   }
 
-  private addToTree(mainCategory: string, subCategory: string, faq: Faq) {
-    if (!this.tree[mainCategory]) {
-      this.tree[mainCategory] = {};
+  private addToTree(mainCategory: Category, subCategory: Category, faq: Faq) {
+    const existingMainCategory = this.findCategoryByKo(
+      this.tree.keys(),
+      mainCategory.category_ko
+    );
+
+    if (!existingMainCategory) {
+      this.tree.set(mainCategory, new Map());
     }
 
-    if (!this.tree[mainCategory][subCategory]) {
-      this.tree[mainCategory][subCategory] = [];
+    const subCategoryMap = this.tree.get(existingMainCategory || mainCategory)!;
+
+    const existingSubCategory = this.findCategoryByKo(
+      subCategoryMap.keys(),
+      subCategory.category_ko
+    );
+
+    if (!existingSubCategory) {
+      subCategoryMap.set(subCategory, []);
     }
 
-    this.tree[mainCategory][subCategory].push(faq);
+    subCategoryMap.get(existingSubCategory || subCategory)!.push(faq);
+  }
+
+  private findCategoryByKo(
+    keys: Iterable<Category>,
+    targetKo: string
+  ): Category | undefined {
+    for (const key of keys) {
+      if (key.category_ko === targetKo) {
+        return key;
+      }
+    }
+    return undefined;
   }
 }

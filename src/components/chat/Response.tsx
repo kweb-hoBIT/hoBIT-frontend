@@ -48,7 +48,6 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
             try {
               const sanitizedAnswer = sanitizeJSON(rawAnswer);
               answers = JSON.parse(sanitizedAnswer);
-              console.log('Parsed Answers:', answers);
             } catch (error) {
               console.error('JSON Parse Error');
               console.log('Raw Answer with Issues:', rawAnswer);

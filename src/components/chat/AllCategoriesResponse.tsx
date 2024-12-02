@@ -5,7 +5,7 @@ import { sendInputValue, clearSentValue } from '../../redux/inputSlice';
 import { RootState } from '../../redux/store';
 import HobitProfile from './HobitProfile';
 import Response from './Response';
-import { FaqTree } from '../../lib/FaqTree';
+import { Category, FaqTree } from '../../lib/FaqTree';
 import { getAllFAQs } from '../../api/query';
 import { Faq } from '../../types/faq';
 
@@ -14,10 +14,10 @@ const AllCategoriesResponse: React.FC = () => {
   const [faqTree, setFaqTree] = useState<FaqTree | null>(null);
   const [allFaqs, setAllFaqs] = useState<Faq[]>([]);
   const [categories, setCategories] = useState<
-    { mainCategory: string; subCategories: string[] }[]
+    { mainCategory: Category; subCategories: Category[] }[]
   >([]);
-  const [currentCategory, setCurrentCategory] = useState<string | null>(null);
-  const [currentSubCategory, setCurrentSubCategory] = useState<string | null>(
+  const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
+  const [currentSubCategory, setCurrentSubCategory] = useState<Category | null>(
     null
   );
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
@@ -45,13 +45,13 @@ const AllCategoriesResponse: React.FC = () => {
 
   useEffect(() => {
     if (!faqTreeInitFlag.current && allFaqs.length > 0) {
-      const tree = new FaqTree(allFaqs);
-      setFaqTree(tree);
+      const faqTree = new FaqTree(allFaqs);
+      setFaqTree(faqTree);
 
-      const mainCategories = Object.keys(tree.tree);
+      const mainCategories = Array.from(faqTree.tree.keys());
       const extractedCategories = mainCategories.map((mainCategory) => ({
         mainCategory,
-        subCategories: Object.keys(tree.tree[mainCategory]),
+        subCategories: Array.from(faqTree.tree.get(mainCategory)!.keys()),
       }));
 
       setCategories(extractedCategories);
@@ -65,12 +65,12 @@ const AllCategoriesResponse: React.FC = () => {
     setCurrentSubCategory(null);
   };
 
-  const showSubCategory = (mainCategory: string) => {
+  const showSubCategory = (mainCategory: Category) => {
     setCurrentCategory(mainCategory);
     setCurrentSubCategory(null);
   };
 
-  const showQuestions = (subCategory: string) => {
+  const showQuestions = (subCategory: Category) => {
     setCurrentSubCategory(subCategory);
   };
 
@@ -96,7 +96,9 @@ const AllCategoriesResponse: React.FC = () => {
               >
                 <span className="text-[30px]">{/* Optional emoji/icon */}</span>
                 <span className="text-[18px] font-6semibold">
-                  {category.mainCategory}
+                  {isKorean
+                    ? category.mainCategory.category_ko
+                    : category.mainCategory.category_en}
                 </span>
               </div>
             ))}
@@ -116,21 +118,25 @@ const AllCategoriesResponse: React.FC = () => {
           <div className="bg-gray-100 rounded-[20px] px-[20px] pt-[15px] pb-[10px] mt-[10px] w-[500px]">
             <div>
               <button className="font-6semibold text-[20px] inline-block">
-                {currentCategory}
+                {isKorean
+                  ? currentCategory.category_ko
+                  : currentCategory.category_en}
               </button>
             </div>
             <div className="w-full h-[1px] bg-gray-400 mt-[5px]" />
             <div className="mt-[5px] w-full flex flex-wrap">
-              {faqTree?.tree[currentCategory] &&
-                Object.keys(faqTree.tree[currentCategory]).map(
-                  (subCategory: string, index: number) => (
+              {faqTree?.tree.get(currentCategory) &&
+                Array.from(faqTree.tree.get(currentCategory)!.keys()).map(
+                  (subCategory: Category, index: number) => (
                     <div
                       key={index}
                       className="bg-gray-100 w-[100px] h-[100px] flex flex-col items-center justify-center rounded-[20px] m-[10px] hover:bg-gray-200 cursor-pointer"
                       onClick={() => showQuestions(subCategory)}
                     >
                       <span className="text-[18px] font-6semibold">
-                        {subCategory}
+                        {isKorean
+                          ? subCategory.category_ko
+                          : subCategory.category_en}
                       </span>
                     </div>
                   )
@@ -147,18 +153,24 @@ const AllCategoriesResponse: React.FC = () => {
             className="bg-gray-100 pl-[15px] pr-[20px] cursor-pointer rounded-[20px] w-fit flex flex-row items-center py-[10px] mt-[10px] text-[20px] font-6semibold text-[#686D76] hover:bg-gray-200"
           >
             <IoChevronBackOutline className="text-[18px] mr-[10px]" />
-            {currentCategory}
+            {isKorean
+              ? currentCategory.category_ko
+              : currentCategory.category_en}
           </div>
           <div className="bg-gray-100 rounded-[20px] px-[20px] pt-[15px] pb-[10px] mt-[10px] w-[500px]">
             <div>
               <button className="font-6semibold text-[20px] inline-block">
-                {currentSubCategory}
+                {isKorean
+                  ? currentSubCategory.category_ko
+                  : currentSubCategory.category_en}
               </button>
             </div>
             <div className="w-full h-[1px] bg-gray-400 mt-[5px]" />
             <div className="mt-[5px] w-full flex flex-wrap">
-              {faqTree?.tree[currentCategory]?.[currentSubCategory]?.map(
-                (faq, index: number) => {
+              {faqTree?.tree
+                .get(currentCategory)
+                ?.get(currentSubCategory)
+                ?.map((faq, index: number) => {
                   return (
                     <div
                       key={index}
@@ -176,8 +188,7 @@ const AllCategoriesResponse: React.FC = () => {
                       </button>
                     </div>
                   );
-                }
-              )}
+                })}
             </div>
           </div>
         </>
