@@ -91,7 +91,7 @@ const AllCategoriesResponse: React.FC = () => {
             {categories.map((category, index) => (
               <div
                 key={index}
-                className="bg-gray-100 w-[100px] h-[100px] flex flex-col items-center justify-center rounded-[20px] m-[10px] hover:bg-gray-200 cursor-pointer"
+                className="bg-gray-100 w-[100px] h-[100px] flex flex-col items-center justify-center rounded-[20px] mt-[10px] mr-[10px] hover:bg-gray-200 cursor-pointer"
                 onClick={() => showSubCategory(category.mainCategory)}
               >
                 <span className="text-[30px]">{/* Optional emoji/icon */}</span>
@@ -123,17 +123,17 @@ const AllCategoriesResponse: React.FC = () => {
                   : currentCategory.category_en}
               </button>
             </div>
-            <div className="w-full h-[1px] bg-gray-400 mt-[5px]" />
-            <div className="mt-[5px] w-full flex flex-wrap">
+            <div className="w-full h-[1px] bg-gray-400 my-[5px]" />
+            <div className="mt-[10px] w-full grid grid-cols-3 gap-2">
               {faqTree?.tree.get(currentCategory) &&
                 Array.from(faqTree.tree.get(currentCategory)!.keys()).map(
                   (subCategory: Category, index: number) => (
                     <div
                       key={index}
-                      className="bg-gray-100 w-[100px] h-[100px] flex flex-col items-center justify-center rounded-[20px] m-[10px] hover:bg-gray-200 cursor-pointer"
+                      className="bg-gray-100 w-full h-[30px] flex flex-col items-start justify-center hover:text-black cursor-pointer"
                       onClick={() => showQuestions(subCategory)}
                     >
-                      <span className="text-[18px] font-6semibold">
+                      <span className="text-[20px] text-[#686D76] font-5medium text-left">
                         {isKorean
                           ? subCategory.category_ko
                           : subCategory.category_en}
@@ -172,17 +172,14 @@ const AllCategoriesResponse: React.FC = () => {
                 ?.get(currentSubCategory)
                 ?.map((faq, index: number) => {
                   return (
-                    <div
-                      key={index}
-                      className="w-full text-left flex flex-col mb-[10px]"
-                    >
+                    <div key={index} className="w-full text-left flex flex-col">
                       <button
                         onClick={() =>
                           handleSendKeyword(
                             isKorean ? faq.question_ko : faq.question_en
                           )
                         }
-                        className="font-6semibold text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
+                        className="font-5medium text-left text-[#686D76] text-[20px] inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-black"
                       >
                         {isKorean ? faq.question_ko : faq.question_en}
                       </button>

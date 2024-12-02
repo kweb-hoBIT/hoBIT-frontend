@@ -1,9 +1,12 @@
+import { LuMenu } from 'react-icons/lu';
+import { IoClose } from 'react-icons/io5';
+
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../redux/store';
-import { IoClose } from 'react-icons/io5';
 import { lang } from '../i18n/lang';
 import { setEnglish, setKorean } from '../redux/languageSlice';
+import { toggleMenu } from '../redux/menuSlice';
 
 const Header: React.FC = () => {
   const dispatch = useDispatch();
@@ -12,7 +15,13 @@ const Header: React.FC = () => {
 
   return (
     <div className="h-[70px] bg-white fixed top-0 w-full border-b-2 border-[#bbbbbb] flex items-center relative px-[20px] py-[20px]">
-      <div className="relative w-[88px] h-[36px] bg-[#D9D9D9] rounded-[20px] flex items-center">
+      <div>
+        <LuMenu
+          className="text-[28px] text-gray-400 hover:text-black mr-[20px]"
+          onClick={() => dispatch(toggleMenu())}
+        />
+      </div>
+      <div className="relative w-[88px] h-[32px] bg-[#D9D9D9] rounded-[20px] flex items-center">
         <div
           className={`absolute h-full rounded-full justify-center transition-transform duration-500 ease-in-out bg-black ${
             isKorean ? 'translate-x-0 w-[50px]' : 'translate-x-[48px] w-[40px]'
@@ -41,7 +50,7 @@ const Header: React.FC = () => {
       <p className="absolute left-1/2 transform -translate-x-1/2 font-7bold text-[26px]">
         {i18n.headerTitle}
       </p>
-      <IoClose className="text-[#aaaaaa] absolute right-4 text-[28px] hover:text-[#000000]" />
+      <IoClose className="text-gray-400 absolute right-4 text-[28px] hover:text-black" />
     </div>
   );
 };

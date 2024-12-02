@@ -5,7 +5,7 @@ import Header from '../components/Header';
 import Input from '../components/Input';
 import AutoComplete from '../components/AutoComplete';
 import Chatting from '../components/Chatting';
-import KeywordRecommend from '../components/KeywordRecommend';
+import Modal from '../components/Modal';
 
 const MainPage: React.FC = () => {
   const isEmpty = useSelector((state: RootState) => state.input.isEmpty);
@@ -13,6 +13,7 @@ const MainPage: React.FC = () => {
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       <Header />
+      <Modal />
       <div>
         <Chatting />
       </div>
