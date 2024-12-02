@@ -116,7 +116,7 @@ const Modal: React.FC = () => {
         {categories.map((category, index) => (
           <li key={index} className="mb-[10px] ">
             <div
-              className="hover:bg-gray-100 flex flex-row justify-between items-center cursor-pointer text-[16px] font-5medium text-[20px] text-[#686D76] bg-gray-100 px-[15px] py-[5px] rounded-[10px]"
+              className="flex flex-row justify-between items-center cursor-pointer text-[16px] font-5medium text-[20px] hover:bg-gray-200 text-[#686D76] bg-gray-100 px-[15px] py-[5px] rounded-[10px]"
               onClick={() => toggleCategory(category.mainCategory.category_ko)}
             >
               <span>{category.mainCategory.category_ko}</span>
