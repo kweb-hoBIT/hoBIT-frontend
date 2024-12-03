@@ -116,19 +116,35 @@ const Modal: React.FC = () => {
         {categories.map((category, index) => (
           <li key={index} className="mb-[10px] ">
             <div
-              className="flex flex-row justify-between items-center cursor-pointer text-[16px] font-5medium text-[20px] hover:bg-gray-200 text-[#686D76] bg-gray-100 px-[15px] py-[5px] rounded-[10px]"
-              onClick={() => toggleCategory(category.mainCategory.category_ko)}
+              className="hover:bg-gray-100 flex flex-row justify-between items-center cursor-pointer text-[16px] font-5medium text-[20px] text-[#686D76] bg-gray-100 px-[15px] py-[5px] rounded-[10px]"
+              onClick={() =>
+                toggleCategory(
+                  isKorean
+                    ? category.mainCategory.category_ko
+                    : category.mainCategory.category_en
+                )
+              }
             >
-              <span>{category.mainCategory.category_ko}</span>
+              <span>
+                {isKorean
+                  ? category.mainCategory.category_ko
+                  : category.mainCategory.category_en}
+              </span>
               {expandedCategories.includes(
-                category.mainCategory.category_ko
+                isKorean
+                  ? category.mainCategory.category_ko
+                  : category.mainCategory.category_en
               ) ? (
                 <FaChevronUp className="text-[16px] text-gray-400" />
               ) : (
                 <FaChevronDown className="text-[16px] text-gray-400" />
               )}
             </div>
-            {expandedCategories.includes(category.mainCategory.category_ko) && (
+            {expandedCategories.includes(
+              isKorean
+                ? category.mainCategory.category_ko
+                : category.mainCategory.category_en
+            ) && (
               <div className="relative ml-[25px]">
                 <div
                   className="absolute left-[-10px] w-[2px] bg-gray-200"
@@ -143,16 +159,30 @@ const Modal: React.FC = () => {
                       key={subIndex}
                       onClick={() =>
                         toggleSubCategory(
-                          category.mainCategory.category_ko,
-                          subCategory.category_ko
+                          isKorean
+                            ? category.mainCategory.category_ko
+                            : category.mainCategory.category_en,
+                          isKorean
+                            ? subCategory.category_ko
+                            : subCategory.category_en
                         )
                       }
                       className="cursor-pointer font-5medium text-[18px] text-[#686D76] hover:text-black my-[5px]"
                     >
-                      <div>{subCategory.category_ko}</div>
+                      <div>
+                        {isKorean
+                          ? subCategory.category_ko
+                          : subCategory.category_en}
+                      </div>
                       {expandedSubCategories[
-                        category.mainCategory.category_ko
-                      ]?.includes(subCategory.category_ko) && (
+                        isKorean
+                          ? category.mainCategory.category_ko
+                          : category.mainCategory.category_en
+                      ]?.includes(
+                        isKorean
+                          ? subCategory.category_ko
+                          : subCategory.category_en
+                      ) && (
                         <ul className="mt-[5px]">
                           {faqTree?.tree
                             .get(category.mainCategory)
@@ -167,7 +197,7 @@ const Modal: React.FC = () => {
                                 }
                                 className="cursor-pointer text-[16px] text-black font-3light px-[10px] py-[5px] rounded-[10px] bg-gray-100 mb-[5px] hover:bg-gray-200"
                               >
-                                {faq.question_ko}
+                                {isKorean ? faq.question_ko : faq.question_en}
                               </li>
                             ))}
                         </ul>
