@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaRobot } from 'react-icons/fa6';
+import { AiFillHome } from 'react-icons/ai';
 import { TbSend2 } from 'react-icons/tb';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -8,6 +8,7 @@ import {
   setIsEmpty,
   updateLiveValue,
 } from '../redux/inputSlice';
+import { setHomeClicked } from '../redux/homeSlice';
 import { RootState } from '../redux/store';
 
 const Input: React.FC = () => {
@@ -41,9 +42,16 @@ const Input: React.FC = () => {
     }
   };
 
+  const handleHomeClick = () => {
+    dispatch(setHomeClicked());
+  };
+
   return (
     <div className="bg-white border-t-2 fixed bottom-0 w-full h-[80px] flex items-center px-[20px]">
-      <FaRobot className="text-[32px] text-[#750E21] mr-[20px]" />
+      <AiFillHome
+        className="text-[32px] text-[#750E21] mr-[20px] hover:text-gray-600 cursor-pointer"
+        onClick={handleHomeClick}
+      />
       <div className="bg-gray-200 w-full h-[48px] px-4 rounded-[30px] flex flex-row items-center">
         <input
           type="text"

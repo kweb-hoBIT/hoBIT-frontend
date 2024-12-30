@@ -4,6 +4,7 @@ import { faqCardReducer } from './faqCardSlice';
 import { languageReducer } from './languageSlice';
 import { questionsReducer } from './questionsSlice';
 import { menuReducer } from './menuSlice';
+import { homeReducer } from './homeSlice';
 
 const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
     language: languageReducer,
     questions: questionsReducer,
     menu: menuReducer,
+    home: homeReducer,
   },
 });
 

@@ -10,11 +10,13 @@ import { RootState } from '../redux/store';
 import { Faq } from '../types/faq';
 import { sendQuestion, getAllQuestions } from '../api/query';
 import { setQuestions } from '../redux/questionsSlice';
+import { resetHomeClicked } from '../redux/homeSlice';
 
 interface ChatItem {
   query: string;
   response: Faq[];
-  loading: boolean; // 각 chatItem별 로딩 상태 추가
+  loading: boolean;
+  flag: boolean;
 }
 
 const Chatting: React.FC = () => {
@@ -22,6 +24,7 @@ const Chatting: React.FC = () => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const sentValue = useSelector((state: RootState) => state.input.sentValue);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
+  const homeClicked = useSelector((state: RootState) => state.home.homeClicked);
 
   const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -61,6 +64,7 @@ const Chatting: React.FC = () => {
       query: sentValue,
       response: [],
       loading: true,
+      flag: false,
     };
 
     setChatHistory((prevHistory) => [...prevHistory, newChatItem]);
@@ -96,6 +100,20 @@ const Chatting: React.FC = () => {
     fetchResponse();
   }, [sentValue]);
 
+  useEffect(() => {
+    if (homeClicked) {
+      const newChatItem: ChatItem = {
+        query: '',
+        response: [],
+        loading: false,
+        flag: true,
+      };
+
+      setChatHistory((prevHistory) => [...prevHistory, newChatItem]);
+      dispatch(resetHomeClicked());
+    }
+  }, [homeClicked, dispatch]);
+
   return (
     <div
       ref={chatContainerRef}
@@ -104,20 +122,30 @@ const Chatting: React.FC = () => {
       <HelloHobit />
       {chatHistory.map((chatItem, index) => (
         <div key={index}>
-          <Query text={chatItem.query} />
-          {chatItem.query === '자주 묻는 질문' || chatItem.query === 'FAQ' ? (
-            <FAQResponse />
-          ) : chatItem.query === '할 수 있는 일' ||
-            chatItem.query === 'What I Can Do' ? (
-            <AllCategoriesResponse />
+          {chatItem.flag ? (
+            <div className="mt-[40px]">
+              <HelloHobit />
+            </div>
           ) : (
-            <GeneralResponse
-              faqs={chatItem.response}
-              loading={chatItem.loading}
-            />
+            <>
+              <Query text={chatItem.query} />
+              {chatItem.query === '자주 묻는 질문' ||
+              chatItem.query === 'FAQ' ? (
+                <FAQResponse />
+              ) : chatItem.query === '할 수 있는 일' ||
+                chatItem.query === 'What I Can Do' ? (
+                <AllCategoriesResponse />
+              ) : (
+                <GeneralResponse
+                  faqs={chatItem.response}
+                  loading={chatItem.loading}
+                />
+              )}
+            </>
           )}
         </div>
       ))}
+
       {error && <div style={{ color: 'red' }}>Error: {error}</div>}
     </div>
   );
