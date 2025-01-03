@@ -12,13 +12,10 @@ const AutoComplete: React.FC = () => {
     (state: RootState) => state.questions.questions
   );
 
-  const [isAutocompleteOn, setIsAutocompleteOn] = useState<boolean>(true);
+  const [isAutocompleteOn, _setIsAutocompleteOn] = useState<boolean>(true);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [trie, setTrie] = useState<Trie | null>(null);
   const trieInitFlag = useRef(false);
-  const isKorean = useSelector((state: RootState) => state.language.isKorean);
-
-  const toggleAutocomplete = () => setIsAutocompleteOn(!isAutocompleteOn);
 
   useEffect(() => {
     if (!trieInitFlag.current && questions.length > 0) {

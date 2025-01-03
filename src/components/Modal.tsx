@@ -11,7 +11,7 @@ import { closeMenu } from '../redux/menuSlice';
 import { sendInputValue, clearSentValue } from '../redux/inputSlice';
 
 import { Category, FaqTree } from '../lib/FaqTree';
-import { getAllFAQs } from '../api/query';
+import { directUserFeedback, getAllFAQs } from '../api/query';
 import { Faq } from '../types/faq';
 
 const Modal: React.FC = () => {
@@ -30,6 +30,28 @@ const Modal: React.FC = () => {
     [categoryName: string]: string[];
   }>({});
   const faqTreeInitFlag = useRef(false);
+
+  const [feedback, setFeedback] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleFeedbackSubmit = async () => {
+    if (!feedback.trim()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await directUserFeedback({
+        feedback_detail: feedback,
+        language: isKorean ? 'KO' : 'EN',
+      });
+      setFeedback('');
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     const fetchFAQs = async () => {
@@ -227,9 +249,17 @@ const Modal: React.FC = () => {
           <textarea
             placeholder="여기에 피드백을 작성해주세요!"
             rows={4}
+            value={feedback}
+            onChange={(e) => setFeedback(e.target.value)}
             className="w-full border-none bg-gray-100 font-5medium text-[20px] rounded-[8px] px-[15px] py-[10px] focus:outline-none focus:border-[#F075AA] resize-none"
           />
-          <button className="bg-gray-200 text-gray-500 font-6semibold py-[5px] mt-[10px] rounded-[8px] text-[20px] hover:bg-gray-300 transition">
+          <button
+            onClick={handleFeedbackSubmit}
+            disabled={isSubmitting}
+            className={`${
+              feedback ? 'bg-blue-200' : 'bg-gray-200'
+            } text-gray-500 font-semibold py-[5px] mt-[10px] rounded-[8px] text-[20px] hover:bg-gray-300 transition`}
+          >
             작성 완료
           </button>
         </div>
