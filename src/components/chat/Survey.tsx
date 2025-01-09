@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 
 import { rateFAQ } from '../../api/query';
 import { RootState } from '../../redux/store';
+import { clearSentValue } from '../../redux/inputSlice';
 
 type SurveyProps = {
 	id: number;
@@ -13,8 +14,6 @@ type SurveyProps = {
 
 const Survey: React.FC<SurveyProps> = ({ id }) => {
 	const inputValue = useSelector((state: RootState) => state.input.sentValue);
-	console.log('InputValueL', inputValue);
-
 	const isKorean = useSelector((state: RootState) => state.language.isKorean);
 	const [thumbUp, setThumbUp] = useState(false);
 	const [thumbDown, setThumbDown] = useState(false);
@@ -32,6 +31,7 @@ const Survey: React.FC<SurveyProps> = ({ id }) => {
 				});
 				console.log(response);
 			}
+			clearSentValue();
 		} catch (error) {
 			console.error('Error rating FAQ (Thumb Up):', error);
 		}
@@ -50,6 +50,7 @@ const Survey: React.FC<SurveyProps> = ({ id }) => {
 				});
 				console.log(response);
 			}
+			clearSentValue();
 		} catch (error) {
 			console.error('Error rating FAQ (Thumb Down):', error);
 		}

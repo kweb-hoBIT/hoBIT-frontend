@@ -1,8 +1,7 @@
-import { IoIosArrowForward } from 'react-icons/io';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { sendInputValue, clearSentValue } from '../../redux/inputSlice';
+import { sendInputValue } from '../../redux/inputSlice';
 import { RootState } from '../../redux/store';
 
 import HobitProfile from './HobitProfile';
@@ -12,16 +11,12 @@ import { getFAQs } from '../../api/query';
 
 const FAQResponse: React.FC = () => {
 	const dispatch = useDispatch();
-	const [mocks, setMocks] = useState<Faq[]>([]);
+	const [mocks, _setMocks] = useState<Faq[]>([]);
 	const [faqs, setFaqs] = useState<Faq[]>([]);
 	const isKorean = useSelector((state: RootState) => state.language.isKorean);
 
 	const handleSendKeyword = (message: string) => {
 		dispatch(sendInputValue(message));
-
-		//setTimeout(() => {
-		//  dispatch(clearSentValue());
-		//}, 100);
 	};
 
 	useEffect(() => {

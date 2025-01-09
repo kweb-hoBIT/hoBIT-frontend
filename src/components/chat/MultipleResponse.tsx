@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 
-import { sendInputValue, clearSentValue } from '../../redux/inputSlice';
+import { sendInputValue } from '../../redux/inputSlice';
 import { RootState } from '../../redux/store';
 import { Faq } from '../../types/faq';
 
@@ -15,10 +15,6 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
 
 	const handleSendKeyword = (message: string) => {
 		dispatch(sendInputValue(message));
-
-		//setTimeout(() => {
-		//  dispatch(clearSentValue());
-		//}, 100);
 	};
 
 	return (

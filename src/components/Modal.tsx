@@ -8,7 +8,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../redux/store';
 import { closeMenu } from '../redux/menuSlice';
-import { sendInputValue, clearSentValue } from '../redux/inputSlice';
+import { sendInputValue } from '../redux/inputSlice';
 
 import { Category, FaqTree } from '../lib/FaqTree';
 import { directUserFeedback, getAllFAQs } from '../api/query';
@@ -100,9 +100,6 @@ const Modal: React.FC = () => {
 
 	const handleSendKeyword = (message: string) => {
 		dispatch(sendInputValue(message));
-		//setTimeout(() => {
-		//	dispatch(clearSentValue());
-		//}, 100);
 		dispatch(closeMenu());
 	};
 

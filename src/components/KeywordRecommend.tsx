@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 
-import { sendInputValue, clearSentValue } from '../redux/inputSlice';
+import { sendInputValue } from '../redux/inputSlice';
 import { RootState } from '../redux/store';
 
 const KeywordRecommend: React.FC = () => {
@@ -13,10 +13,6 @@ const KeywordRecommend: React.FC = () => {
 
 	const handleSendKeyword = (message: string) => {
 		dispatch(sendInputValue(message));
-
-		//setTimeout(() => {
-		//	dispatch(clearSentValue());
-		//}, 10000);
 	};
 
 	return (

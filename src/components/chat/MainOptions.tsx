@@ -2,7 +2,7 @@ import { CiImageOn } from 'react-icons/ci';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import { sendInputValue, clearSentValue } from '../../redux/inputSlice';
+import { sendInputValue } from '../../redux/inputSlice';
 import { RootState } from '../../redux/store';
 
 const MainOptions: React.FC = () => {
@@ -11,10 +11,6 @@ const MainOptions: React.FC = () => {
 
 	const handleSendOption = (message: string) => {
 		dispatch(sendInputValue(message));
-
-		//setTimeout(() => {
-		//  dispatch(clearSentValue());
-		//}, 100);
 	};
 
 	return (

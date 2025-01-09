@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { AiFillHome } from 'react-icons/ai';
 import { TbSend2 } from 'react-icons/tb';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,6 +16,7 @@ const Input: React.FC = () => {
 	const liveValue = useSelector((state: RootState) => state.input.liveValue);
 	const inputRef = React.useRef<HTMLInputElement>(null);
 	const isKorean = useSelector((state: RootState) => state.language.isKorean);
+	const [isSending, setIsSending] = React.useState(false);
 
 	useEffect(() => {
 		if (inputRef.current) inputRef.current.focus();
@@ -29,15 +30,19 @@ const Input: React.FC = () => {
 	};
 
 	const handleSend = () => {
-		if (liveValue.trim() !== '') {
+		if (liveValue.trim() !== '' && !isSending) {
+			setIsSending(true);
 			dispatch(sendInputValue(liveValue));
 			dispatch(updateLiveValue(''));
 			dispatch(setIsEmpty(true));
+
+			setTimeout(() => setIsSending(false), 500);
 		}
 	};
 
 	const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === 'Enter') {
+			event.preventDefault();
 			handleSend();
 		}
 	};

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IoChevronBackOutline } from 'react-icons/io5';
-import { sendInputValue, clearSentValue } from '../../redux/inputSlice';
+import { sendInputValue } from '../../redux/inputSlice';
 import { RootState } from '../../redux/store';
 import HobitProfile from './HobitProfile';
 import Response from './Response';
@@ -25,9 +25,6 @@ const AllCategoriesResponse: React.FC = () => {
 
 	const handleSendKeyword = (message: string) => {
 		dispatch(sendInputValue(message));
-		//setTimeout(() => {
-		//  dispatch(clearSentValue());
-		//}, 100);
 	};
 
 	useEffect(() => {
