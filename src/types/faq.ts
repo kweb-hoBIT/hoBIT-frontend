@@ -2,6 +2,7 @@ import { QuestionLanguage } from './question';
 
 export type RateFaqRequest = {
 	faq_id: number;
+	user_question: string;
 	rating: number;
 	language: QuestionLanguage;
 };

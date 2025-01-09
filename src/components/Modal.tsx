@@ -100,9 +100,9 @@ const Modal: React.FC = () => {
 
 	const handleSendKeyword = (message: string) => {
 		dispatch(sendInputValue(message));
-		setTimeout(() => {
-			dispatch(clearSentValue());
-		}, 100);
+		//setTimeout(() => {
+		//	dispatch(clearSentValue());
+		//}, 100);
 		dispatch(closeMenu());
 	};
 

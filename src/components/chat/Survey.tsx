@@ -12,6 +12,9 @@ type SurveyProps = {
 };
 
 const Survey: React.FC<SurveyProps> = ({ id }) => {
+	const inputValue = useSelector((state: RootState) => state.input.sentValue);
+	console.log('InputValueL', inputValue);
+
 	const isKorean = useSelector((state: RootState) => state.language.isKorean);
 	const [thumbUp, setThumbUp] = useState(false);
 	const [thumbDown, setThumbDown] = useState(false);
@@ -24,6 +27,7 @@ const Survey: React.FC<SurveyProps> = ({ id }) => {
 				const response = await rateFAQ({
 					faq_id: id,
 					rating: 1,
+					user_question: inputValue,
 					language: isKorean ? 'KO' : 'EN',
 				});
 				console.log(response);
@@ -41,6 +45,7 @@ const Survey: React.FC<SurveyProps> = ({ id }) => {
 				const response = await rateFAQ({
 					faq_id: id,
 					rating: -1,
+					user_question: inputValue,
 					language: isKorean ? 'KO' : 'EN',
 				});
 				console.log(response);
