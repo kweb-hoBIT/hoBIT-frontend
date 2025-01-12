@@ -13,11 +13,9 @@ import { sendInputValue } from '../redux/inputSlice';
 import { setSeniorFaqId } from '../redux/SeniorFaqIdSlice';
 
 import { Category, FaqTree } from '../lib/FaqTree';
-import { directUserFeedback, getAllFAQs } from '../api/query';
-import { Faq, seniorFaqs } from '../types/faq';
+import { directUserFeedback, getAllFAQs, getAllSeniorFAQs } from '../api/query';
 import { buildSeniorFaqTree, SeniorFaqTree } from '../lib/SeniorFaqTree';
-
-const seniorFaqTree: SeniorFaqTree = buildSeniorFaqTree(seniorFaqs);
+import { Faq, SeniorFAQ } from '../types/faq';
 
 const Modal: React.FC = () => {
   const dispatch = useDispatch();
@@ -25,7 +23,11 @@ const Modal: React.FC = () => {
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
 
   const [faqTree, setFaqTree] = useState<FaqTree | null>(null);
+  const [seniorFaqTree, setSeniorFaqTree] = useState<SeniorFaqTree | null>(
+    null
+  );
   const [allFaqs, setAllFaqs] = useState<Faq[]>([]);
+  const [allSeniorFaqs, setAllSeniorFaqs] = useState<SeniorFAQ[]>([]);
   const [categories, setCategories] = useState<
     { mainCategory: Category; subCategories: Category[] }[]
   >([]);
@@ -34,6 +36,7 @@ const Modal: React.FC = () => {
     [categoryName: string]: string[];
   }>({});
   const faqTreeInitFlag = useRef(false);
+  const seniorFaqTreeInitFlag = useRef(false);
 
   const [expandedSeniorMainCategories, setExpandedSeniorMainCategories] =
     useState<string[]>([]);
@@ -91,6 +94,28 @@ const Modal: React.FC = () => {
       setCategories(extractedCategories);
 
       faqTreeInitFlag.current = true;
+    }
+  }, [allFaqs]);
+
+  useEffect(() => {
+    const fetchSeniorFAQs = async () => {
+      try {
+        const fetchedSeniorFaqs = await getAllSeniorFAQs();
+        setAllSeniorFaqs(fetchedSeniorFaqs.seniorFaqs);
+      } catch (error) {
+        console.error('Failed to fetch all senior FAQs:', error);
+      }
+    };
+
+    fetchSeniorFAQs();
+  }, []);
+
+  useEffect(() => {
+    if (!seniorFaqTreeInitFlag.current && allSeniorFaqs.length > 0) {
+      const seniorFaqTree = buildSeniorFaqTree(allSeniorFaqs);
+      setSeniorFaqTree(seniorFaqTree);
+
+      seniorFaqTreeInitFlag.current = true;
     }
   }, [allFaqs]);
 
@@ -286,77 +311,85 @@ const Modal: React.FC = () => {
         </div>
 
         <ul>
-          {Object.keys(seniorFaqTree).map((mainCategory) => (
-            <li key={mainCategory} className="mb-[10px]">
-              <div
-                className="hover:bg-[#FFE2E2] flex flex-row justify-between items-center cursor-pointer text-[16px] font-5medium text-[20px] text-[#686D76] bg-[#FFEFEF] px-[15px] py-[5px] rounded-[10px]"
-                onClick={() => toggleSeniorMainCategory(mainCategory)}
-              >
-                <p>{mainCategory}</p>
-                {expandedSeniorMainCategories.includes(mainCategory) ? (
-                  <FaChevronUp className="text-[16px] text-gray-400" />
-                ) : (
-                  <FaChevronDown className="text-[16px] text-gray-400" />
-                )}
-              </div>
-
-              {expandedSeniorMainCategories.includes(mainCategory) && (
-                <div className="relative ml-[25px]">
-                  <div
-                    className="absolute left-[-10px] w-[2px] bg-gray-200"
-                    style={{
-                      top: '5px',
-                      bottom: '5px',
-                    }}
-                  ></div>
-                  <ul className="pl-[10px] mt-[10px]">
-                    {Object.keys(seniorFaqTree[mainCategory]).map(
-                      (subCategory) => (
-                        <li key={subCategory}>
-                          <div
-                            className="cursor-pointer font-5medium text-[18px] text-[#686D76] hover:text-black my-[5px]"
-                            onClick={() =>
-                              toggleSeniorSubCategory(mainCategory, subCategory)
-                            }
-                          >
-                            <p>{subCategory}</p>
-                          </div>
-
-                          {expandedSeniorSubCategories[mainCategory]?.includes(
-                            subCategory
-                          ) && (
-                            <ul className="mt-[10px]">
-                              {Object.keys(
-                                seniorFaqTree[mainCategory][subCategory]
-                              ).map((detailCategory) => (
-                                <li key={detailCategory} className="mb-[10px]">
-                                  <div
-                                    className="cursor-pointer text-[16px] text-black font-3light px-[10px] py-[5px] rounded-[10px] bg-gray-100 mb-[5px] hover:bg-gray-200"
-                                    onClick={() => {
-                                      const seniorFaq =
-                                        seniorFaqTree[mainCategory][
-                                          subCategory
-                                        ][detailCategory][0];
-                                      dispatch(
-                                        setSeniorFaqId(seniorFaq.senior_faq_id)
-                                      );
-                                      dispatch(closeMenu());
-                                    }}
-                                  >
-                                    <p>{detailCategory}</p>
-                                  </div>
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                        </li>
-                      )
-                    )}
-                  </ul>
+          {seniorFaqTree &&
+            Object.keys(seniorFaqTree).map((mainCategory) => (
+              <li key={mainCategory} className="mb-[10px]">
+                <div
+                  className="hover:bg-[#FFE2E2] flex flex-row justify-between items-center cursor-pointer text-[16px] font-5medium text-[20px] text-[#686D76] bg-[#FFEFEF] px-[15px] py-[5px] rounded-[10px]"
+                  onClick={() => toggleSeniorMainCategory(mainCategory)}
+                >
+                  <p>{mainCategory}</p>
+                  {expandedSeniorMainCategories.includes(mainCategory) ? (
+                    <FaChevronUp className="text-[16px] text-gray-400" />
+                  ) : (
+                    <FaChevronDown className="text-[16px] text-gray-400" />
+                  )}
                 </div>
-              )}
-            </li>
-          ))}
+
+                {expandedSeniorMainCategories.includes(mainCategory) && (
+                  <div className="relative ml-[25px]">
+                    <div
+                      className="absolute left-[-10px] w-[2px] bg-gray-200"
+                      style={{
+                        top: '5px',
+                        bottom: '5px',
+                      }}
+                    ></div>
+                    <ul className="pl-[10px] mt-[10px]">
+                      {seniorFaqTree &&
+                        Object.keys(seniorFaqTree[mainCategory]).map(
+                          (subCategory) => (
+                            <li key={subCategory}>
+                              <div
+                                className="cursor-pointer font-5medium text-[18px] text-[#686D76] hover:text-black my-[5px]"
+                                onClick={() =>
+                                  toggleSeniorSubCategory(
+                                    mainCategory,
+                                    subCategory
+                                  )
+                                }
+                              >
+                                <p>{subCategory}</p>
+                              </div>
+
+                              {expandedSeniorSubCategories[
+                                mainCategory
+                              ]?.includes(subCategory) && (
+                                <ul className="mt-[10px]">
+                                  {Object.keys(
+                                    seniorFaqTree[mainCategory][subCategory]
+                                  ).map((detailCategory) => (
+                                    <li
+                                      key={detailCategory}
+                                      className="mb-[10px]"
+                                    >
+                                      <div
+                                        className="cursor-pointer text-[16px] text-black font-3light px-[10px] py-[5px] rounded-[10px] bg-gray-100 mb-[5px] hover:bg-gray-200"
+                                        onClick={() => {
+                                          const seniorFaq =
+                                            seniorFaqTree[mainCategory][
+                                              subCategory
+                                            ][detailCategory][0];
+                                          dispatch(
+                                            setSeniorFaqId(seniorFaq.id)
+                                          );
+                                          dispatch(closeMenu());
+                                        }}
+                                      >
+                                        <p>{detailCategory}</p>
+                                      </div>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </li>
+                          )
+                        )}
+                    </ul>
+                  </div>
+                )}
+              </li>
+            ))}
         </ul>
 
         <div className="w-full h-[1px] bg-gray-200 mt-[24px]" />
