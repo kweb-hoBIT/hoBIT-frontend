@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { FaLink } from 'react-icons/fa6';
 import { MdOutlineEmail } from 'react-icons/md';
 import { FaPhoneVolume } from 'react-icons/fa6';
@@ -7,47 +8,49 @@ import { IoIosArrowForward } from 'react-icons/io';
 import SeniorHobitProfile from './SeniorHobitProfile';
 import { getSeniorFAQById } from '../../api/query';
 import { SeniorFAQ } from '../../types/faq';
+import { RootState } from '../../redux/store';
 
 interface SeniorResponseProps {
   seniorFaqId: number;
 }
 
 const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
+  const isKorean = useSelector((state: RootState) => state.language.isKorean);
   const [seniorFAQ, setSeniorFAQ] = useState<SeniorFAQ | null>(null);
 
-  // Ensure Kakao Map SDK is loaded only once
-  const loadKakaoMapSDK = async () => {
-    if (document.querySelector('script[src*="dapi.kakao.com"]')) {
-      return; // SDK already loaded
-    }
-    const script = document.createElement('script');
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=2efd555ee1d8091a8fb33477f8c771cb&autoload=false`;
-    script.async = true;
-    document.body.appendChild(script);
+  // // Ensure Kakao Map SDK is loaded only once
+  // const loadKakaoMapSDK = async () => {
+  //   if (document.querySelector('script[src*="dapi.kakao.com"]')) {
+  //     return; // SDK already loaded
+  //   }
+  //   const script = document.createElement('script');
+  //   script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=2efd555ee1d8091a8fb33477f8c771cb&autoload=false`;
+  //   script.async = true;
+  //   document.body.appendChild(script);
 
-    return new Promise<void>((resolve, reject) => {
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error('Failed to load Kakao Map SDK'));
-    });
-  };
+  //   return new Promise<void>((resolve, reject) => {
+  //     script.onload = () => resolve();
+  //     script.onerror = () => reject(new Error('Failed to load Kakao Map SDK'));
+  //   });
+  // };
 
-  const renderMap = (latitude: number, longitude: number, mapId: string) => {
-    if (window.kakao && window.kakao.maps) {
-      const mapContainer = document.getElementById(mapId);
-      if (mapContainer) {
-        const mapOption = {
-          center: new window.kakao.maps.LatLng(latitude, longitude),
-          level: 3,
-        };
-        const map = new window.kakao.maps.Map(mapContainer, mapOption);
+  // const renderMap = (latitude: number, longitude: number, mapId: string) => {
+  //   if (window.kakao && window.kakao.maps) {
+  //     const mapContainer = document.getElementById(mapId);
+  //     if (mapContainer) {
+  //       const mapOption = {
+  //         center: new window.kakao.maps.LatLng(latitude, longitude),
+  //         level: 3,
+  //       };
+  //       const map = new window.kakao.maps.Map(mapContainer, mapOption);
 
-        const marker = new window.kakao.maps.Marker({
-          position: new window.kakao.maps.LatLng(latitude, longitude),
-        });
-        marker.setMap(map);
-      }
-    }
-  };
+  //       const marker = new window.kakao.maps.Marker({
+  //         position: new window.kakao.maps.LatLng(latitude, longitude),
+  //       });
+  //       marker.setMap(map);
+  //     }
+  //   }
+  // };
 
   // useEffect(() => {
   //   const initializeMaps = async () => {
@@ -108,61 +111,93 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
       <SeniorHobitProfile />
       <div className="flex flex-row">
         {seniorFAQ &&
-          Array.isArray(seniorFAQ.answer_ko) &&
-          seniorFAQ.answer_ko.map((answer, index) => (
-            <div
-              key={index}
-              className="font-5medium text-[20px] bg-[#FFEFEF] mt-[10px] rounded-[20px] px-[20px] py-[15px] w-[365px] break-words inline-block mr-[10px]"
-            >
-              {index === 0 && (
-                <div className="flex flex-row text-[16px] text-[#686D76] items-center rounded-[10px] w-fit mb-[10px]">
-                  <h3 className="font-5medium">{seniorFAQ.maincategory_ko}</h3>
-                  <IoIosArrowForward />
-                  <h3 className="font-4regular">{seniorFAQ.subcategory_ko}</h3>
-                  <IoIosArrowForward />
-                  <h3 className="font-4regular">
-                    {seniorFAQ.detailcategory_ko}
-                  </h3>
-                </div>
-              )}
-              {/* <div
-                id={mapId}
-                style={{ width: '100%', height: '300px', marginTop: '20px' }}
-              ></div> */}
-              {(answer.url || answer.email || answer.phone) && (
-                <div className="w-full h-[1px] bg-gray-300 mt-[20px]" />
-              )}
-              {answer.url && (
-                <div className="flex flex-row items-center mt-[20px]">
-                  <FaLink className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
-                  <a
-                    href={
-                      answer.url.startsWith('http')
-                        ? answer.url
-                        : `http://${answer.url}`
-                    }
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[18px] text-[#0A5EB0] cursor-pointer hover:underline"
-                  >
-                    {answer.url}
-                  </a>
-                </div>
-              )}
-              {answer.email && (
-                <div className="flex flex-row items-center mt-[10px]">
-                  <MdOutlineEmail className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
-                  <p className="text-[18px]">{answer.email}</p>
-                </div>
-              )}
-              {answer.phone && (
-                <div className="flex flex-row items-center mt-[10px]">
-                  <FaPhoneVolume className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
-                  <p className="text-[18px]">{answer.phone}</p>
-                </div>
-              )}
-            </div>
-          ))}
+          Array.isArray(isKorean ? seniorFAQ.answer_ko : seniorFAQ.answer_en) &&
+          (isKorean ? seniorFAQ.answer_ko : seniorFAQ.answer_en).map(
+            (answer, index) => (
+              <div
+                key={index}
+                className="font-5medium text-[20px] bg-[#FFEFEF] mt-[10px] rounded-[20px] px-[20px] py-[15px] w-[365px] break-words inline-block mr-[10px]"
+              >
+                {index === 0 && (
+                  <div className="flex flex-row text-[16px] text-[#686D76] items-center rounded-[10px] w-fit mb-[10px]">
+                    <h3 className="font-5medium">
+                      {isKorean
+                        ? seniorFAQ.maincategory_ko
+                        : seniorFAQ.maincategory_en}
+                    </h3>
+                    <IoIosArrowForward />
+                    <h3 className="font-4regular">
+                      {isKorean
+                        ? seniorFAQ.subcategory_ko
+                        : seniorFAQ.subcategory_en}
+                    </h3>
+                    <IoIosArrowForward />
+                    <h3 className="font-4regular">
+                      {isKorean
+                        ? seniorFAQ.detailcategory_ko
+                        : seniorFAQ.detailcategory_en}
+                    </h3>
+                  </div>
+                )}
+                <p className="font-7bold text-[20px] mb-[10px]">
+                  {answer.title}
+                </p>
+                {answer.image && (
+                  <div className="mt-[20px]">
+                    <img
+                      src={answer.image}
+                      alt={isKorean ? '관련 이미지' : 'Related Image'}
+                      className="w-full h-auto rounded-[10px] object-cover"
+                    />
+                  </div>
+                )}
+                <p>
+                  {answer.answer &&
+                    answer.answer
+                      .split('\n')
+                      .map((line, index) =>
+                        line === '' ? (
+                          <br key={index} />
+                        ) : (
+                          <p key={index}>{line}</p>
+                        )
+                      )}
+                </p>
+                {(answer.url || answer.email || answer.phone) && (
+                  <div className="w-full h-[1px] bg-gray-300 mt-[20px]" />
+                )}
+                {answer.url && (
+                  <div className="flex flex-row items-center mt-[20px]">
+                    <FaLink className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
+                    <a
+                      href={
+                        answer.url.startsWith('http')
+                          ? answer.url
+                          : `http://${answer.url}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[18px] text-[#0A5EB0] cursor-pointer hover:underline"
+                    >
+                      {answer.url}
+                    </a>
+                  </div>
+                )}
+                {answer.email && (
+                  <div className="flex flex-row items-center mt-[10px]">
+                    <MdOutlineEmail className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
+                    <p className="text-[18px]">{answer.email}</p>
+                  </div>
+                )}
+                {answer.phone && (
+                  <div className="flex flex-row items-center mt-[10px]">
+                    <FaPhoneVolume className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
+                    <p className="text-[18px]">{answer.phone}</p>
+                  </div>
+                )}
+              </div>
+            )
+          )}
       </div>
     </div>
   );

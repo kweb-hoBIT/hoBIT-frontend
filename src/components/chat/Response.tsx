@@ -81,8 +81,19 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                       <div className="w-full h-[1px] bg-gray-300 mt-[20px]" />
                     )}
                     {item.url && (
-                      <div className="flex flex-row items-center mt-[20px]">
-                        <FaLink className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
+                      <div
+                        className={`flex flex-row ${
+                          item.url.length <= 30 ? 'items-center' : 'items-start'
+                        } mt-[20px]`}
+                      >
+                        <FaLink
+                          style={{
+                            fontSize: '36px',
+                            minWidth: '36px',
+                            minHeight: '36px',
+                          }}
+                          className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full"
+                        />
                         <a
                           href={
                             item.url.startsWith('http')
@@ -91,7 +102,8 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                           }
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[18px] text-[#0A5EB0] cursor-pointer hover:underline"
+                          className="text-[18px] text-[#0A5EB0] cursor-pointer hover:underline break-words"
+                          style={{ wordBreak: 'break-word' }}
                         >
                           {item.url}
                         </a>

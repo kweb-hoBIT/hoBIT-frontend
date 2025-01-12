@@ -14,7 +14,7 @@ import { setSeniorFaqId } from '../redux/SeniorFaqIdSlice';
 
 import { Category, FaqTree } from '../lib/FaqTree';
 import { directUserFeedback, getAllFAQs, getAllSeniorFAQs } from '../api/query';
-import { buildSeniorFaqTree, SeniorFaqTree } from '../lib/SeniorFaqTree';
+import { SeniorFaqTree } from '../lib/SeniorFaqTree';
 import { Faq, SeniorFAQ } from '../types/faq';
 
 const Modal: React.FC = () => {
@@ -38,6 +38,9 @@ const Modal: React.FC = () => {
   const faqTreeInitFlag = useRef(false);
   const seniorFaqTreeInitFlag = useRef(false);
 
+  const [seniorCategories, setSeniorCategories] = useState<
+    { mainCategory: Category; subCategories: Category[] }[]
+  >([]);
   const [expandedSeniorMainCategories, setExpandedSeniorMainCategories] =
     useState<string[]>([]);
   const [expandedSeniorSubCategories, setExpandedSeniorSubCategories] =
@@ -52,7 +55,6 @@ const Modal: React.FC = () => {
     if (!feedback.trim()) {
       return;
     }
-
     setIsSubmitting(true);
     try {
       await directUserFeedback({
@@ -81,6 +83,19 @@ const Modal: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    const fetchSeniorFAQs = async () => {
+      try {
+        const fetchedSeniorFaqs = await getAllSeniorFAQs();
+        setAllSeniorFaqs(fetchedSeniorFaqs);
+      } catch (error) {
+        console.error('Failed to fetch all senior FAQs:', error);
+      }
+    };
+
+    fetchSeniorFAQs();
+  }, []);
+
+  useEffect(() => {
     if (!faqTreeInitFlag.current && allFaqs.length > 0) {
       const faqTree = new FaqTree(allFaqs);
       setFaqTree(faqTree);
@@ -98,26 +113,22 @@ const Modal: React.FC = () => {
   }, [allFaqs]);
 
   useEffect(() => {
-    const fetchSeniorFAQs = async () => {
-      try {
-        const fetchedSeniorFaqs = await getAllSeniorFAQs();
-        setAllSeniorFaqs(fetchedSeniorFaqs.seniorFaqs);
-      } catch (error) {
-        console.error('Failed to fetch all senior FAQs:', error);
-      }
-    };
-
-    fetchSeniorFAQs();
-  }, []);
-
-  useEffect(() => {
     if (!seniorFaqTreeInitFlag.current && allSeniorFaqs.length > 0) {
-      const seniorFaqTree = buildSeniorFaqTree(allSeniorFaqs);
+      const seniorFaqTree = new SeniorFaqTree(allSeniorFaqs);
       setSeniorFaqTree(seniorFaqTree);
+
+      const mainCategories = Array.from(seniorFaqTree.tree.keys());
+      const extractedCategories = mainCategories.map((mainCategory) => ({
+        mainCategory,
+        subCategories: Array.from(seniorFaqTree.tree.get(mainCategory)!.keys()),
+      }));
+
+      setSeniorCategories(extractedCategories);
+      console.log(seniorCategories);
 
       seniorFaqTreeInitFlag.current = true;
     }
-  }, [allFaqs]);
+  }, [allSeniorFaqs]);
 
   const toggleCategory = (categoryName: string) => {
     setExpandedCategories((prev) => {
@@ -192,11 +203,15 @@ const Modal: React.FC = () => {
       >
         <div className="flex flex-row justify-between items-center">
           <p className="font-6semibold text-[20px] flex flex-row items-center">
-            <span className="mr-[5px]">카테고리</span>
+            <span className="mr-[5px]">
+              {isKorean ? '카테고리' : 'Category'}
+            </span>
             <BiSolidCategory className="text-[#E55604]" />
           </p>
           <button
-            onClick={() => dispatch(closeMenu())}
+            onClick={() => {
+              dispatch(closeMenu());
+            }}
             className="text-gray-500 hover:text-black text-[20px] focus:outline-none"
           >
             <IoClose />
@@ -306,117 +321,143 @@ const Modal: React.FC = () => {
         <div className="w-full h-[1px] bg-gray-200 mt-[24px]" />
 
         <div className="mt-[20px] mb-4 flex flex-row items-center">
-          <span className="font-6semibold text-[20px]">선배모드</span>
+          <span className="font-6semibold text-[20px]">
+            {isKorean ? '선배모드' : 'Senior Mode'}
+          </span>
           <IoSparkles className="ml-[7px] text-[#E55604] text-[20px]" />
         </div>
 
-        <ul>
-          {seniorFaqTree &&
-            Object.keys(seniorFaqTree).map((mainCategory) => (
-              <li key={mainCategory} className="mb-[10px]">
-                <div
-                  className="hover:bg-[#FFE2E2] flex flex-row justify-between items-center cursor-pointer text-[16px] font-5medium text-[20px] text-[#686D76] bg-[#FFEFEF] px-[15px] py-[5px] rounded-[10px]"
-                  onClick={() => toggleSeniorMainCategory(mainCategory)}
-                >
-                  <p>{mainCategory}</p>
-                  {expandedSeniorMainCategories.includes(mainCategory) ? (
-                    <FaChevronUp className="text-[16px] text-gray-400" />
-                  ) : (
-                    <FaChevronDown className="text-[16px] text-gray-400" />
-                  )}
-                </div>
-
-                {expandedSeniorMainCategories.includes(mainCategory) && (
-                  <div className="relative ml-[25px]">
-                    <div
-                      className="absolute left-[-10px] w-[2px] bg-gray-200"
-                      style={{
-                        top: '5px',
-                        bottom: '5px',
-                      }}
-                    ></div>
-                    <ul className="pl-[10px] mt-[10px]">
-                      {seniorFaqTree &&
-                        Object.keys(seniorFaqTree[mainCategory]).map(
-                          (subCategory) => (
-                            <li key={subCategory}>
-                              <div
-                                className="cursor-pointer font-5medium text-[18px] text-[#686D76] hover:text-black my-[5px]"
-                                onClick={() =>
-                                  toggleSeniorSubCategory(
-                                    mainCategory,
-                                    subCategory
-                                  )
-                                }
-                              >
-                                <p>{subCategory}</p>
-                              </div>
-
-                              {expandedSeniorSubCategories[
-                                mainCategory
-                              ]?.includes(subCategory) && (
-                                <ul className="mt-[10px]">
-                                  {Object.keys(
-                                    seniorFaqTree[mainCategory][subCategory]
-                                  ).map((detailCategory) => (
-                                    <li
-                                      key={detailCategory}
-                                      className="mb-[10px]"
-                                    >
-                                      <div
-                                        className="cursor-pointer text-[16px] text-black font-3light px-[10px] py-[5px] rounded-[10px] bg-gray-100 mb-[5px] hover:bg-gray-200"
-                                        onClick={() => {
-                                          const seniorFaq =
-                                            seniorFaqTree[mainCategory][
-                                              subCategory
-                                            ][detailCategory][0];
-                                          dispatch(
-                                            setSeniorFaqId(seniorFaq.id)
-                                          );
-                                          dispatch(closeMenu());
-                                        }}
-                                      >
-                                        <p>{detailCategory}</p>
-                                      </div>
-                                    </li>
-                                  ))}
-                                </ul>
-                              )}
-                            </li>
-                          )
-                        )}
-                    </ul>
-                  </div>
+        <ul className="mt-4">
+          {seniorCategories.map((category, index) => (
+            <li key={index} className="mb-[10px] ">
+              <div
+                className="hover:bg-[#FFDADA] flex flex-row justify-between items-center cursor-pointer text-[16px] font-5medium text-[20px] text-[#686D76] bg-[#FFEFEF] px-[15px] py-[5px] rounded-[10px]"
+                onClick={() =>
+                  toggleSeniorMainCategory(
+                    isKorean
+                      ? category.mainCategory.category_ko
+                      : category.mainCategory.category_en
+                  )
+                }
+              >
+                <span>
+                  {isKorean
+                    ? category.mainCategory.category_ko
+                    : category.mainCategory.category_en}
+                </span>
+                {expandedSeniorMainCategories.includes(
+                  isKorean
+                    ? category.mainCategory.category_ko
+                    : category.mainCategory.category_en
+                ) ? (
+                  <FaChevronUp className="text-[16px] text-gray-400" />
+                ) : (
+                  <FaChevronDown className="text-[16px] text-gray-400" />
                 )}
-              </li>
-            ))}
+              </div>
+              {expandedSeniorMainCategories.includes(
+                isKorean
+                  ? category.mainCategory.category_ko
+                  : category.mainCategory.category_en
+              ) && (
+                <div className="relative ml-[25px]">
+                  <div
+                    className="absolute left-[-10px] w-[2px] bg-gray-200"
+                    style={{
+                      top: '5px',
+                      bottom: '5px',
+                    }}
+                  ></div>
+                  <ul className="pl-[10px] mt-[10px]">
+                    {category.subCategories.map((subCategory, subIndex) => (
+                      <li
+                        key={subIndex}
+                        onClick={() =>
+                          toggleSeniorSubCategory(
+                            isKorean
+                              ? category.mainCategory.category_ko
+                              : category.mainCategory.category_en,
+                            isKorean
+                              ? subCategory.category_ko
+                              : subCategory.category_en
+                          )
+                        }
+                        className="cursor-pointer font-5medium text-[18px] text-[#686D76] hover:text-black my-[5px]"
+                      >
+                        <div>
+                          {isKorean
+                            ? subCategory.category_ko
+                            : subCategory.category_en}
+                        </div>
+                        {expandedSeniorSubCategories[
+                          isKorean
+                            ? category.mainCategory.category_ko
+                            : category.mainCategory.category_en
+                        ]?.includes(
+                          isKorean
+                            ? subCategory.category_ko
+                            : subCategory.category_en
+                        ) && (
+                          <ul className="mt-[5px]">
+                            {seniorFaqTree?.tree
+                              .get(category.mainCategory)
+                              ?.get(subCategory)
+                              ?.map((faq, faqIndex) => (
+                                <li
+                                  key={faqIndex}
+                                  onClick={() => {
+                                    dispatch(setSeniorFaqId(faq.id));
+                                    dispatch(closeMenu());
+                                  }}
+                                  className="cursor-pointer text-[16px] text-black font-3light px-[10px] py-[5px] rounded-[10px] bg-gray-100 mb-[5px] hover:bg-gray-200"
+                                >
+                                  {isKorean
+                                    ? faq.detailcategory_ko
+                                    : faq.detailcategory_en}
+                                </li>
+                              ))}
+                          </ul>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </li>
+          ))}
         </ul>
 
         <div className="w-full h-[1px] bg-gray-200 mt-[24px]" />
 
         <div className="mt-[20px] flex flex-row items-center">
-          <span className="font-6semibold text-[20px]">피드백 남기기</span>
+          <span className="font-6semibold text-[20px]">
+            {isKorean ? '피드백 남기기' : 'Leave Feedback'}
+          </span>
           <RiEditFill className="ml-[5px] text-[#E55604] text-[20px]" />
         </div>
         <div className="flex flex-col mt-4">
           <textarea
-            placeholder="여기에 피드백을 작성해주세요!"
+            placeholder={
+              isKorean
+                ? '여기에 피드백을 작성해주세요!'
+                : 'Please write your feedback here!'
+            }
             rows={4}
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
-            className="w-full border-none bg-gray-100 font-5medium text-[20px] rounded-[8px] px-[15px] py-[10px] focus:outline-none focus:border-[#F075AA] resize-none"
+            className="w-full border-none bg-gray-100 font-5medium text-[18px] rounded-[8px] px-[15px] py-[10px] focus:outline-none focus:border-[#F075AA] resize-none"
           />
           <button
             onClick={handleFeedbackSubmit}
             disabled={isSubmitting}
             className={`${
               feedback ? 'bg-blue-200' : 'bg-gray-200'
-            } text-gray-500 font-6semibold py-[5px] mt-[10px] rounded-[8px] text-[20px] hover:bg-gray-300 transition`}
+            } text-gray-500 font-6semibold py-[5px] mt-[10px] rounded-[8px] text-[18px] hover:bg-gray-300 transition`}
           >
-            작성 완료
+            {isKorean ? '작성 완료' : 'Submit'}
           </button>
         </div>
-        <div className="w-full flex flex-col mt-[20px] items-center font-4regular text-[16px] text-gray-400">
+        <div className="w-full flex flex-col mt-[20px] items-center font-4regular text-[18px] text-gray-400">
           <span>copyrights@KWEB</span>
         </div>
       </div>
