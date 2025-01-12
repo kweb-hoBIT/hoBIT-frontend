@@ -1,20 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaLink } from 'react-icons/fa6';
 import { MdOutlineEmail } from 'react-icons/md';
 import { FaPhoneVolume } from 'react-icons/fa6';
 import { IoIosArrowForward } from 'react-icons/io';
 
-import { seniorFaqs } from '../../types/faq';
 import SeniorHobitProfile from './SeniorHobitProfile';
+import { getSeniorFAQById } from '../../api/query';
+import { SeniorFAQ } from '../../types/faq';
 
 interface SeniorResponseProps {
   seniorFaqId: number;
 }
 
 const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
-  const matchedFaq = seniorFaqs.find(
-    (faq) => faq.senior_faq_id === seniorFaqId
-  );
+  const [seniorFAQ, setSeniorFAQ] = useState<SeniorFAQ | null>(null);
 
   // Ensure Kakao Map SDK is loaded only once
   const loadKakaoMapSDK = async () => {
@@ -50,68 +49,86 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
     }
   };
 
+  // useEffect(() => {
+  //   const initializeMaps = async () => {
+  //     try {
+  //       await loadKakaoMapSDK();
+  //       window.kakao.maps.load(() => {
+  //         matchedFaq?.answer_ko.forEach((answer, index) => {
+  //           const latitude = parseFloat(answer.map?.latitude || '37.566535'); // Default: 광화문
+  //           const longitude = parseFloat(answer.map?.longitude || '126.977969'); // Default: 광화문
+  //           const mapId = `map-${seniorFaqId}-${index}`; // Unique map ID per FAQ and index
+  //           renderMap(latitude, longitude, mapId);
+  //         });
+  //       });
+  //     } catch (error) {
+  //       console.error('Failed to initialize Kakao Maps:', error);
+  //     }
+  //   };
+
+  //   initializeMaps();
+  // }, [matchedFaq, seniorFaqId]);
+
+  // if (!matchedFaq) {
+  //   return (
+  //     <div>
+  //       <SeniorHobitProfile />
+  //       <p>No matching FAQ found for ID: {seniorFaqId}</p>
+  //       <div
+  //         id={`map-placeholder-${seniorFaqId}`}
+  //         style={{ width: '100%', height: '400px', marginTop: '20px' }}
+  //       ></div>
+  //     </div>
+  //   );
+  // }
+
   useEffect(() => {
-    const initializeMaps = async () => {
+    const fetchSeniorFAQById = async () => {
       try {
-        await loadKakaoMapSDK();
-        window.kakao.maps.load(() => {
-          matchedFaq?.answer_ko.forEach((answer, index) => {
-            const latitude = parseFloat(answer.map?.latitude || '37.566535'); // Default: 광화문
-            const longitude = parseFloat(answer.map?.longitude || '126.977969'); // Default: 광화문
-            const mapId = `map-${seniorFaqId}-${index}`; // Unique map ID per FAQ and index
-            renderMap(latitude, longitude, mapId);
-          });
-        });
+        const fetchedSeniorFAQ = await getSeniorFAQById({ id: seniorFaqId });
+
+        const parsedFaq = {
+          ...fetchedSeniorFAQ.seniorFaq,
+          answer_ko: JSON.parse(fetchedSeniorFAQ.seniorFaq.answer_ko),
+          answer_en: JSON.parse(fetchedSeniorFAQ.seniorFaq.answer_en),
+        };
+
+        setSeniorFAQ(parsedFaq);
+        console.log('Fetched and parsed senior faq:', parsedFaq);
       } catch (error) {
-        console.error('Failed to initialize Kakao Maps:', error);
+        console.error('Failed to fetch all senior FAQs:', error);
       }
     };
 
-    initializeMaps();
-  }, [matchedFaq, seniorFaqId]);
-
-  if (!matchedFaq) {
-    return (
-      <div>
-        <SeniorHobitProfile />
-        <p>No matching FAQ found for ID: {seniorFaqId}</p>
-        <div
-          id={`map-placeholder-${seniorFaqId}`}
-          style={{ width: '100%', height: '400px', marginTop: '20px' }}
-        ></div>
-      </div>
-    );
-  }
+    fetchSeniorFAQById();
+  }, [seniorFaqId]);
 
   return (
     <div>
       <SeniorHobitProfile />
-      <div className="flex flex-row flex-wrap">
-        {matchedFaq.answer_ko.map((answer, index) => {
-          const latitude = parseFloat(answer.map?.latitude || '37.566535');
-          const longitude = parseFloat(answer.map?.longitude || '126.977969');
-          const mapId = `map-${seniorFaqId}-${index}`; // Unique map ID
-
-          return (
+      <div className="flex flex-row">
+        {seniorFAQ &&
+          Array.isArray(seniorFAQ.answer_ko) &&
+          seniorFAQ.answer_ko.map((answer, index) => (
             <div
               key={index}
               className="font-5medium text-[20px] bg-[#FFEFEF] mt-[10px] rounded-[20px] px-[20px] py-[15px] w-[365px] break-words inline-block mr-[10px]"
             >
               {index === 0 && (
                 <div className="flex flex-row text-[16px] text-[#686D76] items-center rounded-[10px] w-fit mb-[10px]">
-                  <h3 className="font-5medium">{matchedFaq.maincategory_ko}</h3>
+                  <h3 className="font-5medium">{seniorFAQ.maincategory_ko}</h3>
                   <IoIosArrowForward />
-                  <h3 className="font-4regular">{matchedFaq.subcategory_ko}</h3>
+                  <h3 className="font-4regular">{seniorFAQ.subcategory_ko}</h3>
                   <IoIosArrowForward />
                   <h3 className="font-4regular">
-                    {matchedFaq.detailcategory_ko}
+                    {seniorFAQ.detailcategory_ko}
                   </h3>
                 </div>
               )}
-              <div
+              {/* <div
                 id={mapId}
                 style={{ width: '100%', height: '300px', marginTop: '20px' }}
-              ></div>
+              ></div> */}
               {(answer.url || answer.email || answer.phone) && (
                 <div className="w-full h-[1px] bg-gray-300 mt-[20px]" />
               )}
@@ -145,8 +162,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                 </div>
               )}
             </div>
-          );
-        })}
+          ))}
       </div>
     </div>
   );

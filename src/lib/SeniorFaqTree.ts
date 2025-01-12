@@ -1,4 +1,4 @@
-import { seniorFaqs } from '../types/faq';
+import { SeniorFAQ } from '../types/faq';
 
 export type SeniorFaqTree = {
   [mainCategory: string]: {
@@ -8,16 +8,16 @@ export type SeniorFaqTree = {
   };
 };
 
-export const buildSeniorFaqTree = (faqs: typeof seniorFaqs): SeniorFaqTree => {
+export const buildSeniorFaqTree = (faqs: SeniorFAQ[]): SeniorFaqTree => {
   const tree: SeniorFaqTree = {};
 
-  faqs.forEach((faq) => {
+  faqs.forEach((faq: SeniorFAQ) => {
     const {
+      id,
       maincategory_ko,
       subcategory_ko,
       detailcategory_ko,
       answer_ko,
-      senior_faq_id,
     } = faq;
 
     if (!tree[maincategory_ko]) {
@@ -34,12 +34,10 @@ export const buildSeniorFaqTree = (faqs: typeof seniorFaqs): SeniorFaqTree => {
     }
 
     tree[maincategory_ko][subcategory_ko][detailKey].push({
-      senior_faq_id,
+      id,
       answer_ko,
     });
   });
 
   return tree;
 };
-
-const seniorFaqTree = buildSeniorFaqTree(seniorFaqs);
