@@ -48,10 +48,6 @@ export class SeniorFaqTree {
       subCategoryMap.set(subCategory, []);
     }
 
-    const detailCategoryMap = subCategoryMap.get(
-      existingSubCategory || subCategory
-    )!;
-
     subCategoryMap.get(existingSubCategory || subCategory)!.push(faq);
   }
 

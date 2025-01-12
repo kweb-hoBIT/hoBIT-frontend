@@ -28,6 +28,7 @@ const Modal: React.FC = () => {
   );
   const [allFaqs, setAllFaqs] = useState<Faq[]>([]);
   const [allSeniorFaqs, setAllSeniorFaqs] = useState<SeniorFAQ[]>([]);
+
   const [categories, setCategories] = useState<
     { mainCategory: Category; subCategories: Category[] }[]
   >([]);
@@ -55,6 +56,7 @@ const Modal: React.FC = () => {
     if (!feedback.trim()) {
       return;
     }
+
     setIsSubmitting(true);
     try {
       await directUserFeedback({
@@ -86,7 +88,7 @@ const Modal: React.FC = () => {
     const fetchSeniorFAQs = async () => {
       try {
         const fetchedSeniorFaqs = await getAllSeniorFAQs();
-        setAllSeniorFaqs(fetchedSeniorFaqs);
+        setAllSeniorFaqs(fetchedSeniorFaqs.seniorFaqs);
       } catch (error) {
         console.error('Failed to fetch all senior FAQs:', error);
       }
@@ -113,6 +115,11 @@ const Modal: React.FC = () => {
   }, [allFaqs]);
 
   useEffect(() => {
+    console.log(
+      'seniorFaqTreeInitFlag.current:',
+      seniorFaqTreeInitFlag.current
+    );
+
     if (!seniorFaqTreeInitFlag.current && allSeniorFaqs.length > 0) {
       const seniorFaqTree = new SeniorFaqTree(allSeniorFaqs);
       setSeniorFaqTree(seniorFaqTree);
@@ -331,7 +338,7 @@ const Modal: React.FC = () => {
           {seniorCategories.map((category, index) => (
             <li key={index} className="mb-[10px] ">
               <div
-                className="hover:bg-[#FFDADA] flex flex-row justify-between items-center cursor-pointer text-[16px] font-5medium text-[20px] text-[#686D76] bg-[#FFEFEF] px-[15px] py-[5px] rounded-[10px]"
+                className="hover:bg-[#FDDDDD] flex flex-row justify-between items-center cursor-pointer text-[16px] font-5medium text-[20px] text-[#686D76] bg-[#FFEFEF] px-[15px] py-[5px] rounded-[10px]"
                 onClick={() =>
                   toggleSeniorMainCategory(
                     isKorean
@@ -457,7 +464,7 @@ const Modal: React.FC = () => {
             {isKorean ? '작성 완료' : 'Submit'}
           </button>
         </div>
-        <div className="w-full flex flex-col mt-[20px] items-center font-4regular text-[18px] text-gray-400">
+        <div className="w-full flex flex-col mt-[20px] items-center font-4regular text-[16px] text-gray-400">
           <span>copyrights@KWEB</span>
         </div>
       </div>
