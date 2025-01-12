@@ -108,8 +108,8 @@ export const seniorFaqs: SeniorFaq = [
         phone: '010-1234-5678',
         image: 'https://example.com/image_ko.jpg',
         map: {
-          latitude: '37.5665',
-          longitude: '126.9780',
+          latitude: '37.589169',
+          longitude: '127.033529',
         },
       },
     ],
