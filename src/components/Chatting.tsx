@@ -5,6 +5,7 @@ import HelloHobit from './chat/HelloHobit';
 import GeneralResponse from './chat/GeneralResponse';
 import FAQResponse from './chat/FAQResponse';
 import AllCategoriesResponse from './chat/AllCategoriesResponse';
+import SeniorResponse from './chat/SeniorResponse';
 import Query from './chat/Query';
 import { RootState } from '../redux/store';
 import { Faq } from '../types/faq';
@@ -13,142 +14,164 @@ import { setQuestions } from '../redux/questionsSlice';
 import { resetHomeClicked } from '../redux/homeSlice';
 
 interface ChatItem {
-	query: string;
-	response: Faq[];
-	loading: boolean;
-	flag: boolean;
+  query: string;
+  response: Faq[];
+  loading: boolean;
+  flag: boolean;
+  seniorMode: number;
 }
 
 const Chatting: React.FC = () => {
-	const dispatch = useDispatch();
-	const chatContainerRef = useRef<HTMLDivElement>(null);
-	const sentValue = useSelector((state: RootState) => state.input.sentValue);
-	const isKorean = useSelector((state: RootState) => state.language.isKorean);
-	const homeClicked = useSelector((state: RootState) => state.home.homeClicked);
+  const dispatch = useDispatch();
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const sentValue = useSelector((state: RootState) => state.input.sentValue);
+  const isKorean = useSelector((state: RootState) => state.language.isKorean);
+  const homeClicked = useSelector((state: RootState) => state.home.homeClicked);
+  const seniorFaqId = useSelector(
+    (state: RootState) => state.seniorFaqId.seniorFaqId
+  );
 
-	const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
-	const [error, setError] = useState<string | null>(null);
+  const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-	useEffect(() => {
-		const fetchAllQuestions = async () => {
-			try {
-				const response = await getAllQuestions();
-				dispatch(setQuestions(response.questions));
-			} catch (err) {
-				console.error('Error while fetching all questions:', err);
-				setError(err as string);
-			}
-		};
+  useEffect(() => {
+    const fetchAllQuestions = async () => {
+      try {
+        const response = await getAllQuestions();
+        dispatch(setQuestions(response.questions));
+      } catch (err) {
+        console.error('Error while fetching all questions:', err);
+        setError(err as string);
+      }
+    };
 
-		fetchAllQuestions();
-	}, [dispatch]);
+    fetchAllQuestions();
+  }, [dispatch]);
 
-	useLayoutEffect(() => {
-		if (chatContainerRef.current) {
-			const container = chatContainerRef.current;
-			if (container.scrollHeight > container.clientHeight) {
-				setTimeout(() => {
-					container.scrollTo({
-						top: container.scrollHeight,
-						behavior: 'smooth',
-					});
-				}, 50);
-			}
-		}
-	}, [chatHistory]);
+  useLayoutEffect(() => {
+    if (chatContainerRef.current) {
+      const container = chatContainerRef.current;
+      if (container.scrollHeight > container.clientHeight) {
+        setTimeout(() => {
+          container.scrollTo({
+            top: container.scrollHeight,
+            behavior: 'smooth',
+          });
+        }, 50);
+      }
+    }
+  }, [chatHistory]);
 
-	useEffect(() => {
-		if (!sentValue) return;
+  useEffect(() => {
+    if (!sentValue) return;
 
-		const newChatItem: ChatItem = {
-			query: sentValue,
-			response: [],
-			loading: true,
-			flag: false,
-		};
+    const newChatItem: ChatItem = {
+      query: sentValue,
+      response: [],
+      loading: true,
+      flag: false,
+      seniorMode: -1,
+    };
 
-		setChatHistory((prevHistory) => [...prevHistory, newChatItem]);
+    setChatHistory((prevHistory) => [...prevHistory, newChatItem]);
 
-		const fetchResponse = async () => {
-			try {
-				const language = isKorean ? 'KO' : 'EN';
-				const serverResponse = await sendQuestion(sentValue, language);
+    const fetchResponse = async () => {
+      try {
+        const language = isKorean ? 'KO' : 'EN';
+        const serverResponse = await sendQuestion(sentValue, language);
 
-				if (serverResponse && Array.isArray(serverResponse.faqs)) {
-					setChatHistory((prevHistory) =>
-						prevHistory.map((item) =>
-							item.query === sentValue
-								? { ...item, response: serverResponse.faqs, loading: false }
-								: item
-						)
-					);
-				} else {
-					console.error('Invalid response structure:', serverResponse);
-					setError('Invalid response structure');
-				}
-			} catch (err) {
-				console.error('Error while fetching response:', err);
-				setError(err as string);
-				setChatHistory((prevHistory) =>
-					prevHistory.map((item) =>
-						item.query === sentValue ? { ...item, loading: false } : item
-					)
-				);
-			}
-		};
+        if (serverResponse && Array.isArray(serverResponse.faqs)) {
+          setChatHistory((prevHistory) =>
+            prevHistory.map((item) =>
+              item.query === sentValue
+                ? { ...item, response: serverResponse.faqs, loading: false }
+                : item
+            )
+          );
+        } else {
+          console.error('Invalid response structure:', serverResponse);
+          setError('Invalid response structure');
+        }
+      } catch (err) {
+        console.error('Error while fetching response:', err);
+        setError(err as string);
+        setChatHistory((prevHistory) =>
+          prevHistory.map((item) =>
+            item.query === sentValue ? { ...item, loading: false } : item
+          )
+        );
+      }
+    };
 
-		fetchResponse();
-	}, [sentValue]);
+    fetchResponse();
+  }, [sentValue]);
 
-	useEffect(() => {
-		if (homeClicked) {
-			const newChatItem: ChatItem = {
-				query: '',
-				response: [],
-				loading: false,
-				flag: true,
-			};
+  useEffect(() => {
+    if (seniorFaqId !== null && seniorFaqId !== undefined) {
+      const newChatItem: ChatItem = {
+        query: '',
+        response: [],
+        loading: false,
+        flag: false,
+        seniorMode: seniorFaqId,
+      };
+      setChatHistory((prevHistory) => [...prevHistory, newChatItem]);
+    }
+  }, [seniorFaqId]);
 
-			setChatHistory((prevHistory) => [...prevHistory, newChatItem]);
-			dispatch(resetHomeClicked());
-		}
-	}, [homeClicked, dispatch]);
+  useEffect(() => {
+    if (homeClicked) {
+      const newChatItem: ChatItem = {
+        query: '',
+        response: [],
+        loading: false,
+        flag: true,
+        seniorMode: -1,
+      };
 
-	return (
-		<div
-			ref={chatContainerRef}
-			className="flex flex-col h-full max-h-[calc(100vh-140px)] overflow-y-auto px-[20px] py-[30px]"
-		>
-			<HelloHobit />
-			{chatHistory.map((chatItem, index) => (
-				<div key={index}>
-					{chatItem.flag ? (
-						<div className="mt-[40px]">
-							<HelloHobit />
-						</div>
-					) : (
-						<>
-							<Query text={chatItem.query} />
-							{chatItem.query === '자주 묻는 질문' ||
-								chatItem.query === 'FAQ' ? (
-								<FAQResponse />
-							) : chatItem.query === '할 수 있는 일' ||
-								chatItem.query === 'What I Can Do' ? (
-								<AllCategoriesResponse />
-							) : (
-								<GeneralResponse
-									faqs={chatItem.response}
-									loading={chatItem.loading}
-								/>
-							)}
-						</>
-					)}
-				</div>
-			))}
+      setChatHistory((prevHistory) => [...prevHistory, newChatItem]);
+      dispatch(resetHomeClicked());
+    }
+  }, [homeClicked, dispatch]);
 
-			{error && <div style={{ color: 'red' }}>Error: {error}</div>}
-		</div>
-	);
+  return (
+    <div
+      ref={chatContainerRef}
+      className="flex flex-col h-full max-h-[calc(100vh-140px)] overflow-y-auto px-[20px] py-[30px]"
+    >
+      <HelloHobit />
+      {chatHistory.map((chatItem, index) => (
+        <div key={index}>
+          {chatItem.seniorMode >= 0 ? (
+            <div className="mt-[40px]">
+              <SeniorResponse seniorFaqId={chatItem.seniorMode} />
+            </div>
+          ) : chatItem.flag ? (
+            <div className="mt-[40px]">
+              <HelloHobit />
+            </div>
+          ) : (
+            <>
+              <Query text={chatItem.query} />
+              {chatItem.query === '자주 묻는 질문' ||
+              chatItem.query === 'FAQ' ? (
+                <FAQResponse />
+              ) : chatItem.query === '할 수 있는 일' ||
+                chatItem.query === 'What I Can Do' ? (
+                <AllCategoriesResponse />
+              ) : (
+                <GeneralResponse
+                  faqs={chatItem.response}
+                  loading={chatItem.loading}
+                />
+              )}
+            </>
+          )}
+        </div>
+      ))}
+      {error && <div style={{ color: 'red' }}>Error: {error}</div>}
+    </div>
+  );
 };
 
 export default Chatting;

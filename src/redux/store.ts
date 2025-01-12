@@ -5,6 +5,7 @@ import { languageReducer } from './languageSlice';
 import { questionsReducer } from './questionsSlice';
 import { menuReducer } from './menuSlice';
 import { homeReducer } from './homeSlice';
+import { SeniorFaqIdReducer } from './SeniorFaqIdSlice';
 
 const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
     questions: questionsReducer,
     menu: menuReducer,
     home: homeReducer,
+    seniorFaqId: SeniorFaqIdReducer,
   },
 });
 
