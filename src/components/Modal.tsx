@@ -115,11 +115,6 @@ const Modal: React.FC = () => {
   }, [allFaqs]);
 
   useEffect(() => {
-    console.log(
-      'seniorFaqTreeInitFlag.current:',
-      seniorFaqTreeInitFlag.current
-    );
-
     if (!seniorFaqTreeInitFlag.current && allSeniorFaqs.length > 0) {
       const seniorFaqTree = new SeniorFaqTree(allSeniorFaqs);
       setSeniorFaqTree(seniorFaqTree);
@@ -131,7 +126,7 @@ const Modal: React.FC = () => {
       }));
 
       setSeniorCategories(extractedCategories);
-      console.log(seniorCategories);
+      console.log(131, seniorCategories);
 
       seniorFaqTreeInitFlag.current = true;
     }
