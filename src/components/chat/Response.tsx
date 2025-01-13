@@ -62,11 +62,11 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                   >
                     {itemIndex === 0 && (
                       <div className="flex flex-row text-[16px] text-[#686D76] items-center rounded-[10px] w-fit mb-[10px]">
-                        <h3>
+                        <h3 className="text-center">
                           {isKorean ? faq.maincategory_ko : faq.maincategory_en}
                         </h3>
                         <IoIosArrowForward />
-                        <h3 className="font-4regular">
+                        <h3 className="font-4regular text-center">
                           {isKorean ? faq.subcategory_ko : faq.subcategory_en}
                         </h3>
                       </div>

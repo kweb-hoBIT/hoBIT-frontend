@@ -194,10 +194,6 @@ const Modal: React.FC = () => {
 
   return (
     <>
-      {isOpen && (
-        <div className="fixed top-0 left-0 w-full h-full bg-black opacity-30 transition-opacity duration-700 z-40"></div>
-      )}
-
       <div
         className={`fixed top-0 left-0 overflow-y-auto p-[20px] h-full w-[350px] bg-white shadow-lg z-50 transform transition-transform duration-500 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
@@ -223,7 +219,7 @@ const Modal: React.FC = () => {
           {categories.map((category, index) => (
             <li key={index} className="mb-[10px] ">
               <div
-                className="hover:bg-gray-100 flex flex-row justify-between items-center cursor-pointer text-[16px] font-5medium text-[20px] text-[#686D76] bg-gray-100 px-[15px] py-[5px] rounded-[10px]"
+                className="hover:bg-gray-200 flex flex-row justify-between items-center cursor-pointer text-[16px] font-5medium text-[20px] text-[#686D76] bg-gray-100 px-[15px] py-[5px] rounded-[10px]"
                 onClick={() =>
                   toggleCategory(
                     isKorean
