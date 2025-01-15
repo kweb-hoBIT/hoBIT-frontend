@@ -5,6 +5,10 @@ import { GetSeniorFaqByIdRequest } from '../types/seniorFaq';
 
 export const sendQuestion = async (question: string, language: string) => {
   try {
+    if (language == 'EN') {
+      question = question.toLowerCase();
+    }
+
     const response = await apiClient.post('/question', {
       question,
       language,
