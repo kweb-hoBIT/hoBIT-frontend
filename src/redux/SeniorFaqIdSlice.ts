@@ -9,8 +9,11 @@ const SeniorFaqIdSlice = createSlice({
     setSeniorFaqId: (state, action) => {
       state.seniorFaqId = action.payload;
     },
+    clearSeniorFaqId: (state) => {
+      state.seniorFaqId = null;
+    },
   },
 });
 
-export const { setSeniorFaqId } = SeniorFaqIdSlice.actions;
+export const { setSeniorFaqId, clearSeniorFaqId } = SeniorFaqIdSlice.actions;
 export const SeniorFaqIdReducer = SeniorFaqIdSlice.reducer;

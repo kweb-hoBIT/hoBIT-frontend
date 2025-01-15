@@ -1,10 +1,11 @@
-import { QuestionLanguage } from './question';
+import { FeedbackLanguage } from './question';
 
 export type RateFaqRequest = {
   faq_id: number;
-  user_question: string;
   rating: number;
-  language: QuestionLanguage;
+  feedback_reason: string;
+  feedback_detail: string;
+  language: FeedbackLanguage;
 };
 
 export type RateFaqResponse = {

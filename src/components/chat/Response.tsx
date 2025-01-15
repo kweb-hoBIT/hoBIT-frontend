@@ -105,7 +105,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                           className="text-[18px] text-[#0A5EB0] cursor-pointer hover:underline break-words"
                           style={{ wordBreak: 'break-word' }}
                         >
-                          {item.url}
+                          {isKorean ? '사이트 바로가기' : 'Visit Site'}
                         </a>
                       </div>
                     )}

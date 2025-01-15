@@ -23,7 +23,6 @@ const MainPage: React.FC = () => {
     <div className="flex flex-col h-screen overflow-hidden">
       <Header />
 
-      {/* 오버레이 추가 */}
       {isModalOpen && (
         <div
           className="fixed inset-0 bg-black opacity-30 z-40"
@@ -31,20 +30,16 @@ const MainPage: React.FC = () => {
         ></div>
       )}
 
-      {/* 모달 */}
       <div className="relative z-50" onClick={(e) => e.stopPropagation()}>
         <Modal />
       </div>
 
-      {/* 채팅 영역 */}
       <div>
         <Chatting />
       </div>
 
-      {/* 자동완성 */}
       {isEmpty ? <></> : <AutoComplete />}
 
-      {/* 입력 */}
       <Input />
     </div>
   );

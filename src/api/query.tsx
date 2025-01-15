@@ -29,14 +29,16 @@ export const getAllQuestions = async () => {
 export const rateFAQ = async ({
   faq_id,
   rating,
-  user_question,
+  feedback_reason,
+  feedback_detail,
   language,
 }: RateFaqRequest) => {
   try {
     const response = await apiClient.post('/rate', {
       faq_id,
       rate: rating,
-      user_question,
+      feedback_reason,
+      feedback_detail,
       language,
     });
     return response;

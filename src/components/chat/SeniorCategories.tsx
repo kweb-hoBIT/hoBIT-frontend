@@ -6,8 +6,7 @@ import { Category } from '../../lib/FaqTree';
 import { SeniorFaqTree } from '../../lib/SeniorFaqTree';
 import { getAllSeniorFAQs } from '../../api/query';
 import { SeniorFAQ } from '../../types/faq';
-import { setSeniorFaqId } from '../../redux/SeniorFaqIdSlice';
-import { all } from 'axios';
+import { setSeniorFaqId, clearSeniorFaqId } from '../../redux/SeniorFaqIdSlice';
 
 interface SeniorCategoriesProps {
   subcategory?: Category;
@@ -41,6 +40,13 @@ const SeniorCategories: React.FC<SeniorCategoriesProps> = ({
     useState<Category | null>(subcategory || null);
 
   const seniorFaqTreeInitFlag = useRef(false);
+
+  const handleSendSeniorFaqId = (id: number) => {
+    dispatch(setSeniorFaqId(id));
+    setTimeout(() => {
+      dispatch(clearSeniorFaqId());
+    }, 100);
+  };
 
   useEffect(() => {
     const fetchSeniorFAQs = async () => {
@@ -222,7 +228,7 @@ const SeniorCategories: React.FC<SeniorCategoriesProps> = ({
                     key={index}
                     onClick={() => {
                       if (matchedFaq) {
-                        dispatch(setSeniorFaqId(matchedFaq.id));
+                        handleSendSeniorFaqId(matchedFaq.id);
                       }
                     }}
                     className="hover:bg-[#FDDDDD] bg-[#FFEFEF] w-[160px] h-[80px] flex items-center justify-center px-[10px] rounded-[20px] cursor-pointer"

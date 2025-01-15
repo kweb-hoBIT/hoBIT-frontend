@@ -9,8 +9,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../redux/store';
 import { closeMenu } from '../redux/menuSlice';
-import { sendInputValue } from '../redux/inputSlice';
-import { setSeniorFaqId } from '../redux/SeniorFaqIdSlice';
+import { sendInputValue, clearSentValue } from '../redux/inputSlice';
+import { setSeniorFaqId, clearSeniorFaqId } from '../redux/SeniorFaqIdSlice';
 
 import { Category, FaqTree } from '../lib/FaqTree';
 import { directUserFeedback, getAllFAQs, getAllSeniorFAQs } from '../api/query';
@@ -64,6 +64,11 @@ const Modal: React.FC = () => {
         language: isKorean ? 'KO' : 'EN',
       });
       setFeedback('');
+      alert(
+        isKorean
+          ? '피드백이 성공적으로 전송되었습니다.'
+          : 'Feedback sent successfully!'
+      );
     } catch (error) {
       console.error('Error submitting feedback:', error);
     } finally {
@@ -150,6 +155,17 @@ const Modal: React.FC = () => {
   const handleSendKeyword = (message: string) => {
     dispatch(sendInputValue(message));
     dispatch(closeMenu());
+    setTimeout(() => {
+      dispatch(clearSentValue());
+    }, 100);
+  };
+
+  const handleSendSeniorFaqId = (id: number) => {
+    dispatch(setSeniorFaqId(id));
+    dispatch(closeMenu());
+    setTimeout(() => {
+      dispatch(clearSeniorFaqId());
+    }, 100);
   };
 
   const toggleSubCategory = (categoryName: string, subCategoryName: string) => {
@@ -404,8 +420,7 @@ const Modal: React.FC = () => {
                                 <li
                                   key={faqIndex}
                                   onClick={() => {
-                                    dispatch(setSeniorFaqId(faq.id));
-                                    dispatch(closeMenu());
+                                    handleSendSeniorFaqId;
                                   }}
                                   className="cursor-pointer text-[16px] text-black font-3light px-[10px] py-[5px] rounded-[10px] bg-gray-100 mb-[5px] hover:bg-gray-200"
                                 >
@@ -448,9 +463,9 @@ const Modal: React.FC = () => {
           <button
             onClick={handleFeedbackSubmit}
             disabled={isSubmitting}
-            className={`${
-              feedback ? 'bg-blue-200' : 'bg-gray-200'
-            } text-gray-500 font-6semibold py-[5px] mt-[10px] rounded-[8px] text-[18px] hover:bg-gray-300 transition`}
+            className={
+              'bg-gray-200 text-gray-500 font-6semibold py-[5px] mt-[10px] rounded-[8px] text-[18px] hover:bg-gray-300 transition'
+            }
           >
             {isKorean ? '작성 완료' : 'Submit'}
           </button>

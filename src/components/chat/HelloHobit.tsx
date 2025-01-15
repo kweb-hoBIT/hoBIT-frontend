@@ -18,8 +18,8 @@ const HelloHobit: React.FC = () => {
       <Response
         text={
           isKorean
-            ? `안녕하세요\n저는 고려대학교 정보대학 챗봇\n호빗(HoBIT)이에요!\n\n정보대학 관련 궁금한 점이 생기면\n언제든지 저에게 질문해주세요`
-            : `Hello!\nI'm HoBIT, the chatbot of the College of Informatics at Korea University.\n\nIf you have any questions regarding College of Informatics, feel free to ask me anytime!`
+            ? `안녕하세요\n저는 고려대학교 정보대학 챗봇\n호빗(hoBIT)이에요!\n\n정보대학 관련 궁금한 점이 생기면\n언제든지 저에게 질문해주세요`
+            : `Hello!\nI'm hoBIT, the chatbot of the College of Informatics at Korea University.\n\nIf you have any questions regarding College of Informatics, feel free to ask me anytime!`
         }
         faqs={faqs}
       />

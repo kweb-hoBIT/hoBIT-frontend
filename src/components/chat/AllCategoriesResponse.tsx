@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IoChevronBackOutline } from 'react-icons/io5';
-import { sendInputValue } from '../../redux/inputSlice';
+import { sendInputValue, clearSentValue } from '../../redux/inputSlice';
 import { RootState } from '../../redux/store';
 import HobitProfile from './HobitProfile';
 import Response from './Response';
@@ -9,7 +9,7 @@ import { Category, FaqTree } from '../../lib/FaqTree';
 import { SeniorFaqTree } from '../../lib/SeniorFaqTree';
 import { getAllFAQs, getAllSeniorFAQs } from '../../api/query';
 import { Faq, SeniorFAQ } from '../../types/faq';
-import { setSeniorFaqId } from '../../redux/SeniorFaqIdSlice';
+import { setSeniorFaqId, clearSeniorFaqId } from '../../redux/SeniorFaqIdSlice';
 
 const AllCategoriesResponse: React.FC = () => {
   const dispatch = useDispatch();
@@ -43,6 +43,16 @@ const AllCategoriesResponse: React.FC = () => {
 
   const handleSendKeyword = (message: string) => {
     dispatch(sendInputValue(message));
+    setTimeout(() => {
+      dispatch(clearSentValue());
+    }, 100);
+  };
+
+  const handleSendSeniorFaqId = (id: number) => {
+    dispatch(setSeniorFaqId(id));
+    setTimeout(() => {
+      dispatch(clearSeniorFaqId());
+    }, 100);
   };
 
   useEffect(() => {
@@ -348,7 +358,7 @@ const AllCategoriesResponse: React.FC = () => {
                   return (
                     <div
                       key={index}
-                      onClick={() => dispatch(setSeniorFaqId(faq.id))}
+                      onClick={() => handleSendSeniorFaqId(faq.id)}
                       className="hover:bg-[#FDDDDD] bg-[#FFEFEF] w-[160px] h-[80px] flex items-center justify-center px-[10px] rounded-[20px] cursor-pointer"
                     >
                       <span className="text-[18px] font-6semibold text-center">
