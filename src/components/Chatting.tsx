@@ -107,8 +107,7 @@ const Chatting: React.FC = () => {
   }, [sentValue]);
 
   useEffect(() => {
-    console.log(666);
-    console.log(101, seniorFaqId);
+    console.log(seniorFaqId);
     if (seniorFaqId !== null && seniorFaqId !== undefined) {
       const newChatItem: ChatItem = {
         query: '',

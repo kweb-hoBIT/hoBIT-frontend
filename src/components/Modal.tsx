@@ -420,7 +420,7 @@ const Modal: React.FC = () => {
                                 <li
                                   key={faqIndex}
                                   onClick={() => {
-                                    handleSendSeniorFaqId;
+                                    handleSendSeniorFaqId(faq.id);
                                   }}
                                   className="cursor-pointer text-[16px] text-black font-3light px-[10px] py-[5px] rounded-[10px] bg-gray-100 mb-[5px] hover:bg-gray-200"
                                 >
