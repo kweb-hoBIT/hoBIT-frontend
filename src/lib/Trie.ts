@@ -31,29 +31,6 @@ export class Trie {
     return current;
   }
 
-  getSuggestions(prefix: string): string[] {
-    const node = this.find(prefix);
-    const suggestions: string[] = [];
-
-    if (node) {
-      this.collectAllWords(node, prefix, suggestions);
-    }
-
-    return suggestions;
-  }
-
-  private collectAllWords(
-    node: TrieNode,
-    prefix: string,
-    suggestions: string[]
-  ): void {
-    if (node.isEndOfWord) suggestions.push(prefix);
-
-    for (const [char, childNode] of node.children) {
-      this.collectAllWords(childNode, prefix + char, suggestions);
-    }
-  }
-
   getSuggestionsIncluding(input: string): string[] {
     const suggestions: string[] = [];
     this.collectAllWordsIncluding(this.root, '', input, suggestions);
@@ -78,5 +55,25 @@ export class Trie {
         suggestions
       );
     }
+  }
+
+  getSuggestionsByTokens(input: string): string[] {
+    const tokens = this.parseInputToTokens(input);
+    if (tokens.length === 0) return [];
+
+    let matchingEntries = this.getSuggestionsIncluding(tokens[0]);
+
+    for (let i = 1; i < tokens.length; i++) {
+      const token = tokens[i];
+      matchingEntries = matchingEntries.filter((entry) =>
+        entry.includes(token)
+      );
+    }
+
+    return matchingEntries;
+  }
+
+  private parseInputToTokens(input: string): string[] {
+    return input.split(/\s+/).filter((token) => token.trim() !== '');
   }
 }
