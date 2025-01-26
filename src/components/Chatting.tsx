@@ -12,6 +12,7 @@ import { Faq } from '../types/faq';
 import { sendQuestion, getAllQuestions } from '../api/query';
 import { setQuestions } from '../redux/questionsSlice';
 import { resetHomeClicked } from '../redux/homeSlice';
+import { clearSent } from '../redux/inputSlice';
 
 interface ChatItem {
   query: string;
@@ -25,6 +26,7 @@ const Chatting: React.FC = () => {
   const dispatch = useDispatch();
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const sentValue = useSelector((state: RootState) => state.input.sentValue);
+  const sent = useSelector((state: RootState) => state.input.sent);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
   const homeClicked = useSelector((state: RootState) => state.home.homeClicked);
   const seniorFaqId = useSelector(
@@ -63,7 +65,9 @@ const Chatting: React.FC = () => {
   }, [chatHistory]);
 
   useEffect(() => {
-    if (!sentValue) return;
+    if (!sentValue || !sent) return;
+
+    dispatch(clearSent());
 
     const newChatItem: ChatItem = {
       query: sentValue,
@@ -104,10 +108,9 @@ const Chatting: React.FC = () => {
     };
 
     fetchResponse();
-  }, [sentValue]);
+  }, [sentValue, sent]);
 
   useEffect(() => {
-    console.log(seniorFaqId);
     if (seniorFaqId !== null && seniorFaqId !== undefined) {
       const newChatItem: ChatItem = {
         query: '',

@@ -77,7 +77,7 @@ const Survey: React.FC<SurveyProps> = ({ id }) => {
     <div>
       <div className="flex flex-row w-[365px] items-center bg-gray-100 font-5medium text-[#686D76] text-[18px] mt-[10px] rounded-[20px] px-[20px] py-[10px]">
         <p>
-          {isKorean ? '호빗의 응답이 도움이 되었어요!' : 'Was HoBIT helpful?'}
+          {isKorean ? '호빗의 응답이 도움이 되었어요!' : 'Was hoBIT helpful?'}
         </p>
         <div className="flex justify-end ml-auto">
           <div className="bg-white p-[10px] rounded-full cursor-pointer hover:bg-gray-200">

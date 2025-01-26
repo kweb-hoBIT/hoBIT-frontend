@@ -131,7 +131,6 @@ const Modal: React.FC = () => {
       }));
 
       setSeniorCategories(extractedCategories);
-      console.log(131, seniorCategories);
 
       seniorFaqTreeInitFlag.current = true;
     }

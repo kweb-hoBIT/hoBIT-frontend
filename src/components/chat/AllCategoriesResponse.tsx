@@ -110,7 +110,6 @@ const AllCategoriesResponse: React.FC = () => {
       }));
 
       setSeniorCategories(extractedCategories);
-      console.log(seniorCategories);
 
       seniorFaqTreeInitFlag.current = true;
     }
