@@ -14,6 +14,7 @@ import { setQuestions } from '../redux/questionsSlice';
 import { resetHomeClicked } from '../redux/homeSlice';
 import { clearSent } from '../redux/inputSlice';
 import GreetResponse from './chat/GreetResponse';
+import { setId } from '../redux/inputSlice';
 
 interface ChatItem {
 	query: string;
@@ -86,6 +87,10 @@ const Chatting: React.FC = () => {
 			try {
 				const language = isKorean ? 'KO' : 'EN';
 				const serverResponse = await sendQuestion(sentValue, language);
+				if (serverResponse && serverResponse.id >= 0) {
+					console.log(717, serverResponse.id);
+					dispatch(setId(serverResponse.id));
+				}
 
 				if (serverResponse && Array.isArray(serverResponse.faqs)) {
 					if (serverResponse.is_greet) {

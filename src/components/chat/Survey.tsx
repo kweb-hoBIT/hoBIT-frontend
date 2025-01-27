@@ -14,6 +14,7 @@ type SurveyProps = {
 
 const Survey: React.FC<SurveyProps> = ({ id }) => {
 	const isKorean = useSelector((state: RootState) => state.language.isKorean);
+	const rate_id = useSelector((state: RootState) => state.input.id);
 	const [thumbUp, setThumbUp] = useState(false);
 	const [thumbDown, setThumbDown] = useState(false);
 	const [feedbackReason, setFeedbackReason] = useState<string | null>(null);
@@ -24,24 +25,25 @@ const Survey: React.FC<SurveyProps> = ({ id }) => {
 		try {
 			if (thumbUp) {
 				// cancel rate
-				const response = await rateFAQ({
+				await rateFAQ({
+					id: rate_id,
 					faq_id: id,
 					rating: 0,
 					feedback_reason: '',
 					feedback_detail: '',
 					language: isKorean ? 'ko' : 'en',
 				});
-				console.log(response);
 			} else {
 				// rate positive
-				const response = await rateFAQ({
+				await rateFAQ({
+					id: rate_id,
 					faq_id: id,
 					rating: 1,
 					feedback_reason: '',
 					feedback_detail: '',
 					language: isKorean ? 'ko' : 'en',
 				});
-				console.log(response);
+
 				alert(
 					isKorean
 						? '피드백이 성공적으로 전송되었습니다.'
@@ -60,16 +62,14 @@ const Survey: React.FC<SurveyProps> = ({ id }) => {
 	const handleSendFeedback = async () => {
 		try {
 			if (thumbDown) {
-				const response = await rateFAQ({
+				await rateFAQ({
+					id: rate_id,
 					faq_id: id,
 					rating: -1,
 					feedback_reason: feedbackReason || '',
 					feedback_detail: feedbackDetail || '',
 					language: isKorean ? 'ko' : 'en',
 				});
-				console.log(response);
-				console.log(313, feedbackReason);
-				console.log(314, feedbackDetail);
 				clearSentValue();
 				setFeedbackReason('');
 				setFeedbackDetail('');

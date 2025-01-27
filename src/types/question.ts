@@ -5,7 +5,7 @@ export type QuestionRequest = {
 	language: QuestionLanguage;
 };
 
-export type QuestionResponse = { faq: Faq[]; is_greet: boolean };
+export type QuestionResponse = { faq: Faq[]; is_greet: boolean; id: number };
 
 export type FeedbackLanguage = 'ko' | 'en';
 
