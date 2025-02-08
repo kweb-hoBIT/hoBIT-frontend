@@ -176,7 +176,9 @@ const AllCategoriesResponse: React.FC = () => {
               {isKorean ? '선배모드 |' : 'Senior Mode |'}
             </p>
             <p className="font-4regular text-[20px] ml-[10px] text-[#686D76]">
-              {isKorean ? '선배모드에 대한 설명' : 'About Senior Mode'}
+              {isKorean
+                ? '정보대학 선배가 알려주는 꿀팁!'
+                : 'Few tips from your seniors!'}
             </p>
           </div>
           <div className="flex flex-row flex-wrap">

@@ -39,8 +39,8 @@ const FAQResponse: React.FC = () => {
       <Response
         text={
           isKorean
-            ? `자주 묻는 질문들이에요!\n궁금한 점이 있으면 추가로 질문해주세요`
-            : `Here are some frequently asked questions!\nFeel free to ask more if you have any other questions.`
+            ? `최근 한 달간 자주 묻는 질문들이에요!\n궁금한 점이 있으면 추가로 질문해주세요`
+            : `Here are some frequently asked questions for the past month!\nFeel free to ask more if you have any other questions.`
         }
         faqs={mocks}
       />
