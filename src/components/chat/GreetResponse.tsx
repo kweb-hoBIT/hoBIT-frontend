@@ -33,7 +33,8 @@ const GreetResponse: React.FC = () => {
 카테고리를 통해 정보대학 행정 관련 정보를,
 선배모드에서는 학교 관련 정보를 알 수 있어요!
 
-할 수 있는 일을 통해 호빗에 대해서 자세히 알아보세요!!`
+"할 수 있는 일"을 통해 
+호빗에 대해서 자세히 알아보세요!!`
             : `Hello!
 I’m hoBIT, the chatbot for the College of Informatics.
 
