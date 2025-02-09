@@ -461,12 +461,14 @@ const Modal: React.FC = () => {
           />
           <button
             onClick={handleFeedbackSubmit}
-            disabled={isSubmitting}
-            className={
-              'bg-gray-200 text-gray-500 font-6semibold py-[5px] mt-[10px] rounded-[8px] text-[18px] hover:bg-gray-300 transition'
-            }
+            disabled={!feedback.trim() || isSubmitting}
+            className={`font-6semibold py-[5px] mt-[10px] rounded-[8px] text-[18px] transition ${
+              feedback.trim()
+                ? 'bg-blue-500 text-white hover:bg-blue-600'
+                : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+            }`}
           >
-            {isKorean ? '작성 완료' : 'Submit'}
+            {isKorean ? '제출' : 'Submit'}
           </button>
         </div>
         <div className="w-full flex flex-col mt-[20px] items-center font-4regular text-[16px] text-gray-400">

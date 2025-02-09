@@ -11,19 +11,21 @@ export class Trie {
     let current = this.root;
 
     for (const char of word) {
-      if (!current.children.has(char)) {
-        current.children.set(char, new TrieNode());
+      const lowerChar = char.toLowerCase();
+      if (!current.children.has(lowerChar)) {
+        current.children.set(lowerChar, new TrieNode());
       }
-      current = current.children.get(char)!;
+      current = current.children.get(lowerChar)!;
     }
 
     current.isEndOfWord = true;
+    current.originalWord = word;
   }
 
   find(prefix: string): TrieNode | null {
     let current = this.root;
 
-    for (const char of prefix) {
+    for (const char of prefix.toLowerCase()) {
       if (!current.children.has(char)) return null;
       current = current.children.get(char)!;
     }
@@ -33,27 +35,24 @@ export class Trie {
 
   getSuggestionsIncluding(input: string): string[] {
     const suggestions: string[] = [];
-    this.collectAllWordsIncluding(this.root, '', input, suggestions);
+    const node = this.find(input);
+    if (node) {
+      this.collectAllWordsIncluding(node, '', suggestions);
+    }
     return suggestions;
   }
 
   private collectAllWordsIncluding(
     node: TrieNode,
     currentWord: string,
-    input: string,
     suggestions: string[]
   ): void {
-    if (node.isEndOfWord && currentWord.includes(input)) {
-      suggestions.push(currentWord);
+    if (node.isEndOfWord && node.originalWord) {
+      suggestions.push(node.originalWord);
     }
 
     for (const [char, childNode] of node.children) {
-      this.collectAllWordsIncluding(
-        childNode,
-        currentWord + char,
-        input,
-        suggestions
-      );
+      this.collectAllWordsIncluding(childNode, currentWord + char, suggestions);
     }
   }
 
@@ -64,9 +63,9 @@ export class Trie {
     let matchingEntries = this.getSuggestionsIncluding(tokens[0]);
 
     for (let i = 1; i < tokens.length; i++) {
-      const token = tokens[i];
+      const token = tokens[i].toLowerCase();
       matchingEntries = matchingEntries.filter((entry) =>
-        entry.includes(token)
+        entry.toLowerCase().includes(token)
       );
     }
 

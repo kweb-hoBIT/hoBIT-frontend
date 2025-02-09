@@ -1,15 +1,25 @@
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { RootState } from '../../redux/store';
 
 import HobitProfile from './HobitProfile';
 import Response from './Response';
 import { Faq } from '../../types/faq';
+import homeImg from '../../assets/home_image.png';
+import { clearSentValue, sendInputValue } from '../../redux/inputSlice';
 
 const GreetResponse: React.FC = () => {
+  const dispatch = useDispatch();
   const [mocks, _setMocks] = useState<Faq[]>([]);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
+
+  const handleSendOption = (message: string) => {
+    dispatch(sendInputValue(message));
+    setTimeout(() => {
+      dispatch(clearSentValue());
+    }, 100);
+  };
 
   return (
     <div>
@@ -34,6 +44,28 @@ Check out what I can do to learn more about hoBIT!`
         }
         faqs={mocks}
       />
+      <div className="bg-gray-100 w-[330px] h-auto mt-[20px] rounded-[20px] flex flex-col items-center p-[20px]">
+        <img src={homeImg} alt="home image" className="w-[150px] mb-[10px]" />
+        <div className="flex w-full justify-between items-center">
+          <button
+            onClick={() =>
+              handleSendOption(isKorean ? '자주 묻는 질문' : 'FAQ')
+            }
+            className="w-full text-[#686D76] font-6semibold text-[20px] py-[5px] hover:text-black"
+          >
+            {isKorean ? '자주 묻는 질문' : 'FAQ'}
+          </button>
+          <span className="text-[28px] text-gray-400 font-1thin">|</span>
+          <button
+            onClick={() =>
+              handleSendOption(isKorean ? '할 수 있는 일' : 'What I Can Do')
+            }
+            className="w-full text-[#686D76] font-6semibold text-[20px] py-[5px] hover:text-black"
+          >
+            {isKorean ? '할 수 있는 일' : 'What I Can Do'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
