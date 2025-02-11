@@ -23,6 +23,7 @@ interface ChatItem {
   flag: boolean;
   seniorMode: number;
   is_greet: boolean;
+  is_able: boolean;
 }
 
 const Chatting: React.FC = () => {
@@ -79,6 +80,7 @@ const Chatting: React.FC = () => {
       flag: false,
       seniorMode: -1,
       is_greet: false,
+      is_able: false,
     };
 
     setChatHistory((prevHistory) => [...prevHistory, newChatItem]);
@@ -101,6 +103,20 @@ const Chatting: React.FC = () => {
                       response: serverResponse.faqs,
                       loading: false,
                       is_greet: true,
+                    }
+                  : item
+              )
+            );
+          } else if (serverResponse.is_able) {
+            setChatHistory((prevHistory) =>
+              prevHistory.map((item) =>
+                item.query === sentValue
+                  ? {
+                      ...item,
+                      response: serverResponse.faqs,
+                      loading: false,
+                      is_greet: false,
+                      is_able: true,
                     }
                   : item
               )
@@ -141,6 +157,7 @@ const Chatting: React.FC = () => {
         flag: false,
         seniorMode: seniorFaqId,
         is_greet: false,
+        is_able: false,
       };
       setChatHistory((prevHistory) => [...prevHistory, newChatItem]);
     }
@@ -155,6 +172,7 @@ const Chatting: React.FC = () => {
         flag: true,
         seniorMode: -1,
         is_greet: false,
+        is_able: false,
       };
 
       setChatHistory((prevHistory) => [...prevHistory, newChatItem]);
@@ -189,6 +207,8 @@ const Chatting: React.FC = () => {
                 <AllCategoriesResponse />
               ) : chatItem.is_greet == true ? (
                 <GreetResponse />
+              ) : chatItem.is_able == true ? (
+                <AllCategoriesResponse />
               ) : (
                 <GeneralResponse
                   faqs={chatItem.response}

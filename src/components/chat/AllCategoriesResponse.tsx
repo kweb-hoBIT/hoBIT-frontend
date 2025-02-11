@@ -4,7 +4,6 @@ import { IoChevronBackOutline } from 'react-icons/io5';
 import { sendInputValue, clearSentValue } from '../../redux/inputSlice';
 import { RootState } from '../../redux/store';
 import HobitProfile from './HobitProfile';
-import Response from './Response';
 import { Category, FaqTree } from '../../lib/FaqTree';
 import { SeniorFaqTree } from '../../lib/SeniorFaqTree';
 import { getAllFAQs, getAllSeniorFAQs } from '../../api/query';
