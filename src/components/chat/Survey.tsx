@@ -103,6 +103,7 @@ const Survey: React.FC<SurveyProps> = ({ id }) => {
             <TbThumbDownFilled
               onClick={() => {
                 setThumbDown(!thumbDown);
+                if (thumbDown) setFeedbackReason('');
                 if (thumbUp) setThumbUp(false);
               }}
               className={thumbDown ? 'text-[#E55604]' : 'text-gray-400'}
@@ -142,7 +143,10 @@ const Survey: React.FC<SurveyProps> = ({ id }) => {
                   ? '내용이 이해하기 어려움'
                   : 'Difficult to Understand',
               },
-              { value: '기타', label: isKorean ? '기타' : 'Other' },
+              {
+                value: '기타',
+                label: isKorean ? '기타' : 'Other',
+              },
             ].map((option) => (
               <label
                 key={option.value}
@@ -173,7 +177,8 @@ const Survey: React.FC<SurveyProps> = ({ id }) => {
           <button
             onClick={handleSendFeedback}
             className={`rounded-[10px] font-5medium py-[5px] mb-[10px] cursor-pointer transition ${
-              feedbackReason
+              (feedbackReason && !(feedbackReason == '기타')) ||
+              (feedbackReason == '기타' && feedbackDetail)
                 ? 'bg-blue-500 text-white hover:bg-blue-600'
                 : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
             }`}

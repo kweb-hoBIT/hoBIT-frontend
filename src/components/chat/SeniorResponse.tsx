@@ -12,6 +12,7 @@ import { SeniorFAQ } from '../../types/faq';
 import { RootState } from '../../redux/store';
 import { Category } from '../../lib/FaqTree';
 import SeniorCategories from './SeniorCategories';
+import { CiMap } from 'react-icons/ci';
 
 interface SeniorResponseProps {
   seniorFaqId: number;
@@ -235,7 +236,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                       )}
                       {answer.map && (
                         <div className="flex flex-row items-center mt-[10px]">
-                          <FaPhoneVolume className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
+                          <CiMap className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
                           <a
                             href="https://www.korea.ac.kr/campusMap/ko/view.do"
                             target="_blank"
