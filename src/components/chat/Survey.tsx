@@ -182,7 +182,12 @@ const Survey: React.FC<SurveyProps> = ({ id }) => {
                 ? 'bg-blue-500 text-white hover:bg-blue-600'
                 : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
             }`}
-            disabled={!feedbackReason}
+            disabled={
+              !(
+                (feedbackReason && !(feedbackReason == '기타')) ||
+                (feedbackReason == '기타' && feedbackDetail)
+              )
+            }
           >
             {isKorean ? '제출' : 'Submit'}
           </button>
