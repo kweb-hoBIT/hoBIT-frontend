@@ -31,7 +31,15 @@ const AutoComplete: React.FC = () => {
 
   useEffect(() => {
     if (trie && inputValue.trim() && isAutocompleteOn) {
-      let suggestions = trie.getSuggestionsByTokens(inputValue);
+      const isKoreanChosung = /^[ㄱ-ㅎ]+$/.test(inputValue); // 초성만 입력됐는지 확인
+      let suggestions: string[];
+
+      if (isKoreanChosung) {
+        suggestions = trie.getSuggestionsByChosung(inputValue); // 초성 검색
+      } else {
+        suggestions = trie.getSuggestionsByTokens(inputValue); // 일반 검색
+      }
+
       setSuggestions(suggestions);
     } else {
       setSuggestions([]);
@@ -59,8 +67,6 @@ const AutoComplete: React.FC = () => {
         className="w-full h-[70px] bg-gray-100 rounded-t-[30px] fixed bottom-[80px] px-[20px] flex flex-col items-center h-fit max-h-[250px] overflow-y-auto"
         style={{
           boxShadow: '0 -6px 15px rgba(0, 0, 0, 0.3)',
-          // scrollbarWidth: 'none', // Firefox용
-          // msOverflowStyle: 'none', // IE 및 Edge용
         }}
       >
         {suggestions.length > 0 && (
