@@ -75,8 +75,12 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                       item.answer
                         .split('\n')
                         .map((line: string, lineIndex: number) => (
-                          <p key={lineIndex}>{line}</p>
+                          <div key={lineIndex}>
+                            {lineIndex > 0 && <br />} {/* 줄바꿈 추가 */}
+                            <p>{line}</p>
+                          </div>
                         ))}
+
                     {(item.url || item.email || item.phone) && (
                       <div className="w-full h-[1px] bg-gray-300 mt-[20px]" />
                     )}
