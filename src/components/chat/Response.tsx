@@ -76,8 +76,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                         .split('\n')
                         .map((line: string, lineIndex: number) => (
                           <div key={lineIndex}>
-                            {lineIndex > 0 && <br />} {/* 줄바꿈 추가 */}
-                            <p>{line}</p>
+                            {line === '' ? <br /> : <p>{line}</p>}
                           </div>
                         ))}
 
