@@ -92,11 +92,8 @@ export class Trie {
 
   getSuggestionsIncluding(input: string): string[] {
     const suggestions: string[] = [];
-    const node = this.find(input);
-    if (node) {
-      this.collectAllWordsIncluding(node, '', suggestions);
-    }
-    return suggestions;
+    this.collectAllWordsIncluding(this.root, '', suggestions);
+    return suggestions.filter((word) => word.includes(input));
   }
 
   private collectAllWordsIncluding(
