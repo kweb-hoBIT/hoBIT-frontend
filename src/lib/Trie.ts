@@ -112,14 +112,13 @@ export class Trie {
 
   getSuggestionsByChosung(input: string): string[] {
     const chosungInput = extractChosung(input);
-    const node = this.findChosung(chosungInput);
     const suggestions: string[] = [];
 
-    if (node) {
-      this.collectAllWordsIncluding(node, '', suggestions);
-    }
+    this.collectAllWordsIncluding(this.chosungRoot, '', suggestions);
 
-    return suggestions;
+    return suggestions.filter((word) =>
+      extractChosung(word).includes(chosungInput)
+    );
   }
 
   private findChosung(chosung: string): TrieNode | null {
