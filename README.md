@@ -1,4 +1,4 @@
-how to start hoBIT frontend
+hoBIT frontend
 
 ```bash
 $ npm start
