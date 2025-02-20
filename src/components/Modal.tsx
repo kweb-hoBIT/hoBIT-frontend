@@ -81,6 +81,7 @@ const Modal: React.FC = () => {
       try {
         const fetchedFaqs = await getAllFAQs();
         setAllFaqs(fetchedFaqs.faqs);
+        console.log('fetchedFaqs: ', fetchedFaqs);
       } catch (error) {
         console.error('Failed to fetch all FAQs:', error);
       }
