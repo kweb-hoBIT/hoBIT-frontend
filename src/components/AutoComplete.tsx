@@ -7,6 +7,7 @@ import { sendInputValue, updateLiveValue } from '../redux/inputSlice';
 const AutoComplete: React.FC = () => {
   const dispatch = useDispatch();
 
+  const isKorean = useSelector((state: RootState) => state.language.isKorean);
   const inputValue = useSelector((state: RootState) => state.input.liveValue);
   const questions = useSelector(
     (state: RootState) => state.questions.questions
@@ -14,37 +15,45 @@ const AutoComplete: React.FC = () => {
 
   const [isAutocompleteOn, _setIsAutocompleteOn] = useState<boolean>(true);
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [trie, setTrie] = useState<Trie | null>(null);
+  const [trieKr, setTrieKr] = useState<Trie | null>(null);
+  const [trieEn, setTrieEn] = useState<Trie | null>(null);
   const trieInitFlag = useRef(false);
 
   useEffect(() => {
     if (!trieInitFlag.current && questions.length > 0) {
-      const newTrie = new Trie();
+      const newTrieKr = new Trie();
+      const newTrieEn = new Trie();
+
       questions.forEach((question) => {
-        newTrie.insert(question.question_en);
-        newTrie.insert(question.question_ko);
+        newTrieKr.insert(question.question_ko);
+        newTrieEn.insert(question.question_en);
       });
-      setTrie(newTrie);
+      setTrieKr(newTrieKr);
+      setTrieEn(newTrieEn);
       trieInitFlag.current = true;
     }
   }, [questions]);
 
   useEffect(() => {
-    if (trie && inputValue.trim() && isAutocompleteOn) {
-      const isKoreanChosung = /^[ㄱ-ㅎ]+$/.test(inputValue); // 초성만 입력됐는지 확인
+    if (trieKr && trieEn && inputValue.trim() && isAutocompleteOn) {
+      const isKoreanChosung = /^[ㄱ-ㅎ]+$/.test(inputValue);
       let suggestions: string[];
 
-      if (isKoreanChosung) {
-        suggestions = trie.getSuggestionsByChosung(inputValue); // 초성 검색
+      if (isKorean) {
+        if (isKoreanChosung) {
+          suggestions = trieKr.getSuggestionsByChosung(inputValue);
+        } else {
+          suggestions = trieKr.getSuggestionsByTokens(inputValue);
+        }
       } else {
-        suggestions = trie.getSuggestionsByTokens(inputValue); // 일반 검색
+        suggestions = trieEn.getSuggestionsByTokens(inputValue);
       }
 
       setSuggestions(suggestions);
     } else {
       setSuggestions([]);
     }
-  }, [inputValue, trie, isAutocompleteOn]);
+  }, [inputValue, trieKr, trieEn, isAutocompleteOn]);
 
   const handleSuggestionClick = (suggestion: string) => {
     const controlCharPattern = /[\x00-\x1F\x7F]/g;
