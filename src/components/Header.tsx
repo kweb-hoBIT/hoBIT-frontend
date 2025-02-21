@@ -13,10 +13,6 @@ const Header: React.FC = () => {
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
   const i18n = isKorean ? lang.ko : lang.en;
 
-  const handleClose = () => {
-    window.close();
-  };
-
   return (
     <div className="h-[70px] bg-white fixed top-0 w-full border-b-2 border-[#bbbbbb] flex items-center relative px-[20px] py-[20px]">
       <div>
@@ -54,12 +50,11 @@ const Header: React.FC = () => {
       <p className="absolute left-1/2 transform -translate-x-1/2 font-7bold text-[26px]">
         {i18n.headerTitle}
       </p>
-      <IoClose
-        className="text-gray-400 absolute right-4 text-[28px] hover:text-black"
-        onClick={handleClose}
-      />
     </div>
   );
 };
+//<IoClose
+//  className="text-gray-400 absolute right-4 text-[28px] hover:text-black"
+///>
 
 export default Header;
