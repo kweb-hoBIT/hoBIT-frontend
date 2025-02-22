@@ -28,18 +28,17 @@ function extractChosung(word: string): string {
 		.map((char) => {
 			const code = char.charCodeAt(0);
 			if (code >= 0xac00 && code <= 0xd7a3) {
-				// 한글 음절 범위 (가 ~ 힣)
 				const index = Math.floor((code - 0xac00) / (21 * 28));
-				return CHO[index]; // 초성 반환
+				return CHO[index];
 			}
-			return char; // 한글이 아니면 그대로 반환
+			return char;
 		})
 		.join('');
 }
 
 export class Trie {
 	root: TrieNode;
-	chosungRoot: TrieNode; // 초성 Trie 추가
+	chosungRoot: TrieNode;
 
 	constructor() {
 		this.root = new TrieNode();
@@ -50,7 +49,6 @@ export class Trie {
 		let current = this.root;
 		const chosung = extractChosung(word);
 
-		// 일반 단어 Trie에 추가
 		for (const char of word) {
 			const lowerChar = char.toLowerCase();
 			if (!current.children.has(lowerChar)) {
@@ -61,7 +59,6 @@ export class Trie {
 		current.isEndOfWord = true;
 		current.originalWord = word;
 
-		// 초성 Trie에 추가
 		this.insertChosung(chosung, word);
 	}
 
@@ -121,24 +118,15 @@ export class Trie {
 		);
 	}
 
-	private findChosung(chosung: string): TrieNode | null {
-		let current = this.chosungRoot;
-
-		for (const char of chosung) {
-			if (!current.children.has(char)) return null;
-			current = current.children.get(char)!;
-		}
-
-		return current;
-	}
-
 	getSuggestionsByTokens(input: string): string[] {
 		const tokens = this.parseInputToTokens(input);
 		if (tokens.length === 0) return [];
 
-		const suggestions = this.getSuggestionsIncluding(input); // Look for the full phrase
+		const allSuggestions = this.getSuggestionsIncluding('');
 
-		return suggestions.filter((word) => word.includes(input)); // Strict filter for exact sequence
+		return allSuggestions.filter((word) =>
+			tokens.every((token) => word.includes(token))
+		);
 	}
 
 	private parseInputToTokens(input: string): string[] {
