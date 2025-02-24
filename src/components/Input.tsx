@@ -63,7 +63,7 @@ const Input: React.FC = () => {
           type="text"
           ref={inputRef}
           placeholder={
-            isKorean ? '호빗에게 물어보세요!' : 'Ask Anything to HoBIT!'
+            isKorean ? '호빗에게 물어봐~' : 'Ask Anything to HoBIT!'
           }
           value={liveValue}
           onChange={handleChange}
