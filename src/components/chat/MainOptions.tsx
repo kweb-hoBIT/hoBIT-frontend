@@ -22,7 +22,7 @@ const MainOptions: React.FC = () => {
         src={homeImg}
         alt="home image"
         className="w-[150px] mb-[10px]"
-        loading="lazy"
+        loading="eager"
       />
       <div className="flex w-full justify-between items-center">
         <button
