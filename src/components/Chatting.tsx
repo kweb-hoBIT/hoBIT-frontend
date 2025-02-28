@@ -64,7 +64,7 @@ const Chatting: React.FC = () => {
             top: container.scrollHeight,
             behavior: 'smooth',
           }),
-        200
+        1000
       );
       newChatItemRef.current = null;
     }
