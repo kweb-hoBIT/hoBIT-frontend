@@ -37,9 +37,9 @@ const Chatting: React.FC = () => {
     (state: RootState) => state.seniorFaqId.seniorFaqId
   );
 
-  const [ret, setRet] = useState<boolean>(false);
   const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const newChatItemRef = useRef<ChatItem | null>(null);
 
   useEffect(() => {
     const fetchAllQuestions = async () => {
@@ -56,17 +56,19 @@ const Chatting: React.FC = () => {
   }, [dispatch]);
 
   useLayoutEffect(() => {
-    if (chatContainerRef.current) {
+    if (chatContainerRef.current && newChatItemRef.current) {
       const container = chatContainerRef.current;
-      if (container.scrollHeight > container.clientHeight && ret) {
-        container.scrollTo({
-          top: container.scrollHeight,
-          behavior: 'smooth',
-        });
-        setRet(false);
-      }
+      setTimeout(
+        () =>
+          container.scrollTo({
+            top: container.scrollHeight,
+            behavior: 'smooth',
+          }),
+        200
+      );
+      newChatItemRef.current = null;
     }
-  }, [chatHistory, ret]);
+  }, [chatHistory]);
 
   useEffect(() => {
     if (!sentValue || !sent) return;
@@ -83,6 +85,7 @@ const Chatting: React.FC = () => {
       is_able: false,
     };
 
+    newChatItemRef.current = newChatItem;
     setChatHistory((prevHistory) => [...prevHistory, newChatItem]);
 
     const fetchResponse = async () => {
@@ -143,7 +146,6 @@ const Chatting: React.FC = () => {
           )
         );
       }
-      setRet(true);
     };
 
     fetchResponse();
@@ -160,6 +162,7 @@ const Chatting: React.FC = () => {
         is_greet: false,
         is_able: false,
       };
+      newChatItemRef.current = newChatItem;
       setChatHistory((prevHistory) => [...prevHistory, newChatItem]);
     }
   }, [seniorFaqId]);
