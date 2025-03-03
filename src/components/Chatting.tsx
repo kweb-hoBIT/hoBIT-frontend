@@ -33,6 +33,9 @@ const Chatting: React.FC = () => {
   const sent = useSelector((state: RootState) => state.input.sent);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
   const homeClicked = useSelector((state: RootState) => state.home.homeClicked);
+  const feedbackClicked = useSelector(
+    (state: RootState) => state.feedback.feedbackClicked
+  );
   const seniorFaqId = useSelector(
     (state: RootState) => state.seniorFaqId.seniorFaqId
   );
@@ -54,6 +57,30 @@ const Chatting: React.FC = () => {
 
     fetchAllQuestions();
   }, [dispatch]);
+
+  useEffect(() => {
+    if (homeClicked && chatContainerRef.current) {
+      const container = chatContainerRef.current;
+      setTimeout(() => {
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior: 'smooth',
+        });
+      }, 300);
+    }
+  }, [homeClicked]);
+
+  useEffect(() => {
+    if (feedbackClicked && chatContainerRef.current) {
+      const container = chatContainerRef.current;
+      setTimeout(() => {
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior: 'smooth',
+        });
+      }, 300);
+    }
+  }, [feedbackClicked]);
 
   useLayoutEffect(() => {
     if (chatContainerRef.current && newChatItemRef.current) {
