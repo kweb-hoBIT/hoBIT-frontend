@@ -1,3 +1,4 @@
+import { useDispatch } from 'react-redux';
 import { TbThumbUpFilled } from 'react-icons/tb';
 import { TbThumbDownFilled } from 'react-icons/tb';
 
@@ -8,11 +9,14 @@ import { rateFAQ } from '../../api/query';
 import { RootState } from '../../redux/store';
 import { clearSentValue } from '../../redux/inputSlice';
 
+import { setFeedbackClicked } from '../../redux/feedbackSlice';
+
 type SurveyProps = {
   id: number;
 };
 
 const Survey: React.FC<SurveyProps> = ({ id }) => {
+  const dispatch = useDispatch();
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
   const rate_id = useSelector((state: RootState) => state.input.id);
   const [thumbUp, setThumbUp] = useState(false);
@@ -103,6 +107,7 @@ const Survey: React.FC<SurveyProps> = ({ id }) => {
             <TbThumbDownFilled
               onClick={() => {
                 setThumbDown(!thumbDown);
+                dispatch(setFeedbackClicked());
                 if (thumbDown) setFeedbackReason('');
                 if (thumbUp) setThumbUp(false);
               }}

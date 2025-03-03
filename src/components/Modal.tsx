@@ -210,9 +210,9 @@ const Modal: React.FC = () => {
   return (
     <>
       <div
-        className={`fixed top-0 left-0 overflow-y-auto p-[20px] h-full w-[350px] bg-white shadow-lg z-50 transform transition-transform duration-500 ${
+        className={`fixed top-0 left-0 overflow-y-auto p-[20px] h-full bg-white shadow-lg z-50 transform transition-transform duration-500 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        } w-full md:w-[350px]`}
       >
         <div className="flex flex-row justify-between items-center">
           <p className="font-6semibold text-[20px] flex flex-row items-center">
