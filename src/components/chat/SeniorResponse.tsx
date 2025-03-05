@@ -134,7 +134,10 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                               )
                             )}
                       </p>
-                      {(answer.url || answer.email || answer.phone) && (
+                      {(answer.url ||
+                        answer.email ||
+                        answer.phone ||
+                        answer.map) && (
                         <div className="w-full h-[1px] bg-gray-300 mt-[20px]" />
                       )}
                       {answer.url && (
