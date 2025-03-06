@@ -171,7 +171,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                       )}
                       {answer.map.latitude && answer.map.longitude && (
                         <div className="flex flex-row items-center mt-[10px]">
-                          <FiMap className="mr-[10px] text-[28px] text-[#686D76] bg-white p-[8px] rounded-full" />
+                          <FiMap className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full [&>path]:scale-80" />
                           <a
                             href="https://www.korea.ac.kr/campusMap/ko/view.do"
                             target="_blank"
