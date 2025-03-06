@@ -11,7 +11,7 @@ import { getSeniorFAQById } from '../../api/query';
 import { SeniorFAQ } from '../../types/faq';
 import { RootState } from '../../redux/store';
 import SeniorCategories from './SeniorCategories';
-import { FiMap } from 'react-icons/fi';
+import { TbMapPinFilled } from 'react-icons/tb';
 
 interface SeniorResponseProps {
   seniorFaqId: number;
@@ -112,7 +112,6 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                           </p>
                         </div>
                       )}
-
                       {answer.image && (
                         <div className="mt-[20px]">
                           <img
@@ -171,7 +170,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                       )}
                       {answer.map.latitude && answer.map.longitude && (
                         <div className="flex flex-row items-center mt-[10px]">
-                          <FiMap className="mr-[10px] text-[28px] text-[#686D76] bg-white p-[8px] rounded-full" />
+                          <TbMapPinFilled className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
                           <a
                             href="https://www.korea.ac.kr/campusMap/ko/view.do"
                             target="_blank"
