@@ -21,7 +21,7 @@ const MainOptions: React.FC = () => {
       <img
         src={homeImg}
         alt="home image"
-        className="w-[150px] mb-[10px]"
+        className="w-[200px] mb-[10px]"
         loading="eager"
       />
       <div className="flex w-full justify-between items-center">

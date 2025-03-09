@@ -6,6 +6,7 @@ import { questionsReducer } from './questionsSlice';
 import { menuReducer } from './menuSlice';
 import { homeReducer } from './homeSlice';
 import { SeniorFaqIdReducer } from './SeniorFaqIdSlice';
+import { feedbackReducer } from './feedbackSlice';
 
 const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
     menu: menuReducer,
     home: homeReducer,
     seniorFaqId: SeniorFaqIdReducer,
+    feedback: feedbackReducer,
   },
 });
 
