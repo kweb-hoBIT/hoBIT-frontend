@@ -6,6 +6,7 @@ import MainPage from './pages/MainPage';
 import homeImage from './assets/home_image.png';
 import helloImage from './assets/hello.png';
 import { setImages } from './redux/imageSlice';
+import './loader.css';
 
 interface PreloadImagesProps {
   children: ReactNode;
@@ -34,7 +35,13 @@ const PreloadImages: React.FC<PreloadImagesProps> = ({ children }) => {
     });
   }, [dispatch]);
 
-  return loaded ? <>{children}</> : <div></div>;
+  return loaded ? (
+    <>{children}</>
+  ) : (
+    <div className="flex items-center justify-center h-screen">
+      <div className="loader"></div>
+    </div>
+  );
 };
 
 const App: React.FC = () => {
