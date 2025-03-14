@@ -3,11 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { sendInputValue, clearSentValue } from '../../redux/inputSlice';
 import { RootState } from '../../redux/store';
 
-import homeImg from '../../assets/home_image.png';
-
 const MainOptions: React.FC = () => {
   const dispatch = useDispatch();
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
+  const homeImg = useSelector(
+    (state: RootState) => state.image.images['homeImage']
+  );
 
   const handleSendOption = (message: string) => {
     dispatch(sendInputValue(message));
