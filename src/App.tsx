@@ -34,7 +34,7 @@ const PreloadImages: React.FC<PreloadImagesProps> = ({ children }) => {
     });
   }, [dispatch]);
 
-  return loaded ? <>{children}</> : <div>Loading images...</div>;
+  return loaded ? <>{children}</> : <div></div>;
 };
 
 const App: React.FC = () => {
