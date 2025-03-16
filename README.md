@@ -1,8 +1,16 @@
-hoBIT frontend
+# hoBIT frontend
 
-```bash
-$ npm start
-```
+<p align="center">
+<img alt="Logo" src="https://github.com/user-attachments/assets/721b0e77-9460-49cc-a98d-e4fc056a9323" width="300px"/>
+</p>
+
+# 호빗(hoBIT) 소개
+
+**호빗**은 고려대학교 정보대학 행정 관련 질문, 정보대학 선배들의 조언들을 한 곳에 모아둔 챗봇입니다.
+
+자세한 내용은 [호빗 소개](https://magnificent-screw-658.notion.site/hoBIT-19ed8b1360b88003bf51e2b299b287ff?pvs=4)에서 확인해주세요.
+
+
 # 가이드라인
 
 ## 브랜치 전략
