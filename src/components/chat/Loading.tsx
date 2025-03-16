@@ -1,5 +1,5 @@
 import React from 'react';
-import './Loading.css'; // 작성한 CSS 파일을 import
+import './Loading.css';
 
 const Loading: React.FC = () => {
   return (
