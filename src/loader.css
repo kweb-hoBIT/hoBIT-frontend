@@ -3,13 +3,14 @@
   aspect-ratio: 1;
   position: relative;
   --g: /calc(30.259% + 5.027px) calc(30.259% + 5.027px) radial-gradient(
+      circle at center,
       #0000 calc(70% - 8px),
       #000 calc(71% - 8px) 70%,
       #0000 71%
     ) no-repeat;
   mask:
     radial-gradient(
-        100% 100%,
+        circle at center,
         #0000 calc((30.259% + 5.027px) / 0.964 - 8.306px),
         #000 calc((30.259% + 5.027px) / 0.964 - 8.306px + 1px)
       )

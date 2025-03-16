@@ -9,53 +9,53 @@ import { setImages } from './redux/imageSlice';
 import './loader.css';
 
 interface PreloadImagesProps {
-  children: ReactNode;
+	children: ReactNode;
 }
 
 const PreloadImages: React.FC<PreloadImagesProps> = ({ children }) => {
-  const dispatch = useDispatch();
-  const [loaded, setLoaded] = useState(false);
+	const dispatch = useDispatch();
+	const [loaded, setLoaded] = useState(false);
 
-  useEffect(() => {
-    const imagesToLoad = { homeImage, helloImage };
-    const loadedImages: { [key: string]: string } = {};
-    let loadedCount = 0;
+	useEffect(() => {
+		const imagesToLoad = { homeImage, helloImage };
+		const loadedImages: { [key: string]: string } = {};
+		let loadedCount = 0;
 
-    Object.entries(imagesToLoad).forEach(([key, src]) => {
-      const img = new Image();
-      img.src = src;
-      img.onload = () => {
-        loadedImages[key] = img.src;
-        loadedCount++;
-        if (loadedCount === Object.keys(imagesToLoad).length) {
-          dispatch(setImages(loadedImages));
-          setLoaded(true);
-        }
-      };
-    });
-  }, [dispatch]);
+		Object.entries(imagesToLoad).forEach(([key, src]) => {
+			const img = new Image();
+			img.src = src;
+			img.onload = () => {
+				loadedImages[key] = img.src;
+				loadedCount++;
+				if (loadedCount === Object.keys(imagesToLoad).length) {
+					dispatch(setImages(loadedImages));
+					setLoaded(true);
+				}
+			};
+		});
+	}, [dispatch]);
 
-  return loaded ? (
-    <>{children}</>
-  ) : (
-    <div className="flex items-center justify-center h-screen">
-      <div className="loader"></div>
-    </div>
-  );
+	return loaded ? (
+		<>{children}</>
+	) : (
+		<div className="flex items-center justify-center h-screen">
+			<div className="loader"></div>
+		</div>
+	);
 };
 
 const App: React.FC = () => {
-  return (
-    <Provider store={store}>
-      <Router>
-        <PreloadImages>
-          <Routes>
-            <Route path="/" element={<MainPage />} />
-          </Routes>
-        </PreloadImages>
-      </Router>
-    </Provider>
-  );
+	return (
+		<Provider store={store}>
+			<Router>
+				<PreloadImages>
+					<Routes>
+						<Route path="/" element={<MainPage />} />
+					</Routes>
+				</PreloadImages>
+			</Router>
+		</Provider>
+	);
 };
 
 export default App;
