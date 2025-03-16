@@ -10,9 +10,7 @@
 
 자세한 내용은 [호빗 소개](https://magnificent-screw-658.notion.site/hoBIT-19ed8b1360b88003bf51e2b299b287ff?pvs=4)에서 확인해주세요.
 
-```bash
-$ npm start
-```
+
 # 가이드라인
 
 ## 브랜치 전략
