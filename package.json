@@ -37,6 +37,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@types/eslint": "^9.6.1",
     "@types/jest": "^29.5.14",
     "@types/json-bigint": "^1.0.4",
