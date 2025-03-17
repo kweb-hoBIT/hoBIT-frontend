@@ -22,11 +22,11 @@ const Header: React.FC = () => {
         />
       </div>
 
-      <p className="absolute left-1/2 transform -translate-x-1/2 font-7bold text-[26px]">
+      <p className="absolute left-1/2 transform -translate-x-1/2 font-7bold text-[20px] sm:text-[26px]">
         {i18n.headerTitle}
       </p>
 
-	  <div className="ml-auto relative w-[88px] h-[32px] bg-[#D9D9D9] rounded-[20px] flex items-center">
+      {/* <div className="ml-auto relative w-[88px] h-[32px] bg-[#D9D9D9] rounded-[20px] flex items-center">
         <div
           className={`absolute h-full rounded-full justify-center transition-transform duration-500 ease-in-out bg-black ${
             isKorean ? 'translate-x-0 w-[50px]' : 'translate-x-[48px] w-[40px]'
@@ -45,6 +45,33 @@ const Header: React.FC = () => {
         <button
           onClick={() => dispatch(setEnglish())}
           className={`w-[38px] h-full z-10 text-[16px] font-6semibold rounded-full transition-colors duration-500 ${
+            !isKorean ? 'text-white' : 'text-[#aaaaaa]'
+          }`}
+        >
+          EN
+        </button>
+      </div> */}
+      <div className="ml-auto relative w-[70px] sm:w-[88px] h-[28px] sm:h-[32px] bg-[#D9D9D9] rounded-[20px] flex items-center">
+        <div
+          className={`absolute h-full rounded-full justify-center transition-transform duration-500 ease-in-out bg-black ${
+            isKorean
+              ? 'translate-x-0 w-[40px] sm:w-[50px]'
+              : 'translate-x-[32px] sm:translate-x-[48px] w-[30px] sm:w-[40px]'
+          }`}
+        ></div>
+
+        <button
+          onClick={() => dispatch(setKorean())}
+          className={`w-[40px] sm:w-[50px] h-full z-10 text-[14px] sm:text-[16px] font-6semibold rounded-full transition-colors duration-500 ${
+            isKorean ? 'text-white' : 'text-[#aaaaaa]'
+          }`}
+        >
+          KOR
+        </button>
+
+        <button
+          onClick={() => dispatch(setEnglish())}
+          className={`w-[30px] sm:w-[38px] h-full z-10 text-[14px] sm:text-[16px] font-6semibold rounded-full transition-colors duration-500 ${
             !isKorean ? 'text-white' : 'text-[#aaaaaa]'
           }`}
         >
