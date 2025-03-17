@@ -22,11 +22,11 @@ const Header: React.FC = () => {
         />
       </div>
 
-      <p className="absolute left-1/2 transform -translate-x-1/2 font-7bold text-[26px]">
+      <p className="absolute left-1/2 transform -translate-x-1/2 font-7bold text-[20px] sm:text-[26px]">
         {i18n.headerTitle}
       </p>
 
-	  <div className="ml-auto relative w-[88px] h-[32px] bg-[#D9D9D9] rounded-[20px] flex items-center">
+      <div className="ml-auto relative w-[88px] h-[32px] bg-[#D9D9D9] rounded-[20px] flex items-center">
         <div
           className={`absolute h-full rounded-full justify-center transition-transform duration-500 ease-in-out bg-black ${
             isKorean ? 'translate-x-0 w-[50px]' : 'translate-x-[48px] w-[40px]'
