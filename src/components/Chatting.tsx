@@ -98,6 +98,21 @@ const Chatting: React.FC = () => {
   }, [chatHistory]);
 
   useEffect(() => {
+    if (
+      chatContainerRef.current &&
+      chatHistory.some((chatItem) => chatItem.is_greet)
+    ) {
+      const container = chatContainerRef.current;
+      setTimeout(() => {
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior: 'smooth',
+        });
+      }, 300);
+    }
+  }, [chatHistory]);
+
+  useEffect(() => {
     if (!sentValue || !sent) return;
 
     dispatch(clearSent());
