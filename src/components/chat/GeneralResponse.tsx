@@ -46,7 +46,7 @@ const GeneralResponse: React.FC<HobitResponseProps> = ({
           <img
             src={errorImg}
             alt="error image"
-            className="w-[150px] my-[10px] ml-[60px]"
+            className="w-[200px] my-[10px] ml-[60px]"
           />
           <MultipleResponse
             text={
