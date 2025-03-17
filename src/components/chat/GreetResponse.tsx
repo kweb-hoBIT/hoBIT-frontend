@@ -6,13 +6,15 @@ import { RootState } from '../../redux/store';
 import HobitProfile from './HobitProfile';
 import Response from './Response';
 import { Faq } from '../../types/faq';
-import helloImg from '../../assets/hello.png';
 import { clearSentValue, sendInputValue } from '../../redux/inputSlice';
 
 const GreetResponse: React.FC = () => {
   const dispatch = useDispatch();
   const [mocks, _setMocks] = useState<Faq[]>([]);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
+  const helloImg = useSelector(
+    (state: RootState) => state.image.images['helloImage']
+  );
 
   const handleSendOption = (message: string) => {
     dispatch(sendInputValue(message));
@@ -28,7 +30,7 @@ const GreetResponse: React.FC = () => {
         <img
           src={helloImg}
           alt="hello image"
-          className="w-[150px] mb-[10px]"
+          className="w-[200px] mb-[10px]"
           loading="eager"
         />
         <div className="flex w-full justify-between items-center">

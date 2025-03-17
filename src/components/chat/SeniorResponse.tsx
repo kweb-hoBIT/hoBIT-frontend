@@ -121,7 +121,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                           />
                         </div>
                       )}
-                      <p>
+                      <div>
                         {answer.answer &&
                           answer.answer
                             .split('\n')
@@ -132,7 +132,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                                 <p key={index}>{line}</p>
                               )
                             )}
-                      </p>
+                      </div>
                       {(answer.url ||
                         answer.email ||
                         answer.phone ||

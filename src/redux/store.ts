@@ -7,9 +7,11 @@ import { menuReducer } from './menuSlice';
 import { homeReducer } from './homeSlice';
 import { SeniorFaqIdReducer } from './SeniorFaqIdSlice';
 import { feedbackReducer } from './feedbackSlice';
+import { imageReducer } from './imageSlice';
 
 const store = configureStore({
   reducer: {
+    image: imageReducer,
     input: inputReducer,
     faqCard: faqCardReducer,
     language: languageReducer,
