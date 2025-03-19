@@ -11,7 +11,7 @@ export const lang = {
     faq: '자주 묻는 질문',
   },
   en: {
-    headerTitle: 'Info College(Undergrad) hoBIT',
+    headerTitle: 'Info Chatbot hoBIT',
     questionLabel: 'Question:',
     answerLabel: 'Answer:',
     managerContact: 'Manager Contact:',
