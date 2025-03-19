@@ -1,6 +1,6 @@
 export const lang = {
   ko: {
-    headerTitle: '정보대학 챗봇 호빗',
+    headerTitle: '정보대학(학부) 챗봇 호빗',
     questionLabel: '질문:',
     answerLabel: '답변:',
     managerContact: '담당자 연락처:',
@@ -11,7 +11,7 @@ export const lang = {
     faq: '자주 묻는 질문',
   },
   en: {
-    headerTitle: 'Chatbot hoBIT',
+    headerTitle: 'Info Chatbot hoBIT',
     questionLabel: 'Question:',
     answerLabel: 'Answer:',
     managerContact: 'Manager Contact:',
