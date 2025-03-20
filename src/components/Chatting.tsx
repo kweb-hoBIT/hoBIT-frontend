@@ -82,6 +82,36 @@ const Chatting: React.FC = () => {
     }
   }, [feedbackClicked]);
 
+  useEffect(() => {
+    if (chatContainerRef.current && newChatItemRef.current) {
+      const container = chatContainerRef.current;
+      setTimeout(
+        () =>
+          container.scrollTo({
+            top: container.scrollHeight,
+            behavior: 'smooth',
+          }),
+        500
+      );
+      newChatItemRef.current = null;
+    }
+  }, [chatHistory.map((item) => item.is_greet).join(',')]);
+
+  useEffect(() => {
+    if (chatContainerRef.current && newChatItemRef.current) {
+      const container = chatContainerRef.current;
+      setTimeout(
+        () =>
+          container.scrollTo({
+            top: container.scrollHeight,
+            behavior: 'smooth',
+          }),
+        500
+      );
+      newChatItemRef.current = null;
+    }
+  }, [chatHistory.map((item) => item.is_able).join(',')]);
+
   useLayoutEffect(() => {
     if (chatContainerRef.current && newChatItemRef.current) {
       const container = chatContainerRef.current;
