@@ -227,7 +227,7 @@ const AllCategoriesResponse: React.FC = () => {
                       className="hover:bg-gray-200 bg-gray-100 w-[160px] h-[80px] flex items-center justify-center px-[10px] rounded-[20px] cursor-pointer"
                       onClick={() => showQuestions(subCategory)}
                     >
-                      <span className="text-[18px] font-6semibold text-center">
+                      <span className="text-[12px] sm:text-[18px] font-6semibold text-center">
                         {isKorean
                           ? subCategory.category_ko
                           : subCategory.category_en}

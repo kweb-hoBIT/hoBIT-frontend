@@ -138,19 +138,20 @@ const Chatting: React.FC = () => {
               )
             );
           } else if (serverResponse.is_able) {
-            setChatHistory((prevHistory) =>
-              prevHistory.map((item) =>
+            setChatHistory((prevHistory) => {
+              const updatedHistory = prevHistory.map((item) =>
                 item.query === sentValue
                   ? {
                       ...item,
                       response: serverResponse.faqs,
                       loading: false,
-                      is_greet: false,
-                      is_able: true,
+                      is_greet: true,
                     }
                   : item
-              )
-            );
+              );
+
+              return [...updatedHistory];
+            });
           } else {
             setChatHistory((prevHistory) =>
               prevHistory.map((item) =>
