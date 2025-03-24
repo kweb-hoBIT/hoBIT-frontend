@@ -23,7 +23,6 @@ const FAQResponse: React.FC = () => {
     const fetchFAQs = async () => {
       try {
         const fetchedFaqs = await getFAQs();
-        console.log('Fetched FAQs:', fetchedFaqs);
         setFaqs(fetchedFaqs.faqs);
       } catch (error) {
         console.error('Failed to fetch FAQs:', error);

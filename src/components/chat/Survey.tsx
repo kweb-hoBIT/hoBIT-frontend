@@ -13,9 +13,10 @@ import { setFeedbackClicked } from '../../redux/feedbackSlice';
 
 type SurveyProps = {
   id: number;
+  user_question: string;
 };
 
-const Survey: React.FC<SurveyProps> = ({ id }) => {
+const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
   const dispatch = useDispatch();
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
   const rate_id = useSelector((state: RootState) => state.input.id);
@@ -31,6 +32,7 @@ const Survey: React.FC<SurveyProps> = ({ id }) => {
         // cancel rate
         await rateFAQ({
           id: rate_id,
+          user_question,
           faq_id: id,
           rating: 0,
           feedback_reason: '',
@@ -41,6 +43,7 @@ const Survey: React.FC<SurveyProps> = ({ id }) => {
         // rate positive
         await rateFAQ({
           id: rate_id,
+          user_question,
           faq_id: id,
           rating: 1,
           feedback_reason: '',
@@ -68,6 +71,7 @@ const Survey: React.FC<SurveyProps> = ({ id }) => {
       if (thumbDown) {
         await rateFAQ({
           id: rate_id,
+          user_question,
           faq_id: id,
           rating: -1,
           feedback_reason: feedbackReason || '',

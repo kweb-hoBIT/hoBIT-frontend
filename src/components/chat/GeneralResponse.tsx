@@ -22,6 +22,7 @@ const GeneralResponse: React.FC<HobitResponseProps> = ({
 }) => {
   const [faqs, setFaqs] = useState<Faq[]>([]);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
+  const sentValue = useSelector((state: RootState) => state.input.sentValue);
 
   useEffect(() => {
     if (newFaqs) {
@@ -60,7 +61,9 @@ const GeneralResponse: React.FC<HobitResponseProps> = ({
       ) : (
         <>
           <Response text="" faqs={faqs} />
-          {faqs.length > 0 && <Survey id={faqs[0].id} />}
+          {faqs.length > 0 && (
+            <Survey id={faqs[0].id} user_question={sentValue} />
+          )}
         </>
       )}
     </div>
