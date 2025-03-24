@@ -66,7 +66,7 @@ const Chatting: React.FC = () => {
           top: container.scrollHeight,
           behavior: 'smooth',
         });
-      }, 300);
+      }, 500);
     }
   }, [homeClicked]);
 
@@ -78,9 +78,39 @@ const Chatting: React.FC = () => {
           top: container.scrollHeight,
           behavior: 'smooth',
         });
-      }, 300);
+      }, 500);
     }
   }, [feedbackClicked]);
+
+  useEffect(() => {
+    if (chatContainerRef.current && newChatItemRef.current) {
+      const container = chatContainerRef.current;
+      setTimeout(
+        () =>
+          container.scrollTo({
+            top: container.scrollHeight,
+            behavior: 'smooth',
+          }),
+        500
+      );
+      newChatItemRef.current = null;
+    }
+  }, [chatHistory.map((item) => item.is_greet).join(',')]);
+
+  useEffect(() => {
+    if (chatContainerRef.current && newChatItemRef.current) {
+      const container = chatContainerRef.current;
+      setTimeout(
+        () =>
+          container.scrollTo({
+            top: container.scrollHeight,
+            behavior: 'smooth',
+          }),
+        500
+      );
+      newChatItemRef.current = null;
+    }
+  }, [chatHistory.map((item) => item.is_able).join(',')]);
 
   useLayoutEffect(() => {
     if (chatContainerRef.current && newChatItemRef.current) {
@@ -91,24 +121,9 @@ const Chatting: React.FC = () => {
             top: container.scrollHeight,
             behavior: 'smooth',
           }),
-        300
+        500
       );
       newChatItemRef.current = null;
-    }
-  }, [chatHistory]);
-
-  useEffect(() => {
-    if (
-      chatContainerRef.current &&
-      chatHistory.some((chatItem) => chatItem.is_greet)
-    ) {
-      const container = chatContainerRef.current;
-      setTimeout(() => {
-        container.scrollTo({
-          top: container.scrollHeight,
-          behavior: 'smooth',
-        });
-      }, 300);
     }
   }, [chatHistory]);
 
@@ -153,19 +168,20 @@ const Chatting: React.FC = () => {
               )
             );
           } else if (serverResponse.is_able) {
-            setChatHistory((prevHistory) =>
-              prevHistory.map((item) =>
+            setChatHistory((prevHistory) => {
+              const updatedHistory = prevHistory.map((item) =>
                 item.query === sentValue
                   ? {
                       ...item,
                       response: serverResponse.faqs,
                       loading: false,
-                      is_greet: false,
-                      is_able: true,
+                      is_greet: true,
                     }
                   : item
-              )
-            );
+              );
+
+              return [...updatedHistory];
+            });
           } else {
             setChatHistory((prevHistory) =>
               prevHistory.map((item) =>

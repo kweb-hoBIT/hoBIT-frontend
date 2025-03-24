@@ -56,7 +56,7 @@ const Header: React.FC = () => {
           className={`absolute h-full rounded-full justify-center transition-transform duration-500 ease-in-out bg-black ${
             isKorean
               ? 'translate-x-0 w-[40px] sm:w-[50px]'
-              : 'translate-x-[32px] sm:translate-x-[48px] w-[30px] sm:w-[40px]'
+              : 'translate-x-[40px] sm:translate-x-[48px] w-[30px] sm:w-[40px]'
           }`}
         ></div>
 
