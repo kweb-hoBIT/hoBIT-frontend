@@ -82,6 +82,36 @@ const Chatting: React.FC = () => {
     }
   }, [feedbackClicked]);
 
+  useEffect(() => {
+    if (chatContainerRef.current && newChatItemRef.current) {
+      const container = chatContainerRef.current;
+      setTimeout(
+        () =>
+          container.scrollTo({
+            top: container.scrollHeight,
+            behavior: 'smooth',
+          }),
+        500
+      );
+      newChatItemRef.current = null;
+    }
+  }, [chatHistory.map((item) => item.is_greet).join(',')]);
+
+  useEffect(() => {
+    if (chatContainerRef.current && newChatItemRef.current) {
+      const container = chatContainerRef.current;
+      setTimeout(
+        () =>
+          container.scrollTo({
+            top: container.scrollHeight,
+            behavior: 'smooth',
+          }),
+        500
+      );
+      newChatItemRef.current = null;
+    }
+  }, [chatHistory.map((item) => item.is_able).join(',')]);
+
   useLayoutEffect(() => {
     if (chatContainerRef.current && newChatItemRef.current) {
       const container = chatContainerRef.current;
@@ -138,19 +168,20 @@ const Chatting: React.FC = () => {
               )
             );
           } else if (serverResponse.is_able) {
-            setChatHistory((prevHistory) =>
-              prevHistory.map((item) =>
+            setChatHistory((prevHistory) => {
+              const updatedHistory = prevHistory.map((item) =>
                 item.query === sentValue
                   ? {
                       ...item,
                       response: serverResponse.faqs,
                       loading: false,
-                      is_greet: false,
-                      is_able: true,
+                      is_greet: true,
                     }
                   : item
-              )
-            );
+              );
+
+              return [...updatedHistory];
+            });
           } else {
             setChatHistory((prevHistory) =>
               prevHistory.map((item) =>
