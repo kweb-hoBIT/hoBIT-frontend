@@ -2,6 +2,7 @@ import { FeedbackLanguage } from './question';
 
 export type RateFaqRequest = {
   id: number;
+  user_question: string;
   faq_id: number;
   rating: -1 | 1 | 0;
   feedback_reason: string;

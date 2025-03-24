@@ -33,14 +33,13 @@ const Header: React.FC = () => {
           }`}
         ></div>
 
-        <button
-          onClick={() => dispatch(setKorean())}
-          className={`w-[50px] h-full z-10 text-[16px] font-6semibold rounded-full transition-colors duration-500 ${
-            isKorean ? 'text-white' : 'text-[#aaaaaa]'
-          }`}
-        >
-          KOR
-        </button>
+				<button
+					onClick={() => dispatch(setKorean())}
+					className={`w-[50px] h-full z-10 text-[16px] font-6semibold rounded-full transition-colors duration-500 ${isKorean ? 'text-white' : 'text-[#aaaaaa]'
+						}`}
+				>
+					KOR
+				</button>
 
         <button
           onClick={() => dispatch(setEnglish())}
