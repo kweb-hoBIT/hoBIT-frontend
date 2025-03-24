@@ -10,6 +10,18 @@
 
 자세한 내용은 [호빗 소개](https://magnificent-screw-658.notion.site/hoBIT-19ed8b1360b88003bf51e2b299b287ff?pvs=4)에서 확인해주세요.
 
+# 파이프라인  
+
+## Deployment Pipeline
+<p align="center">
+<img width="800" alt="Image" src="https://github.com/user-attachments/assets/a0fa219e-5f90-470a-9b5c-d12b87dc3985" />
+</p>
+
+## Creating FAQ
+<p align="center">
+<img width="800" alt="Image" src="https://github.com/user-attachments/assets/a0c4d190-87e3-4fb1-9adc-fb59c81aa12e" />
+</p>
+
 
 # 가이드라인
 
