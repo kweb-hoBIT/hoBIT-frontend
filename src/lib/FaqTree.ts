@@ -29,26 +29,25 @@ export class FaqTree {
 			mainCategory.category_ko
 		);
 
-		const mainKey = existingMainCategory || mainCategory;
-
-		if (!this.tree.has(mainKey)) {
-			this.tree.set(mainKey, new Map());
+		if (!existingMainCategory) {
+			this.tree.set(mainCategory, new Map());
 		}
 
-		const subCategoryMap = this.tree.get(mainKey)!;
+		const subCategoryMap = this.tree.get(existingMainCategory || mainCategory)!;
 
 		const existingSubCategory = this.findCategoryByKo(
 			subCategoryMap.keys(),
 			subCategory.category_ko
 		);
 
-		const subKey = existingSubCategory || subCategory;
-
-		if (!subCategoryMap.has(subKey)) {
-			subCategoryMap.set(subKey, []);
+		if (!existingSubCategory) {
+			subCategoryMap.set(subCategory, []);
 		}
 
-		subCategoryMap.get(subKey)!.push(faq);
+		const list = subCategoryMap.get(existingSubCategory || subCategory)!;
+		list.push(faq);
+
+		list.sort((a, b) => Number(a.category_order) - Number(b.category_order));
 	}
 
 	private findCategoryByKo(
