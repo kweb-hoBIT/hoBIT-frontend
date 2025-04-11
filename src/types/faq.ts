@@ -90,6 +90,7 @@ export type SeniorFAQ = {
 		};
 	}[];
 	manager: string;
+	category_order: string;
 	created_at: string;
 	updated_at: string;
 };
