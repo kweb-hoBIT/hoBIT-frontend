@@ -14,13 +14,7 @@ export class FaqTree {
 	}
 
 	private initializeTree(faqs: Faq[]) {
-		const sortedFaqs = [...faqs].sort((a, b) => {
-			const orderA = parseInt(a.category_order);
-			const orderB = parseInt(b.category_order);
-			return orderA - orderB;
-		});
-
-		sortedFaqs.forEach((faq) => {
+		faqs.forEach((faq) => {
 			this.addToTree(
 				{ category_ko: faq.maincategory_ko, category_en: faq.maincategory_en },
 				{ category_ko: faq.subcategory_ko, category_en: faq.subcategory_en },
@@ -35,26 +29,25 @@ export class FaqTree {
 			mainCategory.category_ko
 		);
 
-		const mainKey = existingMainCategory || mainCategory;
-
-		if (!this.tree.has(mainKey)) {
-			this.tree.set(mainKey, new Map());
+		if (!existingMainCategory) {
+			this.tree.set(mainCategory, new Map());
 		}
 
-		const subCategoryMap = this.tree.get(mainKey)!;
+		const subCategoryMap = this.tree.get(existingMainCategory || mainCategory)!;
 
 		const existingSubCategory = this.findCategoryByKo(
 			subCategoryMap.keys(),
 			subCategory.category_ko
 		);
 
-		const subKey = existingSubCategory || subCategory;
-
-		if (!subCategoryMap.has(subKey)) {
-			subCategoryMap.set(subKey, []);
+		if (!existingSubCategory) {
+			subCategoryMap.set(subCategory, []);
 		}
 
-		subCategoryMap.get(subKey)!.push(faq);
+		const list = subCategoryMap.get(existingSubCategory || subCategory)!;
+		list.push(faq);
+
+		list.sort((a, b) => Number(a.category_order) - Number(b.category_order));
 	}
 
 	private findCategoryByKo(
