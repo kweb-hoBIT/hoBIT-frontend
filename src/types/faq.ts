@@ -89,6 +89,7 @@ export type SeniorFAQ = {
 			longitude: string;
 		};
 	}[];
+	category_order: string;
 	manager: string;
 	created_at: string;
 	updated_at: string;
