@@ -91,6 +91,7 @@ export type SeniorFAQ = {
 	}[];
 	category_order: string;
 	manager: string;
+	category_order: string;
 	created_at: string;
 	updated_at: string;
 };

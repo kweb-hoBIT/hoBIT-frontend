@@ -14,6 +14,7 @@ export class SeniorFaqTree {
 	}
 
 	private initializeTree(faqs: SeniorFAQ[]) {
+
 		faqs.forEach((faq) => {
 			this.addToTree(
 				{ category_ko: faq.maincategory_ko, category_en: faq.maincategory_en },
