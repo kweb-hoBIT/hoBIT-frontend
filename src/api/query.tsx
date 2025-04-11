@@ -31,29 +31,29 @@ export const getAllQuestions = async () => {
 };
 
 export const rateFAQ = async ({
-	id,
-	user_question,
-	faq_id,
-	rating,
-	feedback_reason,
-	feedback_detail,
-	language,
+  id,
+  user_question,
+  faq_id,
+  rating,
+  feedback_reason,
+  feedback_detail,
+  language,
 }: RateFaqRequest) => {
-	try {
-		const response = await apiClient.post('/rate', {
-			id,
-			user_question,
-			faq_id,
-			rate: rating,
-			feedback_reason,
-			feedback_detail,
-			language,
-		});
-		return response;
-	} catch (error: any) {
-		console.error('Error while rating FAQ:', error);
-		throw error.response?.data || error.message;
-	}
+  try {
+    const response = await apiClient.post('/rate', {
+      id,
+      user_question,
+      faq_id,
+      rate: rating,
+      feedback_reason,
+      feedback_detail,
+      language,
+    });
+    return response;
+  } catch (error: any) {
+    console.error('Error while rating FAQ:', error);
+    throw error.response?.data || error.message;
+  }
 };
 
 export const directUserFeedback = async ({
