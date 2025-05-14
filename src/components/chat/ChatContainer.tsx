@@ -9,7 +9,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
 }) => {
   return (
     <div
-      className={`bg-gray-100 max-w-[330px] h-auto mt-[20px] rounded-[20px] flex flex-col items-center p-[20px] ${className}`}
+      className={`bg-gray-100 max-w-[250px] md:max-w-[330px] h-auto mt-[20px] rounded-[20px] flex flex-col items-center p-[20px] ${className}`}
     >
       {children}
     </div>
