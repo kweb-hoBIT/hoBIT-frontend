@@ -6,9 +6,7 @@ const Text = ({
   className?: string;
 }) => {
   return (
-    <div
-      className={`text-[12px] xs:text-[16px] sm:text-[18px] md:text-[20px] ${className}`}
-    >
+    <div className={`text-[16px] sm:text-[18px] md:text-[20px] ${className}`}>
       {children}
     </div>
   );
