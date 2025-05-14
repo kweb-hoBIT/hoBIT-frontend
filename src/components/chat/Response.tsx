@@ -6,6 +6,7 @@ import { IoIosArrowForward } from 'react-icons/io';
 import { useSelector } from 'react-redux';
 import { Faq } from '../../types/faq';
 import { RootState } from '../../redux/store';
+import Text from '../common/Text';
 
 interface ResponseProps {
   faqs: Faq[];
@@ -22,12 +23,16 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
   return (
     <div>
       {text && (
-        <div className="bg-gray-100 font-5medium text-[20px] mt-[10px] rounded-[20px] px-[20px] py-[15px] max-w-[400px] break-words inline-block">
+        <div className="bg-gray-100 font-5medium mt-[10px] rounded-[20px] px-[20px] py-[15px] max-w-[400px] break-words inline-block">
           {text &&
             text
               .split('\n')
               .map((line, index) =>
-                line === '' ? <br key={index} /> : <p key={index}>{line}</p>
+                line === '' ? (
+                  <br key={index} />
+                ) : (
+                  <Text key={index}>{line}</Text>
+                )
               )}
         </div>
       )}
@@ -76,13 +81,18 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                         .split('\n')
                         .map((line: string, lineIndex: number) => (
                           <div key={lineIndex}>
-                            {line === '' ? <br /> : <p>{line}</p>}
+                            {line === '' ? (
+                              <br />
+                            ) : (
+                              <Text key={lineIndex}>{line}</Text>
+                            )}
                           </div>
                         ))}
 
                     {(item.url || item.email || item.phone) && (
                       <div className="w-full h-[1px] bg-gray-300 mt-[20px]" />
                     )}
+
                     {item.url && (
                       <div
                         className={`flex flex-row ${
@@ -108,20 +118,25 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                           className="text-[18px] text-[#0A5EB0] cursor-pointer hover:underline break-words"
                           style={{ wordBreak: 'break-word' }}
                         >
-                          {isKorean ? '사이트 바로가기' : 'Visit Site'}
+                          {/* {isKorean ? '사이트 바로가기' : 'Visit Site'} */}
+                          <Text>
+                            {isKorean ? '사이트 바로가기' : 'Visit Site'}
+                          </Text>
                         </a>
                       </div>
                     )}
                     {item.email && (
                       <div className="flex flex-row items-center mt-[10px]">
                         <MdOutlineEmail className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
-                        <p className="text-[18px]">{item.email}</p>
+                        {/* <p className="text-[18px]">{item.email}</p> */}
+                        <Text>{item.email}</Text>
                       </div>
                     )}
                     {item.phone && (
                       <div className="flex flex-row items-center mt-[10px]">
                         <FaPhoneVolume className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
-                        <p className="text-[18px]">{item.phone}</p>
+                        {/* <p className="text-[18px]">{item.phone}</p> */}
+                        <Text>{item.phone}</Text>
                       </div>
                     )}
                   </div>
