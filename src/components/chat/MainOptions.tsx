@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { sendInputValue, clearSentValue } from '../../redux/inputSlice';
 import { RootState } from '../../redux/store';
-
+import ChatContainer from './ChatContainer';
 const MainOptions: React.FC = () => {
   const dispatch = useDispatch();
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
@@ -18,11 +18,11 @@ const MainOptions: React.FC = () => {
   };
 
   return (
-    <div className="bg-gray-100 w-[330px] h-auto mt-[20px] rounded-[20px] flex flex-col items-center p-[20px]">
+    <ChatContainer className="gap-[10px]">
       <img
         src={homeImg}
         alt="home image"
-        className="w-[200px] mb-[10px]"
+        className="w-[125px] sm:w-[150px] md:w-[175px] lg:w-[200px]"
         loading="eager"
       />
       <div className="flex w-full justify-between items-center">
@@ -42,7 +42,7 @@ const MainOptions: React.FC = () => {
           {isKorean ? '할 수 있는 일' : 'What I Can Do'}
         </button>
       </div>
-    </div>
+    </ChatContainer>
   );
 };
 
