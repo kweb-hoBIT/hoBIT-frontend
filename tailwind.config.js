@@ -2,6 +2,14 @@
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
+    screens: {
+      'xs': '480px',   // 모바일
+      'sm': '640px',   // 모바일
+      'md': '768px',   // 태블릿
+      'lg': '1024px',  // 작은 데스크톱
+      'xl': '1280px',  // 데스크톱
+      '2xl': '1536px', // 큰 데스크톱
+    },
     extend: {
       fontFamily: {
         '9black': ['Freesentation-9Black', 'sans-serif'],
