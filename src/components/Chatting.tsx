@@ -6,7 +6,6 @@ import GeneralResponse from './chat/GeneralResponse';
 import FAQResponse from './chat/FAQResponse';
 import AllCategoriesResponse from './chat/AllCategoriesResponse';
 import SeniorResponse from './chat/SeniorResponse';
-import Query from './chat/Query';
 import { RootState } from '../redux/store';
 import { Faq } from '../types/faq';
 import { sendQuestion, getAllQuestions } from '../api/query';
@@ -15,6 +14,8 @@ import { resetHomeClicked } from '../redux/homeSlice';
 import { clearSent } from '../redux/inputSlice';
 import GreetResponse from './chat/GreetResponse';
 import { setId } from '../redux/inputSlice';
+import ChatContainer from './chat/ChatContainer';
+import Text from './common/Text';
 
 interface ChatItem {
   query: string;
@@ -260,7 +261,12 @@ const Chatting: React.FC = () => {
             </div>
           ) : (
             <>
-              <Query text={chatItem.query} />
+              <ChatContainer type="query">
+                <Text className="text-white break-words font-5medium">
+                  {chatItem.query}
+                </Text>
+              </ChatContainer>
+
               {chatItem.query === '자주 묻는 질문' ||
               chatItem.query === 'FAQ' ? (
                 <FAQResponse />

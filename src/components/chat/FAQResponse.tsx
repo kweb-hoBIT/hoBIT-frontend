@@ -8,6 +8,8 @@ import HobitProfile from './HobitProfile';
 import Response from './Response';
 import { Faq } from '../../types/faq';
 import { getFAQs } from '../../api/query';
+import ChatContainer from './ChatContainer';
+import Text from '../common/Text';
 
 const FAQResponse: React.FC = () => {
   const dispatch = useDispatch();
@@ -45,16 +47,15 @@ const FAQResponse: React.FC = () => {
       />
       <div className="flex flex-col">
         {faqs.map((faq, index) => (
-          <div
+          <ChatContainer
             key={index}
+            type="faq"
             onClick={() =>
               handleSendKeyword(isKorean ? faq.question_ko : faq.question_en)
             }
-            className="faq-item border border-gray-300 font-5medium text-[20px] w-fit mt-[10px] rounded-[20px] px-[20px] py-[15px] max-w-[400px] break-words inline-block
-              hover:bg-gray-100 transition-colors mr-[10px] cursor-pointer"
           >
-            <h3>{isKorean ? faq.question_ko : faq.question_en}</h3>
-          </div>
+            <Text>{isKorean ? faq.question_ko : faq.question_en}</Text>
+          </ChatContainer>
         ))}
       </div>
     </div>
