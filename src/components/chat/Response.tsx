@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { Faq } from '../../types/faq';
 import { RootState } from '../../redux/store';
 import Text from '../common/Text';
+import IconTextRow from '../common/IconTextRow';
 
 interface ResponseProps {
   faqs: Faq[];
@@ -63,7 +64,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                 {answers.map((item: any, itemIndex: number) => (
                   <div
                     key={itemIndex}
-                    className="bg-gray-100 font-5medium text-[20px] mt-[10px] rounded-[20px] px-[20px] py-[15px] w-[365px] break-words inline-block mr-[10px]"
+                    className="bg-gray-100 font-5medium text-[20px] mt-[10px] rounded-[20px] px-[20px] py-[15px] max-w-[365px] break-words inline-block mr-[10px]"
                   >
                     {itemIndex === 0 && (
                       <div className="flex flex-row text-[16px] text-[#686D76] items-center rounded-[10px] w-fit mb-[10px]">
@@ -94,50 +95,18 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                     )}
 
                     {item.url && (
-                      <div
-                        className={`flex flex-row ${
-                          item.url.length <= 30 ? 'items-center' : 'items-start'
-                        } mt-[20px]`}
-                      >
-                        <FaLink
-                          style={{
-                            fontSize: '36px',
-                            minWidth: '36px',
-                            minHeight: '36px',
-                          }}
-                          className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full"
-                        />
-                        <a
-                          href={
-                            item.url.startsWith('http')
-                              ? item.url
-                              : `http://${item.url}`
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[18px] text-[#0A5EB0] cursor-pointer hover:underline break-words"
-                          style={{ wordBreak: 'break-word' }}
-                        >
-                          {/* {isKorean ? '사이트 바로가기' : 'Visit Site'} */}
-                          <Text>
-                            {isKorean ? '사이트 바로가기' : 'Visit Site'}
-                          </Text>
-                        </a>
-                      </div>
+                      <IconTextRow
+                        type="link"
+                        icon={FaLink}
+                        text={isKorean ? '사이트 바로가기' : 'Visit Site'}
+                        url={item.url}
+                      />
                     )}
                     {item.email && (
-                      <div className="flex flex-row items-center mt-[10px]">
-                        <MdOutlineEmail className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
-                        {/* <p className="text-[18px]">{item.email}</p> */}
-                        <Text>{item.email}</Text>
-                      </div>
+                      <IconTextRow icon={MdOutlineEmail} text={item.email} />
                     )}
                     {item.phone && (
-                      <div className="flex flex-row items-center mt-[10px]">
-                        <FaPhoneVolume className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
-                        {/* <p className="text-[18px]">{item.phone}</p> */}
-                        <Text>{item.phone}</Text>
-                      </div>
+                      <IconTextRow icon={FaPhoneVolume} text={item.phone} />
                     )}
                   </div>
                 ))}
