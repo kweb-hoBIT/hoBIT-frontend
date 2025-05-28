@@ -8,6 +8,7 @@ import { Faq } from '../../types/faq';
 import { RootState } from '../../redux/store';
 import Text from '../common/Text';
 import IconTextRow from '../common/IconTextRow';
+import ChatContainer from './ChatContainer';
 
 interface ResponseProps {
   faqs: Faq[];
@@ -40,7 +41,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
 
       {faqs.length > 0 && (
         <div
-          className="flex flex-row overflow-x-auto"
+          className="flex flex-col overflow-x-auto md:flex-row"
           style={{
             maxWidth: '100%',
             scrollbarWidth: 'none',
@@ -53,6 +54,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
             let answers: any[] = [];
             try {
               const sanitizedAnswer = sanitizeJSON(rawAnswer);
+
               answers = JSON.parse(sanitizedAnswer);
             } catch (error) {
               console.error('JSON Parse Error');
@@ -60,12 +62,14 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
             }
 
             return (
-              <div key={index} className="flex flex-row">
+              <div key={index} className="flex flex-col lg:flex-row">
                 {answers.map((item: any, itemIndex: number) => (
-                  <div
+                  <ChatContainer
                     key={itemIndex}
-                    className="bg-gray-100 font-5medium text-[20px] mt-[10px] rounded-[20px] px-[20px] py-[15px] max-w-[365px] break-words inline-block mr-[10px]"
+                    type="response"
+                    className="font-5medium text-[20px] mt-[10px] rounded-[20px] px-[20px] py-[15px] max-w-[365px] break-words inline-block mr-[10px] items-start"
                   >
+                    {/* 교환학생 > 학점인정 */}
                     {itemIndex === 0 && (
                       <div className="flex flex-row text-[16px] text-[#686D76] items-center rounded-[10px] w-fit mb-[10px]">
                         <h3 className="text-center">
@@ -77,6 +81,8 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                         </h3>
                       </div>
                     )}
+
+                    {/* 내용들 */}
                     {typeof item.answer === 'string' &&
                       item.answer
                         .split('\n')
@@ -108,7 +114,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                     {item.phone && (
                       <IconTextRow icon={FaPhoneVolume} text={item.phone} />
                     )}
-                  </div>
+                  </ChatContainer>
                 ))}
               </div>
             );
