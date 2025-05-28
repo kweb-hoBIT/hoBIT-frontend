@@ -6,6 +6,9 @@ import { IoIosArrowForward } from 'react-icons/io';
 import { useSelector } from 'react-redux';
 import { Faq } from '../../types/faq';
 import { RootState } from '../../redux/store';
+import Text from '../common/Text';
+import IconTextRow from '../common/IconTextRow';
+import ChatContainer from './ChatContainer';
 
 interface ResponseProps {
   faqs: Faq[];
@@ -22,19 +25,23 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
   return (
     <div>
       {text && (
-        <div className="bg-gray-100 font-5medium text-[20px] mt-[10px] rounded-[20px] px-[20px] py-[15px] max-w-[400px] break-words inline-block">
+        <div className="bg-gray-100 font-5medium mt-[10px] rounded-[20px] px-[20px] py-[15px] max-w-[400px] break-words inline-block">
           {text &&
             text
               .split('\n')
               .map((line, index) =>
-                line === '' ? <br key={index} /> : <p key={index}>{line}</p>
+                line === '' ? (
+                  <br key={index} />
+                ) : (
+                  <Text key={index}>{line}</Text>
+                )
               )}
         </div>
       )}
 
       {faqs.length > 0 && (
         <div
-          className="flex flex-row overflow-x-auto"
+          className="flex flex-col overflow-x-auto md:flex-row"
           style={{
             maxWidth: '100%',
             scrollbarWidth: 'none',
@@ -47,6 +54,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
             let answers: any[] = [];
             try {
               const sanitizedAnswer = sanitizeJSON(rawAnswer);
+
               answers = JSON.parse(sanitizedAnswer);
             } catch (error) {
               console.error('JSON Parse Error');
@@ -54,12 +62,14 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
             }
 
             return (
-              <div key={index} className="flex flex-row">
+              <div key={index} className="flex flex-col lg:flex-row">
                 {answers.map((item: any, itemIndex: number) => (
-                  <div
+                  <ChatContainer
                     key={itemIndex}
-                    className="bg-gray-100 font-5medium text-[20px] mt-[10px] rounded-[20px] px-[20px] py-[15px] w-[365px] break-words inline-block mr-[10px]"
+                    type="response"
+                    className="font-5medium text-[20px] mt-[10px] rounded-[20px] px-[20px] py-[15px] max-w-[365px] break-words inline-block mr-[10px] items-start"
                   >
+                    {/* 교환학생 > 학점인정 */}
                     {itemIndex === 0 && (
                       <div className="flex flex-row text-[16px] text-[#686D76] items-center rounded-[10px] w-fit mb-[10px]">
                         <h3 className="text-center">
@@ -71,60 +81,40 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                         </h3>
                       </div>
                     )}
+
+                    {/* 내용들 */}
                     {typeof item.answer === 'string' &&
                       item.answer
                         .split('\n')
                         .map((line: string, lineIndex: number) => (
                           <div key={lineIndex}>
-                            {line === '' ? <br /> : <p>{line}</p>}
+                            {line === '' ? (
+                              <br />
+                            ) : (
+                              <Text key={lineIndex}>{line}</Text>
+                            )}
                           </div>
                         ))}
 
                     {(item.url || item.email || item.phone) && (
                       <div className="w-full h-[1px] bg-gray-300 mt-[20px]" />
                     )}
+
                     {item.url && (
-                      <div
-                        className={`flex flex-row ${
-                          item.url.length <= 30 ? 'items-center' : 'items-start'
-                        } mt-[20px]`}
-                      >
-                        <FaLink
-                          style={{
-                            fontSize: '36px',
-                            minWidth: '36px',
-                            minHeight: '36px',
-                          }}
-                          className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full"
-                        />
-                        <a
-                          href={
-                            item.url.startsWith('http')
-                              ? item.url
-                              : `http://${item.url}`
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[18px] text-[#0A5EB0] cursor-pointer hover:underline break-words"
-                          style={{ wordBreak: 'break-word' }}
-                        >
-                          {isKorean ? '사이트 바로가기' : 'Visit Site'}
-                        </a>
-                      </div>
+                      <IconTextRow
+                        type="link"
+                        icon={FaLink}
+                        text={isKorean ? '사이트 바로가기' : 'Visit Site'}
+                        url={item.url}
+                      />
                     )}
                     {item.email && (
-                      <div className="flex flex-row items-center mt-[10px]">
-                        <MdOutlineEmail className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
-                        <p className="text-[18px]">{item.email}</p>
-                      </div>
+                      <IconTextRow icon={MdOutlineEmail} text={item.email} />
                     )}
                     {item.phone && (
-                      <div className="flex flex-row items-center mt-[10px]">
-                        <FaPhoneVolume className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
-                        <p className="text-[18px]">{item.phone}</p>
-                      </div>
+                      <IconTextRow icon={FaPhoneVolume} text={item.phone} />
                     )}
-                  </div>
+                  </ChatContainer>
                 ))}
               </div>
             );
