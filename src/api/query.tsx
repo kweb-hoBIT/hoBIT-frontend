@@ -5,30 +5,30 @@ import { GetSeniorFaqByIdRequest } from '../types/seniorFaq';
 import { TbWashDryP } from 'react-icons/tb';
 
 export const sendQuestion = async (question: string, language: string) => {
-  try {
-    if (language == 'EN') {
-      question = question.toLowerCase();
-    }
+	try {
+		if (language == 'EN') {
+			question = question.toLowerCase();
+		}
 
-    const response = await apiClient.post('/question', {
-      question,
-      language,
-    });
-    return response.data;
-  } catch (error: any) {
-    console.error('Error while sending question:', error);
-    throw error.response?.data || error.message;
-  }
+		const response = await apiClient.post('/question', {
+			question,
+			language,
+		});
+		return response.data;
+	} catch (error: any) {
+		console.error('Error while sending question:', error);
+		throw error.response?.data || error.message;
+	}
 };
 
 export const getAllQuestions = async () => {
-  try {
-    const response = await apiClient.get('/all_questions');
-    return response.data;
-  } catch (error: any) {
-    console.error('Error while fetching all questions:', error);
-    throw error.response?.data || error.message;
-  }
+	try {
+		const response = await apiClient.get('/all_questions');
+		return response.data;
+	} catch (error: any) {
+		console.error('Error while fetching all questions:', error);
+		throw error.response?.data || error.message;
+	}
 };
 
 export const rateFAQ = async ({
@@ -58,35 +58,35 @@ export const rateFAQ = async ({
 };
 
 export const directUserFeedback = async ({
-  feedback_detail,
-  language,
+	feedback_detail,
+	language,
 }: DirectUserFeedbacksRequest) => {
-  try {
-    const response = await apiClient.post('/direct_user_feedback', {
-      feedback_detail,
-      language,
-    });
-    return response;
-  } catch (error: any) {
-    console.error('Error while direct user feedback FAQ:', error);
-    throw error.response?.data || error.message;
-  }
+	try {
+		const response = await apiClient.post('/direct_user_feedback', {
+			feedback_detail,
+			language,
+		});
+		return response;
+	} catch (error: any) {
+		console.error('Error while direct user feedback FAQ:', error);
+		throw error.response?.data || error.message;
+	}
 };
 
 export const postFaqUserFeedback = async ({
-  feedback_detail,
-  language,
+	feedback_detail,
+	language,
 }: DirectUserFeedbacksRequest) => {
-  try {
-    const response = await apiClient.post('/direct_user_feedback', {
-      feedback_detail,
-      language,
-    });
-    return response;
-  } catch (error: any) {
-    console.error('Error while direct user feedback FAQ:', error);
-    throw error.response?.data || error.message;
-  }
+	try {
+		const response = await apiClient.post('/direct_user_feedback', {
+			feedback_detail,
+			language,
+		});
+		return response;
+	} catch (error: any) {
+		console.error('Error while direct user feedback FAQ:', error);
+		throw error.response?.data || error.message;
+	}
 };
 
 // moderate 관련 로직 추가
@@ -103,37 +103,37 @@ export const moderateContent = async (content: string) => {
 };
 
 export const getAllFAQs = async () => {
-  try {
-    const response = await apiClient.get('/all_faqs');
-    return response.data;
-  } catch (error: any) {
-    console.error('Error while fetching all faqs:', error);
-    throw error.response?.data || error.message;
-  }
+	try {
+		const response = await apiClient.get('/all_faqs');
+		return response.data;
+	} catch (error: any) {
+		console.error('Error while fetching all faqs:', error);
+		throw error.response?.data || error.message;
+	}
 };
 
 export const getFAQs = async () => {
-  try {
-    const response = await apiClient.get('/top_faqs');
-    return response.data;
-  } catch (error: any) {
-    console.error('Error while fetching top faqs:', error);
-    throw error.response?.data || error.message;
-  }
+	try {
+		const response = await apiClient.get('/top_faqs');
+		return response.data;
+	} catch (error: any) {
+		console.error('Error while fetching top faqs:', error);
+		throw error.response?.data || error.message;
+	}
 };
 
 export const getSeniorFAQById = async ({ id }: GetSeniorFaqByIdRequest) => {
-  try {
-    const response = await apiClient.get('/senior_faq', {
-      params: {
-        id,
-      },
-    });
-    return response.data;
-  } catch (error: any) {
-    console.error('Error while fetching senior faq by id:', error);
-    throw error.response?.data || error.message;
-  }
+	try {
+		const response = await apiClient.get('/senior_faq', {
+			params: {
+				id,
+			},
+		});
+		return response.data;
+	} catch (error: any) {
+		console.error('Error while fetching senior faq by id:', error);
+		throw error.response?.data || error.message;
+	}
 };
 
 export const getAllSeniorFAQs = async () => {
