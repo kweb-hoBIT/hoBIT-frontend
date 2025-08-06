@@ -13,9 +13,10 @@ import { sendInputValue, clearSentValue } from '../redux/inputSlice';
 import { setSeniorFaqId, clearSeniorFaqId } from '../redux/SeniorFaqIdSlice';
 
 import { Category, FaqTree } from '../lib/FaqTree';
-import { directUserFeedback, getAllFAQs, getAllSeniorFAQs } from '../api/query';
+import { directUserFeedback, getAllFAQs, getAllSeniorFAQs, moderateContent } from '../api/query';
 import { SeniorFaqTree } from '../lib/SeniorFaqTree';
 import { Faq, SeniorFAQ } from '../types/faq';
+import {check as korcenCheck} from 'korcen';
 
 const Modal: React.FC = () => {
   const dispatch = useDispatch();
@@ -59,6 +60,33 @@ const Modal: React.FC = () => {
 
     setIsSubmitting(true);
     try {
+      const moderationResult = await moderateContent(feedback);
+      const allowed = moderationResult?.allowed ?? true;
+      const reason = moderationResult?.reason ?? {};
+
+      if (korcenCheck(feedback)){
+        alert(
+          isKorean
+          ? `부적절한 내용이 포함되어 있습니다.`
+          : `Inappropriate content detected`
+        );
+        return;
+      }
+
+      if (!allowed) {
+        const categories = Object.entries(reason)
+          .filter(([_, value]) => value)
+          .map(([key]) => key)
+          .join(', ');
+
+          alert(
+            isKorean
+            ? `부적절한 내용이 포함되어 있습니다.`
+            : `Inappropriate content detected`
+          );
+          return;
+      }
+
       await directUserFeedback({
         feedback_detail: feedback,
         language: isKorean ? 'KO' : 'EN',

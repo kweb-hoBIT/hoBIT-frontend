@@ -1,5 +1,4 @@
 import { useDispatch, useSelector } from 'react-redux';
-
 import { sendInputValue } from '../redux/inputSlice';
 import { RootState } from '../redux/store';
 

@@ -27,10 +27,10 @@ const MainOptions: React.FC = () => {
       />
       <div className="flex w-full justify-between items-center">
         <button
-          onClick={() => handleSendOption(isKorean ? '자주 묻는 질문' : 'FAQ')}
+          onClick={() => handleSendOption(isKorean ? '자주 묻는 질문' : 'FAQs')}
           className="w-full text-[#686D76] font-6semibold text-[20px] py-[5px] hover:text-black"
         >
-          {isKorean ? '자주 묻는 질문' : 'FAQ'}
+          {isKorean ? '자주 묻는 질문' : 'FAQs'}
         </button>
         <span className="text-[28px] text-gray-400 font-1thin">|</span>
         <button
