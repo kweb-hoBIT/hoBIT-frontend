@@ -5,11 +5,12 @@ import { TbThumbDownFilled } from 'react-icons/tb';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { rateFAQ } from '../../api/query';
+import { rateFAQ, moderateContent } from '../../api/query';
 import { RootState } from '../../redux/store';
 import { clearSentValue } from '../../redux/inputSlice';
 
 import { setFeedbackClicked } from '../../redux/feedbackSlice';
+import { check as korcenCheck } from 'korcen';
 
 type SurveyProps = {
   id: number;
@@ -68,6 +69,34 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
 
   const handleSendFeedback = async () => {
     try {
+      if (!thumbDown) return;
+
+    const detail = feedbackDetail || '';
+
+    // 1차: korcen으로 욕설 검사 (한국어일 때만)
+    if (isKorean && korcenCheck(detail)) {
+      alert('부적절한 내용이 포함되어 있습니다.');
+      return;
+    }
+
+    // 2차: OpenAI moderation 검사 (한/영 모두)
+    const moderationResult = await moderateContent(detail);
+    const allowed = moderationResult?.allowed ?? true;
+    const reason = moderationResult?.reason ?? {};
+
+    if (!allowed) {
+      const categories = Object.entries(reason)
+        .filter(([_, v]) => v)
+        .map(([k]) => k)
+        .join(', ');
+      alert(
+        isKorean
+          ? `부적절한 내용이 포함되어 있습니다.`
+          : `Inappropriate content detected.`
+      );
+      return;
+    }
+
       if (thumbDown) {
         await rateFAQ({
           id: rate_id,

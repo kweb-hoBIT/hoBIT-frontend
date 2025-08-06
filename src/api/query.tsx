@@ -2,6 +2,7 @@ import apiClient from './apiClient';
 import { RateFaqRequest } from '../types/faq';
 import { DirectUserFeedbacksRequest } from '../types/feedback';
 import { GetSeniorFaqByIdRequest } from '../types/seniorFaq';
+import { TbWashDryP } from 'react-icons/tb';
 
 export const sendQuestion = async (question: string, language: string) => {
 	try {
@@ -88,6 +89,19 @@ export const postFaqUserFeedback = async ({
 	}
 };
 
+// moderate 관련 로직 추가
+export const moderateContent = async (content: string) => {
+  try {
+    const response = await apiClient.post('/moderate', {
+      content
+    });
+    return response.data; // {allowed: boolean, reason: object}
+  } catch (error: any){
+    console.error('Error during moderation: ', error);
+    throw error.response?.data || error.message;
+  }
+};
+
 export const getAllFAQs = async () => {
 	try {
 		const response = await apiClient.get('/all_faqs');
@@ -131,3 +145,4 @@ export const getAllSeniorFAQs = async () => {
 		throw error.response?.data || error.message;
 	}
 };
+

@@ -24,6 +24,7 @@ interface ChatItem {
   seniorMode: number;
   is_greet: boolean;
   is_able: boolean;
+  is_freq: boolean;
 }
 
 const Chatting: React.FC = () => {
@@ -66,7 +67,7 @@ const Chatting: React.FC = () => {
           top: container.scrollHeight,
           behavior: 'smooth',
         });
-      }, 500);
+      }, 100);
     }
   }, [homeClicked]);
 
@@ -78,7 +79,7 @@ const Chatting: React.FC = () => {
           top: container.scrollHeight,
           behavior: 'smooth',
         });
-      }, 500);
+      }, 100 );
     }
   }, [feedbackClicked]);
 
@@ -90,9 +91,7 @@ const Chatting: React.FC = () => {
           container.scrollTo({
             top: container.scrollHeight,
             behavior: 'smooth',
-          }),
-        500
-      );
+          }), 100 );
       newChatItemRef.current = null;
     }
   }, [chatHistory.map((item) => item.is_greet).join(',')]);
@@ -105,12 +104,23 @@ const Chatting: React.FC = () => {
           container.scrollTo({
             top: container.scrollHeight,
             behavior: 'smooth',
-          }),
-        500
-      );
+          }), 100);
       newChatItemRef.current = null;
     }
   }, [chatHistory.map((item) => item.is_able).join(',')]);
+
+  useEffect(() => {
+    if (chatContainerRef.current && newChatItemRef.current) {
+      const container = chatContainerRef.current;
+      setTimeout(
+        () =>
+          container.scrollTo({
+            top: container.scrollHeight,
+            behavior: 'smooth',
+          }), 100);
+      newChatItemRef.current = null;
+    }
+  }, [chatHistory.map((item) => item.is_freq).join(',')]);
 
   useLayoutEffect(() => {
     if (chatContainerRef.current && newChatItemRef.current) {
@@ -120,9 +130,7 @@ const Chatting: React.FC = () => {
           container.scrollTo({
             top: container.scrollHeight,
             behavior: 'smooth',
-          }),
-        500
-      );
+          }), 100 );
       newChatItemRef.current = null;
     }
   }, [chatHistory]);
@@ -140,6 +148,7 @@ const Chatting: React.FC = () => {
       seniorMode: -1,
       is_greet: false,
       is_able: false,
+      is_freq: false,
     };
 
     newChatItemRef.current = newChatItem;
@@ -168,25 +177,40 @@ const Chatting: React.FC = () => {
               )
             );
           } else if (serverResponse.is_able) {
-            setChatHistory((prevHistory) => {
-              const updatedHistory = prevHistory.map((item) =>
+            setChatHistory((prevHistory) => 
+              prevHistory.map((item) =>
                 item.query === sentValue
                   ? {
                       ...item,
                       response: serverResponse.faqs,
                       loading: false,
-                      is_greet: true,
+                      is_able: true,
                     }
                   : item
-              );
-
-              return [...updatedHistory];
-            });
+              )
+            );
+          } else if (serverResponse.is_freq) {
+            setChatHistory((prevHistory) => 
+              prevHistory.map((item) =>
+                item.query === sentValue
+                  ? {
+                      ...item,
+                      response: serverResponse.faqs,
+                      loading: false,
+                      is_freq: true,
+                    }
+                  : item
+              )
+            );
           } else {
             setChatHistory((prevHistory) =>
               prevHistory.map((item) =>
                 item.query === sentValue
-                  ? { ...item, response: serverResponse.faqs, loading: false }
+                  ? { 
+                    ...item, 
+                    response: serverResponse.faqs, 
+                    loading: false 
+                  }
                   : item
               )
             );
@@ -219,6 +243,7 @@ const Chatting: React.FC = () => {
         seniorMode: seniorFaqId,
         is_greet: false,
         is_able: false,
+        is_freq: false,
       };
       newChatItemRef.current = newChatItem;
       setChatHistory((prevHistory) => [...prevHistory, newChatItem]);
@@ -235,6 +260,7 @@ const Chatting: React.FC = () => {
         seniorMode: -1,
         is_greet: false,
         is_able: false,
+        is_freq: false,
       };
 
       setChatHistory((prevHistory) => [...prevHistory, newChatItem]);
@@ -262,7 +288,7 @@ const Chatting: React.FC = () => {
             <>
               <Query text={chatItem.query} />
               {chatItem.query === '자주 묻는 질문' ||
-              chatItem.query === 'FAQ' ? (
+              chatItem.query === 'FAQs' ? (
                 <FAQResponse />
               ) : chatItem.query === '할 수 있는 일' ||
                 chatItem.query === 'What I Can Do' ? (
@@ -271,6 +297,8 @@ const Chatting: React.FC = () => {
                 <GreetResponse />
               ) : chatItem.is_able == true ? (
                 <AllCategoriesResponse />
+              ) : chatItem.is_freq == true ? (
+                <FAQResponse />
               ) : (
                 <GeneralResponse
                   faqs={chatItem.response}
