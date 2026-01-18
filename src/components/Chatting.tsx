@@ -271,17 +271,17 @@ const Chatting: React.FC = () => {
   return (
     <div
       ref={chatContainerRef}
-      className="flex flex-col h-full max-h-[calc(100vh-140px)] overflow-y-auto px-[20px] py-[30px]"
+      className="flex flex-col h-full max-h-[calc(100vh-140px)] overflow-y-auto px-4 py-6 md:px-[20px] md:py-[30px]"
     >
       <HelloHobit />
       {chatHistory.map((chatItem, index) => (
         <div key={index}>
           {chatItem.seniorMode >= 0 ? (
-            <div className="mt-[40px]">
+            <div className="mt-6 md:mt-[40px]">
               <SeniorResponse seniorFaqId={chatItem.seniorMode} />
             </div>
           ) : chatItem.flag ? (
-            <div className="mt-[40px]">
+            <div className="mt-6 md:mt-[40px]">
               <HelloHobit />
             </div>
           ) : (

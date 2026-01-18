@@ -62,56 +62,48 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
             onClick={() => setShowCategories(true)}
             className="flex flex-row items-center mt-[10px] cursor-pointer text-[#686D76] hover:text-black"
           >
-            <IoChevronBackOutline className="text-[28px] mr-[10px] bg-gray-200 rounded-full p-[5px]" />
-            <div className="font-4regular text-[20px]">
+            <IoChevronBackOutline className="text-xl md:text-2xl mr-[10px] bg-gray-200 rounded-full p-[5px]" />
+            <div className="font-4regular text-lg md:text-xl">
               {isKorean ? seniorFAQ?.subcategory_ko : seniorFAQ?.subcategory_en}
             </div>
           </div>
-          <div
-            className="flex flex-row overflow-x-auto"
-            style={{
-              maxWidth: '100%',
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-            }}
-          >
-            <div className="flex flex-row">
-              {seniorFAQ &&
-                Array.isArray(
-                  isKorean ? seniorFAQ.answer_ko : seniorFAQ.answer_en
-                ) &&
-                (isKorean ? seniorFAQ.answer_ko : seniorFAQ.answer_en).map(
-                  (answer, index) => (
-                    <div
-                      key={index}
-                      className="font-5medium text-[20px] bg-[#FFEFEF] mt-[10px] rounded-[20px] px-[20px] py-[15px] w-[365px] break-words inline-block mr-[10px]"
-                    >
-                      {index === 0 && (
-                        <div>
-                          <div className="flex flex-row text-[16px] text-[#686D76] items-center rounded-[10px] w-fit mb-[10px]">
-                            <h3 className="font-5medium text-center">
-                              {isKorean
-                                ? seniorFAQ.maincategory_ko
-                                : seniorFAQ.maincategory_en}
-                            </h3>
-                            <IoIosArrowForward />
-                            <h3 className="font-4regular text-center">
-                              {isKorean
-                                ? seniorFAQ.subcategory_ko
-                                : seniorFAQ.subcategory_en}
-                            </h3>
-                            <IoIosArrowForward />
-                            <h3 className="font-4regular text-center">
-                              {isKorean
-                                ? seniorFAQ.detailcategory_ko
-                                : seniorFAQ.detailcategory_en}
-                            </h3>
-                          </div>
-                          <p className="font-7bold text-[20px] mb-[10px]">
-                            {answer.title}
-                          </p>
+          <div className="flex flex-col md:flex-row md:flex-wrap w-full">
+            {seniorFAQ &&
+              Array.isArray(
+                isKorean ? seniorFAQ.answer_ko : seniorFAQ.answer_en
+              ) &&
+              (isKorean ? seniorFAQ.answer_ko : seniorFAQ.answer_en).map(
+                (answer, index) => (
+                  <div
+                    key={index}
+                    className="font-5medium text-lg md:text-xl bg-[#FFEFEF] mt-[10px] rounded-[20px] px-[20px] py-[15px] w-full md:w-[45%] break-words inline-block md:mr-[10px]"
+                  >
+                    {index === 0 && (
+                      <div>
+                        <div className="flex flex-wrap text-sm md:text-base text-[#686D76] items-center rounded-[10px] w-fit mb-[10px]">
+                          <h3 className="font-5medium text-center">
+                            {isKorean
+                              ? seniorFAQ.maincategory_ko
+                              : seniorFAQ.maincategory_en}
+                          </h3>
+                          <IoIosArrowForward className="mx-1" />
+                          <h3 className="font-4regular text-center">
+                            {isKorean
+                              ? seniorFAQ.subcategory_ko
+                              : seniorFAQ.subcategory_en}
+                          </h3>
+                          <IoIosArrowForward className="mx-1" />
+                          <h3 className="font-4regular text-center">
+                            {isKorean
+                              ? seniorFAQ.detailcategory_ko
+                              : seniorFAQ.detailcategory_en}
+                          </h3>
                         </div>
-                      )}
+                        <p className="font-7bold text-xl md:text-2xl mb-[10px]">
+                          {answer.title}
+                        </p>
+                      </div>
+                    )}
                       {answer.image && (
                         <div className="mt-[20px]">
                           <img
@@ -141,7 +133,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                       )}
                       {answer.url && (
                         <div className="flex flex-row items-center mt-[20px]">
-                          <FaLink className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
+                          <FaLink className="mr-[10px] text-2xl md:text-3xl text-[#686D76] bg-white p-[8px] rounded-full" />
                           <a
                             href={
                               answer.url.startsWith('http')
@@ -150,7 +142,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                             }
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[18px] text-[#0A5EB0] cursor-pointer hover:underline"
+                            className="text-base md:text-lg text-[#0A5EB0] cursor-pointer hover:underline break-all"
                           >
                             {isKorean ? '사이트 바로가기' : 'Visit Site'}
                           </a>
@@ -158,24 +150,24 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                       )}
                       {answer.email && (
                         <div className="flex flex-row items-center mt-[10px]">
-                          <MdOutlineEmail className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
-                          <p className="text-[18px]">{answer.email}</p>
+                          <MdOutlineEmail className="mr-[10px] text-2xl md:text-3xl text-[#686D76] bg-white p-[8px] rounded-full" />
+                          <p className="text-base md:text-lg break-all">{answer.email}</p>
                         </div>
                       )}
                       {answer.phone && (
                         <div className="flex flex-row items-center mt-[10px]">
-                          <FaPhoneVolume className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
-                          <p className="text-[18px]">{answer.phone}</p>
+                          <FaPhoneVolume className="mr-[10px] text-2xl md:text-3xl text-[#686D76] bg-white p-[8px] rounded-full" />
+                          <p className="text-base md:text-lg">{answer.phone}</p>
                         </div>
                       )}
                       {answer.map.latitude && answer.map.longitude && (
                         <div className="flex flex-row items-center mt-[10px]">
-                          <TbMapPinFilled className="mr-[10px] text-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
+                          <TbMapPinFilled className="mr-[10px] text-2xl md:text-3xl text-[#686D76] bg-white p-[8px] rounded-full" />
                           <a
                             href="https://www.korea.ac.kr/campusMap/ko/view.do"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[18px] text-[#0A5EB0]"
+                            className="text-base md:text-lg text-[#0A5EB0]"
                           >
                             {isKorean
                               ? '고려대학교 캠퍼스맵'
@@ -186,7 +178,6 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                     </div>
                   )
                 )}
-            </div>
           </div>
         </div>
       )}

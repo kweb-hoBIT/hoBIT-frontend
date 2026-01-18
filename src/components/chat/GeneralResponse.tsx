@@ -47,13 +47,13 @@ const GeneralResponse: React.FC<HobitResponseProps> = ({
           <img
             src={errorImg}
             alt="error image"
-            className="w-[200px] my-[10px] ml-[60px]"
+            className="w-[150px] md:w-[200px] my-[10px] ml-[50px] md:ml-[60px]"
           />
           <MultipleResponse
             text={
               isKorean
-                ? `질문을 제대로 이해하지 못했어요🥲\n혹시 다음 질문을 찾으시나요?`
-                : `I'm having trouble understanding your question..🥲\nIs these what you’re looking for?`
+                ? `질문을 제대로 이해하지 못했어요 🥲\n혹시 다음 질문을 찾으시나요?`
+                : `I'm having trouble understanding your question.. 🥲\nIs these what you’re looking for?`
             }
             faqs={faqs}
           />

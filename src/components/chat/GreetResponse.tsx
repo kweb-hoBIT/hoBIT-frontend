@@ -26,11 +26,11 @@ const GreetResponse: React.FC = () => {
   return (
     <div>
       <HobitProfile />
-      <div className="bg-gray-100 w-[330px] h-auto mt-[20px] rounded-[20px] flex flex-col items-center p-[20px]">
+      <div className="bg-gray-100 w-fit min-w-[300px] h-auto mt-[20px] rounded-[20px] flex flex-col items-center p-[20px]">
         <img
           src={helloImg}
           alt="hello image"
-          className="w-[200px] mb-[10px]"
+          className="w-[150px] md:w-[200px] mb-[10px]"
           loading="eager"
         />
         <div className="flex w-full justify-between items-center">
@@ -38,16 +38,16 @@ const GreetResponse: React.FC = () => {
             onClick={() =>
               handleSendOption(isKorean ? '자주 묻는 질문' : 'FAQ')
             }
-            className="w-full text-[#686D76] font-6semibold text-[20px] py-[5px] hover:text-black"
+            className="w-full text-[#686D76] font-6semibold text-lg md:text-xl py-[5px] hover:text-black"
           >
             {isKorean ? '자주 묻는 질문' : 'FAQ'}
           </button>
-          <span className="text-[28px] text-gray-400 font-1thin">|</span>
+          <span className="text-xl md:text-2xl text-gray-400 font-1thin">|</span>
           <button
             onClick={() =>
               handleSendOption(isKorean ? '할 수 있는 일' : 'What I Can Do')
             }
-            className="w-full text-[#686D76] font-6semibold text-[20px] py-[5px] hover:text-black"
+            className="w-full text-[#686D76] font-6semibold text-lg md:text-xl py-[5px] hover:text-black"
           >
             {isKorean ? '할 수 있는 일' : 'What I Can Do'}
           </button>

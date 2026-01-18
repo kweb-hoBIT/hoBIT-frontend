@@ -43,15 +43,15 @@ const FAQResponse: React.FC = () => {
         }
         faqs={mocks}
       />
-      <div className="flex flex-col">
+      <div className="flex flex-col w-full">
         {faqs.map((faq, index) => (
           <div
             key={index}
             onClick={() =>
               handleSendKeyword(isKorean ? faq.question_ko : faq.question_en)
             }
-            className="faq-item border border-gray-300 font-5medium text-[20px] w-fit mt-[10px] rounded-[20px] px-[20px] py-[15px] max-w-[400px] break-words inline-block
-              hover:bg-gray-100 transition-colors mr-[10px] cursor-pointer"
+            className="faq-item border border-gray-300 font-5medium text-lg md:text-xl w-fit min-w-[300px] md:w-fit md:max-w-none mt-[10px] rounded-[20px] px-[20px] py-[15px] break-words inline-block
+              hover:bg-gray-100 transition-colors cursor-pointer md:mr-[10px]"
           >
             <h3>{isKorean ? faq.question_ko : faq.question_en}</h3>
           </div>
