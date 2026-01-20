@@ -84,56 +84,24 @@ const Chatting: React.FC = () => {
   }, [feedbackClicked]);
 
   useEffect(() => {
-    if (chatContainerRef.current && newChatItemRef.current) {
+    if (chatContainerRef.current) {
       const container = chatContainerRef.current;
       setTimeout(
         () =>
           container.scrollTo({
             top: container.scrollHeight,
             behavior: 'smooth',
-          }), 500 );
-      newChatItemRef.current = null;
+          }),
+        500
+      );
     }
-  }, [chatHistory.map((item) => item.is_greet).join(',')]);
-
-  useEffect(() => {
-    if (chatContainerRef.current && newChatItemRef.current) {
-      const container = chatContainerRef.current;
-      setTimeout(
-        () =>
-          container.scrollTo({
-            top: container.scrollHeight,
-            behavior: 'smooth',
-          }), 500);
-      newChatItemRef.current = null;
-    }
-  }, [chatHistory.map((item) => item.is_able).join(',')]);
-
-  useEffect(() => {
-    if (chatContainerRef.current && newChatItemRef.current) {
-      const container = chatContainerRef.current;
-      setTimeout(
-        () =>
-          container.scrollTo({
-            top: container.scrollHeight,
-            behavior: 'smooth',
-          }), 500);
-      newChatItemRef.current = null;
-    }
-  }, [chatHistory.map((item) => item.is_freq).join(',')]);
-
-  useLayoutEffect(() => {
-    if (chatContainerRef.current && newChatItemRef.current) {
-      const container = chatContainerRef.current;
-      setTimeout(
-        () =>
-          container.scrollTo({
-            top: container.scrollHeight,
-            behavior: 'smooth',
-          }), 500 );
-      newChatItemRef.current = null;
-    }
-  }, [chatHistory]);
+  }, [
+    chatHistory,
+    chatHistory.map((item) => item.loading).join(','),
+    chatHistory.map((item) => item.is_greet).join(','),
+    chatHistory.map((item) => item.is_able).join(','),
+    chatHistory.map((item) => item.is_freq).join(','),
+  ]);
 
   useEffect(() => {
     if (!sentValue || !sent) return;

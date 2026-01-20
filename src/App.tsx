@@ -6,6 +6,8 @@ import MainPage from './pages/MainPage';
 import ErrorPage from './pages/ErrorPage';
 import homeImage from './assets/home_image.png';
 import helloImage from './assets/hello.png';
+import profileImage from './assets/profile_image.png';
+import errorImage from './assets/error_image.png';
 import { setImages } from './redux/imageSlice';
 import './loader.css';
 
@@ -41,7 +43,7 @@ const PreloadImages: React.FC<PreloadImagesProps> = ({ children }) => {
 	useEffect(() => {
 		if (serverOk !== true) return;
 
-		const imagesToLoad = { homeImage, helloImage };
+		const imagesToLoad = { homeImage, helloImage, profileImage, errorImage };
 		const loadedImages: { [key: string]: string } = {};
 		let loadedCount = 0;
 
