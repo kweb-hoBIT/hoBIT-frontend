@@ -176,7 +176,9 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                             <TbMapPinFilled className="text-xl md:text-xl text-[#686D76]" />
                           </div>
                           <a
-                            href={`https://www.korea.ac.kr/campusMap/ko/view.do?srchWrd=${seniorFAQ?.detailcategory_ko}`}
+                            href={`https://www.korea.ac.kr/campusMap/ko/view.do?srchWrd=${encodeURIComponent(
+                              seniorFAQ?.detailcategory_ko ?? ''
+                            )}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-base md:text-lg text-[#0A5EB0]"
