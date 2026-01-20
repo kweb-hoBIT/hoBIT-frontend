@@ -169,9 +169,15 @@ const AllCategoriesResponse: React.FC = () => {
 								</span>
 							</div>
 						))}
+<<<<<<< Updated upstream
 					</div>
 					<div className="mt-[10px] flex flex-row">
 						<p className="font-6semibold text-[20px]">
+=======
+				</div>
+					<div className="mt-[20px] flex flex-row items-center">
+						<p className="font-6semibold text-lg md:text-xl">
+>>>>>>> Stashed changes
 							{isKorean ? '선배모드 |' : 'Senior Mode |'}
 						</p>
 						<p className="font-4regular text-[20px] ml-[10px] text-[#686D76]">

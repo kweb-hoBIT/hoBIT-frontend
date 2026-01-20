@@ -7,6 +7,7 @@ import { IoIosArrowForward } from 'react-icons/io';
 import { IoChevronBackOutline } from 'react-icons/io5';
 
 import SeniorHobitProfile from './SeniorHobitProfile';
+import HobitProfile from './HobitProfile';
 import { getSeniorFAQById } from '../../api/query';
 import { SeniorFAQ } from '../../types/faq';
 import { RootState } from '../../redux/store';
@@ -44,7 +45,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
 
   return (
     <div>
-      <SeniorHobitProfile />
+      {showCategories ? <HobitProfile /> : <SeniorHobitProfile />}
       {showCategories && seniorFAQ ? (
         <SeniorCategories
           subcategory={{
@@ -67,6 +68,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
               {isKorean ? seniorFAQ?.subcategory_ko : seniorFAQ?.subcategory_en}
             </div>
           </div>
+<<<<<<< Updated upstream
           <div
             className="flex flex-row overflow-x-auto"
             style={{
@@ -112,6 +114,42 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                           </p>
                         </div>
                       )}
+=======
+          <div className="flex flex-col md:flex-row w-full md:overflow-x-auto md:items-start">
+            {seniorFAQ &&
+              Array.isArray(
+                isKorean ? seniorFAQ.answer_ko : seniorFAQ.answer_en
+              ) &&
+              (isKorean ? seniorFAQ.answer_ko : seniorFAQ.answer_en).map(
+                (answer, index) => (
+                  <div
+                    key={index}
+                    className="font-5medium text-lg md:text-xl bg-[#FFEFEF] mt-[10px] rounded-[20px] px-[20px] py-[15px] w-full max-w-[330px] md:max-w-none md:w-[350px] break-words md:mr-[10px] flex-shrink-0"
+                  >
+                    {index === 0 && (
+                      <div>
+                        <div className="flex flex-wrap text-sm md:text-base text-[#686D76] items-center rounded-[10px] w-fit mb-[10px]">
+                          <h3 className="font-5medium text-center">
+                            {isKorean
+                              ? seniorFAQ.maincategory_ko
+                              : seniorFAQ.maincategory_en}
+                          </h3>
+                          <IoIosArrowForward className="mx-1" />
+                          <h3 className="font-4regular text-center">
+                            {isKorean
+                              ? seniorFAQ.subcategory_ko
+                              : seniorFAQ.subcategory_en}
+                          </h3>
+                          <IoIosArrowForward className="mx-1" />
+                          <h3 className="font-4regular text-center">
+                            {isKorean
+                              ? seniorFAQ.detailcategory_ko
+                              : seniorFAQ.detailcategory_en}
+                          </h3>
+                        </div>
+                      </div>
+                    )}
+>>>>>>> Stashed changes
                       {answer.image && (
                         <div className="mt-[20px]">
                           <img

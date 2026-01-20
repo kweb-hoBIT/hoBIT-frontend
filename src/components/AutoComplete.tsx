@@ -73,7 +73,7 @@ const AutoComplete: React.FC = () => {
 	return (
 		<>
 			<div
-				className="w-full h-[70px] bg-gray-100 rounded-t-[30px] fixed bottom-[80px] px-[20px] flex flex-col items-center h-fit max-h-[250px] overflow-y-auto"
+				className="w-full bg-gray-100 rounded-t-[30px] fixed bottom-[60px] md:bottom-[80px] px-[20px] flex flex-col items-center h-fit max-h-[180px] md:max-h-[250px] overflow-y-auto"
 				style={{
 					boxShadow: '0 -6px 15px rgba(0, 0, 0, 0.3)',
 				}}
@@ -88,7 +88,7 @@ const AutoComplete: React.FC = () => {
 							return (
 								<div
 									key={index}
-									className="w-full font-5medium text-[20px] px-[15px] cursor-pointer hover:bg-white py-[10px]"
+									className="w-full font-5medium text-[16px] md:text-[20px] px-[15px] cursor-pointer hover:bg-white py-[10px]"
 									onClick={() => handleSuggestionClick(suggestion)}
 								>
 									{matchIndex !== -1 ? (

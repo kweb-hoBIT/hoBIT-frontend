@@ -19,7 +19,11 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
 
 	return (
 		<>
+<<<<<<< Updated upstream
 			<div className="bg-gray-100 font-5medium text-[20px] mt-[10px] rounded-[20px] px-[20px] py-[15px] max-w-[400px] break-words inline-block">
+=======
+			<div className="bg-gray-100 font-5medium text-lg md:text-xl mt-[10px] rounded-[20px] px-[20px] py-[15px] w-fit max-w-[330px] md:max-w-md break-words inline-block">
+>>>>>>> Stashed changes
 				{text &&
 					text
 						.split('\n')
@@ -35,8 +39,13 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
 							onClick={() =>
 								handleSendKeyword(isKorean ? faq.question_ko : faq.question_en)
 							}
+<<<<<<< Updated upstream
 							className="border border-gray-300 font-5medium text-[20px] mt-[10px] rounded-[20px] px-[20px] py-[15px] w-fit max-w-[400px] break-words inline-block
               hover:bg-gray-100 transition-colors mr-[10px] cursor-pointer"
+=======
+							className="border border-gray-300 font-5medium text-lg md:text-xl mt-[10px] rounded-[20px] px-[20px] py-[15px] w-fit max-w-[330px] md:max-w-md break-words inline-block
+              hover:bg-gray-100 transition-colors cursor-pointer"
+>>>>>>> Stashed changes
 						>
 							<p>{isKorean ? faq.question_ko : faq.question_en}</p>
 						</div>

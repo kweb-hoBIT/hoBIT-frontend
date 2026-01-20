@@ -125,18 +125,18 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
 
   return (
     <div>
-      <div className="flex flex-row w-[365px] items-center bg-gray-100 font-5medium text-[#686D76] text-[18px] mt-[10px] rounded-[20px] px-[20px] py-[10px]">
+      <div className="flex flex-row w-full max-w-[330px] md:max-w-md items-center bg-gray-100 font-5medium text-[#686D76] text-lg md:text-xl mt-[10px] rounded-[20px] px-[20px] py-[10px]">
         <p>
           {isKorean ? '호빗의 응답이 도움이 되었어요!' : 'Was hoBIT helpful?'}
         </p>
         <div className="flex justify-end ml-auto">
-          <div className="bg-white p-[10px] rounded-full cursor-pointer hover:bg-gray-200">
+          <div className="bg-white p-[8px] md:p-[10px] rounded-full cursor-pointer hover:bg-gray-200">
             <TbThumbUpFilled
               onClick={handleThumbUpClick}
-              className={thumbUp ? 'text-[#E55604]' : 'text-gray-400'}
+              className={`text-xl md:text-2xl ${thumbUp ? 'text-[#E55604]' : 'text-gray-400'}`}
             />
           </div>
-          <div className="bg-white p-[10px] rounded-full ml-[15px] cursor-pointer hover:bg-gray-200">
+          <div className="bg-white p-[8px] md:p-[10px] rounded-full ml-[10px] md:ml-[15px] cursor-pointer hover:bg-gray-200">
             <TbThumbDownFilled
               onClick={() => {
                 setThumbDown(!thumbDown);
@@ -144,13 +144,13 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
                 if (thumbDown) setFeedbackReason('');
                 if (thumbUp) setThumbUp(false);
               }}
-              className={thumbDown ? 'text-[#E55604]' : 'text-gray-400'}
+              className={`text-xl md:text-2xl ${thumbDown ? 'text-[#E55604]' : 'text-gray-400'}`}
             />
           </div>
         </div>
       </div>
       {thumbDown && !flag && (
-        <div className="flex flex-col w-[365px] bg-gray-100 font-4regular text-[#686D76] text-[18px] mt-[10px] rounded-[20px] px-[20px] py-[10px] ">
+        <div className="flex flex-col w-full max-w-[330px] md:max-w-md bg-gray-100 font-4regular text-[#686D76] text-lg md:text-xl mt-[10px] rounded-[20px] px-[20px] py-[10px] ">
           <p className="font-5medium">
             {isKorean
               ? '도움이 되지 않은 이유가 무엇인가요?'
@@ -189,13 +189,22 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
               <label
                 key={option.value}
                 className="flex items-center mt-[10px] cursor-pointer hover:text-black"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (feedbackReason === option.value) {
+                    setFeedbackReason('');
+                  } else {
+                    setFeedbackReason(option.value);
+                  }
+                }}
               >
                 <input
                   type="radio"
                   name="feedback"
                   value={option.value}
-                  onChange={() => setFeedbackReason(option.value)}
-                  className="mr-[10px]"
+                  checked={feedbackReason === option.value}
+                  readOnly
+                  className="mr-[10px] w-4 h-4 md:w-5 md:h-5 accent-[#E55604]"
                 />
                 {option.label}
               </label>
@@ -210,7 +219,7 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
             rows={4}
             value={feedbackDetail}
             onChange={(e) => setFeedbackDetail(e.target.value)}
-            className="my-[10px] w-full border-none bg-white font-4regular text-[18px] rounded-[20px] px-[15px] py-[10px] focus:outline-none focus:border-[#F075AA] resize-none"
+            className="my-[10px] w-full border-none bg-white font-4regular text-lg md:text-xl rounded-[20px] px-[15px] py-[10px] focus:outline-none focus:border-[#F075AA] resize-none"
           />
           <button
             onClick={handleSendFeedback}
