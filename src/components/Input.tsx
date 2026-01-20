@@ -53,7 +53,7 @@ const Input: React.FC = () => {
   };
 
   return (
-    <div className="bg-white border-t-2 fixed bottom-0 w-full h-[60px] md:h-[80px] flex items-center px-[15px] md:px-[20px]">
+    <div className="bg-white border-t-2 fixed bottom-0 left-0 z-50 w-full h-[60px] md:h-[80px] flex items-center px-[15px] md:px-[20px]">
       <AiFillHome
         className="text-[28px] md:text-[32px] text-[#750E21] mr-[15px] md:mr-[20px] hover:text-gray-600 cursor-pointer"
         onClick={handleHomeClick}
