@@ -37,6 +37,22 @@ const PreloadImages: React.FC<PreloadImagesProps> = ({ children }) => {
 			});
 	}, []);
 
+	// 서버 연결 체크
+	useEffect(() => {
+		const controller = new AbortController();
+		const timeout = setTimeout(() => controller.abort(), 3000);
+
+		fetch(`${SERVER_URL}/health`, { signal: controller.signal })
+			.then((res) => {
+				clearTimeout(timeout);
+				if (!res.ok) throw new Error();
+				setServerOk(true);
+			})
+			.catch(() => {
+				setServerOk(false);
+			});
+	}, []);
+
 	// 이미지 preload
 	useEffect(() => {
 		if (serverOk !== true) return;
@@ -58,6 +74,20 @@ const PreloadImages: React.FC<PreloadImagesProps> = ({ children }) => {
 			};
 		});
 	}, [dispatch, serverOk]);
+
+	// ⏳ 서버 체크 중
+	if (serverOk === null) {
+		return (
+			<div className="flex items-center justify-center h-screen">
+				<div className="loader"></div>
+			</div>
+		);
+	}
+
+	// 서버 연결 실패
+	if (serverOk === false) {
+		return <ErrorPage />;
+	}
 
 	// ⏳ 서버 체크 중
 	if (serverOk === null) {

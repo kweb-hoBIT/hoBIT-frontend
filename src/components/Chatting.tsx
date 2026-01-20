@@ -67,7 +67,7 @@ const Chatting: React.FC = () => {
           top: container.scrollHeight,
           behavior: 'smooth',
         });
-      }, 500);
+      }, 100);
     }
   }, [homeClicked]);
 
@@ -79,7 +79,7 @@ const Chatting: React.FC = () => {
           top: container.scrollHeight,
           behavior: 'smooth',
         });
-      }, 500 );
+      }, 100 );
     }
   }, [feedbackClicked]);
 
@@ -91,7 +91,7 @@ const Chatting: React.FC = () => {
           container.scrollTo({
             top: container.scrollHeight,
             behavior: 'smooth',
-          }), 500 );
+          }), 100 );
       newChatItemRef.current = null;
     }
   }, [chatHistory.map((item) => item.is_greet).join(',')]);
@@ -104,7 +104,7 @@ const Chatting: React.FC = () => {
           container.scrollTo({
             top: container.scrollHeight,
             behavior: 'smooth',
-          }), 500);
+          }), 100);
       newChatItemRef.current = null;
     }
   }, [chatHistory.map((item) => item.is_able).join(',')]);
@@ -117,7 +117,7 @@ const Chatting: React.FC = () => {
           container.scrollTo({
             top: container.scrollHeight,
             behavior: 'smooth',
-          }), 500);
+          }), 100);
       newChatItemRef.current = null;
     }
   }, [chatHistory.map((item) => item.is_freq).join(',')]);
@@ -130,7 +130,7 @@ const Chatting: React.FC = () => {
           container.scrollTo({
             top: container.scrollHeight,
             behavior: 'smooth',
-          }), 500 );
+          }), 100 );
       newChatItemRef.current = null;
     }
   }, [chatHistory]);

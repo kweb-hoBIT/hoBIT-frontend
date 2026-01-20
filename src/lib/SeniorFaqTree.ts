@@ -14,13 +14,8 @@ export class SeniorFaqTree {
 	}
 
 	private initializeTree(faqs: SeniorFAQ[]) {
-		const sortedFaqs = [...faqs].sort((a, b) => {
-			const orderA = parseInt(a.category_order);
-			const orderB = parseInt(b.category_order);
-			return orderA - orderB;
-		});
 
-		sortedFaqs.forEach((faq) => {
+		faqs.forEach((faq) => {
 			this.addToTree(
 				{ category_ko: faq.maincategory_ko, category_en: faq.maincategory_en },
 				{ category_ko: faq.subcategory_ko, category_en: faq.subcategory_en },
@@ -54,7 +49,10 @@ export class SeniorFaqTree {
 			subCategoryMap.set(subCategory, []);
 		}
 
-		subCategoryMap.get(existingSubCategory || subCategory)!.push(faq);
+		const list = subCategoryMap.get(existingSubCategory || subCategory)!;
+		list.push(faq);
+
+		list.sort((a, b) => Number(a.category_order) - Number(b.category_order));
 	}
 
 	private findCategoryByKo(

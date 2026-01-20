@@ -137,11 +137,12 @@ export const getSeniorFAQById = async ({ id }: GetSeniorFaqByIdRequest) => {
 };
 
 export const getAllSeniorFAQs = async () => {
-  try {
-    const response = await apiClient.get('/all_senior_faqs');
-    return response.data;
-  } catch (error: any) {
-    console.error('Error while fetching all senior faqs questions:', error);
-    throw error.response?.data || error.message;
-  }
+	try {
+		const response = await apiClient.get('/all_senior_faqs');
+		return response.data;
+	} catch (error: any) {
+		console.error('Error while fetching all senior faqs questions:', error);
+		throw error.response?.data || error.message;
+	}
 };
+

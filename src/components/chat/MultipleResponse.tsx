@@ -20,6 +20,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
 	return (
 		<>
 			<div className="bg-gray-100 font-5medium text-lg md:text-xl mt-[10px] rounded-[20px] px-[20px] py-[15px] w-fit max-w-[330px] md:max-w-md break-words inline-block">
+
 				{text &&
 					text
 						.split('\n')

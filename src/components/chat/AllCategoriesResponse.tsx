@@ -172,6 +172,7 @@ const AllCategoriesResponse: React.FC = () => {
 				</div>
 					<div className="mt-[20px] flex flex-row items-center">
 						<p className="font-6semibold text-lg md:text-xl">
+
 							{isKorean ? '선배모드 |' : 'Senior Mode |'}
 						</p>
 						<p className="font-4regular text-base md:text-lg ml-[10px] text-[#686D76]">
