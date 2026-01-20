@@ -68,7 +68,7 @@ const Input: React.FC = () => {
           value={liveValue}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          className="bg-transparent w-full outline-none placeholder-[#aaaaaa] font-6semibold text-[16px] md:text-[20px]"
+          className="bg-transparent w-full outline-none placeholder-[#aaaaaa] font-6semibold text-base md:text-xl"
         />
         <TbSend2
           onClick={handleSend}

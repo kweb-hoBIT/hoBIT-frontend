@@ -240,10 +240,10 @@ const Modal: React.FC = () => {
       <div
         className={`fixed top-0 left-0 overflow-y-auto p-[20px] h-full bg-white shadow-lg z-50 transform transition-transform duration-500 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        } w-full md:w-[350px]`}
+        } w-[300px] md:w-[350px]`}
       >
         <div className="flex flex-row justify-between items-center">
-          <p className="font-6semibold text-[20px] flex flex-row items-center">
+          <p className="font-6semibold text-lg md:text-xl flex flex-row items-center">
             <span className="mr-[5px]">
               {isKorean ? '카테고리' : 'Category'}
             </span>
@@ -253,7 +253,7 @@ const Modal: React.FC = () => {
             onClick={() => {
               dispatch(closeMenu());
             }}
-            className="text-gray-500 hover:text-black text-[20px] focus:outline-none"
+            className="text-gray-500 hover:text-black text-xl md:text-2xl focus:outline-none"
           >
             <IoClose />
           </button>
@@ -262,7 +262,7 @@ const Modal: React.FC = () => {
           {categories.map((category, index) => (
             <li key={index} className="mb-[10px] ">
               <div
-                className="hover:bg-gray-200 flex flex-row justify-between items-center cursor-pointer text-[16px] font-5medium text-[20px] text-[#686D76] bg-gray-100 px-[15px] py-[5px] rounded-[10px]"
+                className="hover:bg-gray-200 flex flex-row justify-between items-center cursor-pointer text-base md:text-lg font-5medium text-[#686D76] bg-gray-100 px-[15px] py-[5px] rounded-[10px]"
                 onClick={() =>
                   toggleCategory(
                     isKorean
@@ -313,7 +313,7 @@ const Modal: React.FC = () => {
                               : subCategory.category_en
                           )
                         }
-                        className="cursor-pointer font-5medium text-[18px] text-[#686D76] hover:text-black my-[5px]"
+                        className="cursor-pointer font-5medium text-base md:text-lg text-[#686D76] hover:text-black my-[5px]"
                       >
                         <div>
                           {isKorean

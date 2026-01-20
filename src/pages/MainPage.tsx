@@ -20,7 +20,7 @@ const MainPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col h-screen overflow-hidden pt-[60px] md:pt-[70px]">
       <Header />
 
       {isModalOpen && (
@@ -34,7 +34,7 @@ const MainPage: React.FC = () => {
         <Modal />
       </div>
 
-      <div>
+      <div className="flex-1 overflow-hidden">
         <Chatting />
       </div>
 

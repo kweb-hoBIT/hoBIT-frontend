@@ -271,7 +271,7 @@ const Chatting: React.FC = () => {
   return (
     <div
       ref={chatContainerRef}
-      className="flex flex-col h-full max-h-[calc(100vh-140px)] overflow-y-auto px-4 py-6 md:px-[20px] md:py-[30px]"
+      className="flex flex-col h-full overflow-y-auto px-4 py-6 md:px-[20px] md:py-[30px] pb-[80px] md:pb-[100px]"
     >
       <HelloHobit />
       {chatHistory.map((chatItem, index) => (

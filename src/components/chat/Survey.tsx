@@ -125,7 +125,7 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
 
   return (
     <div>
-      <div className="flex flex-row w-full max-w-[330px] md:max-w-md items-center bg-gray-100 font-5medium text-[#686D76] text-lg md:text-xl mt-[10px] rounded-[20px] px-[20px] py-[10px]">
+      <div className="flex flex-row w-full max-w-[330px] md:max-w-none md:w-[350px] items-center bg-gray-100 font-5medium text-[#686D76] text-base md:text-lg mt-[10px] rounded-[20px] px-[20px] py-[10px]">
         <p>
           {isKorean ? '호빗의 응답이 도움이 되었어요!' : 'Was hoBIT helpful?'}
         </p>
@@ -133,7 +133,7 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
           <div className="bg-white p-[8px] md:p-[10px] rounded-full cursor-pointer hover:bg-gray-200">
             <TbThumbUpFilled
               onClick={handleThumbUpClick}
-              className={`text-xl md:text-2xl ${thumbUp ? 'text-[#E55604]' : 'text-gray-400'}`}
+              className={`text-lg md:text-xl ${thumbUp ? 'text-[#E55604]' : 'text-gray-400'}`}
             />
           </div>
           <div className="bg-white p-[8px] md:p-[10px] rounded-full ml-[10px] md:ml-[15px] cursor-pointer hover:bg-gray-200">
@@ -144,13 +144,13 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
                 if (thumbDown) setFeedbackReason('');
                 if (thumbUp) setThumbUp(false);
               }}
-              className={`text-xl md:text-2xl ${thumbDown ? 'text-[#E55604]' : 'text-gray-400'}`}
+              className={`text-lg md:text-xl ${thumbDown ? 'text-[#E55604]' : 'text-gray-400'}`}
             />
           </div>
         </div>
       </div>
       {thumbDown && !flag && (
-        <div className="flex flex-col w-full max-w-[330px] md:max-w-md bg-gray-100 font-4regular text-[#686D76] text-lg md:text-xl mt-[10px] rounded-[20px] px-[20px] py-[10px] ">
+        <div className="flex flex-col w-full max-w-[330px] md:max-w-none md:w-[350px] bg-gray-100 font-4regular text-[#686D76] text-base md:text-lg mt-[10px] rounded-[20px] px-[20px] py-[10px] ">
           <p className="font-5medium">
             {isKorean
               ? '도움이 되지 않은 이유가 무엇인가요?'
@@ -219,7 +219,7 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
             rows={4}
             value={feedbackDetail}
             onChange={(e) => setFeedbackDetail(e.target.value)}
-            className="my-[10px] w-full border-none bg-white font-4regular text-lg md:text-xl rounded-[20px] px-[15px] py-[10px] focus:outline-none focus:border-[#F075AA] resize-none"
+            className="my-[10px] w-full border-none bg-white font-4regular text-base md:text-lg rounded-[20px] px-[15px] py-[10px] focus:outline-none focus:border-[#F075AA] resize-none"
           />
           <button
             onClick={handleSendFeedback}
