@@ -14,74 +14,49 @@ const Header: React.FC = () => {
   const i18n = isKorean ? lang.ko : lang.en;
 
   return (
-    <div className="h-[70px] bg-white fixed top-0 w-full border-b-2 border-[#bbbbbb] flex items-center relative px-[20px] py-[20px]">
-      <div>
+    <div className="h-[60px] md:h-[70px] bg-white fixed top-0 w-full border-b-2 border-[#bbbbbb] flex justify-between items-center relative px-[15px] md:px-[20px] py-[20px]">
+      <div className="w-[60px] md:w-[84px] flex justify-start">
         <LuMenu
-          className="text-[28px] text-gray-400 hover:text-black mr-[20px]"
+          className="text-[24px] md:text-[28px] text-gray-400 hover:text-black cursour-pointer"
           onClick={() => dispatch(toggleMenu())}
         />
       </div>
 
-      <p className="absolute left-1/2 transform -translate-x-1/2 font-7bold text-[20px] sm:text-[26px]">
+      <p className="flex-1 text-center font-7bold text-[18px] md:text-[26px] whitespace-nowrap overflow-hidden text-ellipsis">
         {i18n.headerTitle}
       </p>
 
-      {/* <div className="ml-auto relative w-[88px] h-[32px] bg-[#D9D9D9] rounded-[20px] flex items-center">
-        <div
-          className={`absolute h-full rounded-full justify-center transition-transform duration-500 ease-in-out bg-black ${
-            isKorean ? 'translate-x-0 w-[50px]' : 'translate-x-[48px] w-[40px]'
-          }`}
-        ></div>
+      <div className="w-[60px] md:w-[84px] flex justify-end">
+        <div className="relative w-[60px] md:w-[84px] h-[28px] md:h-[32px] bg-[#D9D9D9] rounded-[20px] flex items-center">
+          <div
+            className={`absolute h-full rounded-full transition-transform duration-500 ease-in-out bg-black w-[30px] md:w-[42px] ${
+              isKorean ? 'translate-x-0' : 'translate-x-[30px] md:translate-x-[42px]'
+            }`}
+          ></div>
 
-				<button
-					onClick={() => dispatch(setKorean())}
-					className={`w-[50px] h-full z-10 text-[16px] font-6semibold rounded-full transition-colors duration-500 ${isKorean ? 'text-white' : 'text-[#aaaaaa]'
-						}`}
-				>
-					KOR
-				</button>
+          <button
+            onClick={() => dispatch(setKorean())}
+            className={`w-[30px] md:w-[42px] h-full z-10 text-[14px] md:text-[16px] font-6semibold rounded-full transition-colors duration-500 flex justify-center items-center ${
+              isKorean ? 'text-white' : 'text-[#aaaaaa]'
+            }`}
+          >
+            <span className="md:hidden">한</span>
+            <span className="hidden md:block">KOR</span>
+          </button>
 
-        <button
-          onClick={() => dispatch(setEnglish())}
-          className={`w-[38px] h-full z-10 text-[16px] font-6semibold rounded-full transition-colors duration-500 ${
-            !isKorean ? 'text-white' : 'text-[#aaaaaa]'
-          }`}
-        >
-          EN
-        </button>
-      </div> */}
-      <div className="ml-auto relative w-[70px] sm:w-[88px] h-[28px] sm:h-[32px] bg-[#D9D9D9] rounded-[20px] flex items-center">
-        <div
-          className={`absolute h-full rounded-full justify-center transition-transform duration-500 ease-in-out bg-black ${
-            isKorean
-              ? 'translate-x-0 w-[40px] sm:w-[50px]'
-              : 'translate-x-[40px] sm:translate-x-[48px] w-[30px] sm:w-[40px]'
-          }`}
-        ></div>
-
-        <button
-          onClick={() => dispatch(setKorean())}
-          className={`w-[40px] sm:w-[50px] h-full z-10 text-[14px] sm:text-[16px] font-6semibold rounded-full transition-colors duration-500 ${
-            isKorean ? 'text-white' : 'text-[#aaaaaa]'
-          }`}
-        >
-          KOR
-        </button>
-
-        <button
-          onClick={() => dispatch(setEnglish())}
-          className={`w-[30px] sm:w-[38px] h-full z-10 text-[14px] sm:text-[16px] font-6semibold rounded-full transition-colors duration-500 ${
-            !isKorean ? 'text-white' : 'text-[#aaaaaa]'
-          }`}
-        >
-          EN
-        </button>
+          <button
+            onClick={() => dispatch(setEnglish())}
+            className={`w-[30px] md:w-[42px] h-full z-10 text-[14px] md:text-[16px] font-6semibold rounded-full transition-colors duration-500 flex justify-center items-center ${
+              !isKorean ? 'text-white' : 'text-[#aaaaaa]'
+            }`}
+          >
+            <span className="md:hidden">A</span>
+            <span className="hidden md:block">EN</span>
+          </button>
+        </div>
       </div>
     </div>
   );
 };
-//<IoClose
-//  className="text-gray-400 absolute right-4 text-[28px] hover:text-black"
-///>
 
 export default Header;

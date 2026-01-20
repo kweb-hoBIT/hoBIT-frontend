@@ -169,7 +169,7 @@ const AllCategoriesResponse: React.FC = () => {
 								</span>
 							</div>
 						))}
-					</div>
+				</div>
 					<div className="mt-[20px] flex flex-row items-center">
 						<p className="font-6semibold text-lg md:text-xl">
 							{isKorean ? '선배모드 |' : 'Senior Mode |'}

@@ -111,17 +111,24 @@ const SeniorCategories: React.FC<SeniorCategoriesProps> = ({
     <div>
       {seniorFaqTree && !currentSeniorCategory && (
         <>
-          <div className="font-6semibold text-[20px] py-[5px] mt-[10px]">
-            {isKorean ? '선배 모드 카테고리' : 'Senior Mode Categories'}
+          <div className="mt-[20px] flex flex-row items-center mb-[10px]">
+            <p className="font-6semibold text-lg md:text-xl">
+              {isKorean ? '선배모드 |' : 'Senior Mode |'}
+            </p>
+            <p className="font-4regular text-base md:text-lg ml-[10px] text-[#686D76]">
+              {isKorean
+                ? '정보대학 선배가 알려주는 꿀팁!'
+                : 'Few tips from your seniors!'}
+            </p>
           </div>
-          <div className="mt-[10px] w-full flex flex-wrap gap-[10px]">
+          <div className="mt-[10px] grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 w-full">
             {seniorCategories.map((category, index) => (
               <div
                 key={index}
-                className="hover:bg-[#FDDDDD] bg-[#FFEFEF] w-[160px] h-[80px] flex items-center justify-center px-[10px] rounded-[20px] cursor-pointer"
+                className="hover:bg-[#FDDDDD] bg-[#FFEFEF] min-h-[80px] flex items-center justify-center px-[10px] py-[5px] rounded-[20px] cursor-pointer"
                 onClick={() => showSeniorSubCategory(category.mainCategory)}
               >
-                <span className="text-[18px] font-6semibold text-center">
+                <span className="text-base md:text-lg font-6semibold text-center break-keep">
                   {isKorean
                     ? category.mainCategory.category_ko
                     : category.mainCategory.category_en}
@@ -136,19 +143,19 @@ const SeniorCategories: React.FC<SeniorCategoriesProps> = ({
         <>
           <div
             onClick={showAllCategories}
-            className="cursor-pointer rounded-[20px] items-center mt-[10px] text-[#686D76] flex flex-row font-4regular text-[20px] hover:text-black"
+            className="cursor-pointer rounded-[20px] items-center mt-[10px] text-[#686D76] flex flex-row font-4regular text-lg md:text-xl hover:text-black"
           >
-            <IoChevronBackOutline className="text-[28px] mr-[10px] bg-gray-200 rounded-full p-[5px]" />
+            <IoChevronBackOutline className="text-xl md:text-2xl mr-[10px] bg-gray-200 rounded-full p-[5px]" />
             {isKorean ? '전체 선배모드 보기' : 'All Senior Modes'}
           </div>
           <div>
-            <div className="font-6semibold text-[20px] inline-block py-[5px] mt-[10px]">
+            <div className="font-6semibold text-lg md:text-xl inline-block py-[5px] mt-[10px]">
               {isKorean
                 ? `${currentSeniorCategory.category_ko} |`
                 : `${currentSeniorCategory.category_en} |`}
             </div>
           </div>
-          <div className="mt-[10px] w-full flex flex-wrap gap-[10px]">
+          <div className="mt-[10px] grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 w-full">
             {seniorCategories
               .find((category) =>
                 currentSeniorCategory
@@ -161,12 +168,12 @@ const SeniorCategories: React.FC<SeniorCategoriesProps> = ({
               ?.subCategories.map((subCategory, index) => (
                 <div
                   key={index}
-                  className="hover:bg-[#FDDDDD] bg-[#FFEFEF] w-[160px] h-[80px] flex items-center justify-center px-[10px] rounded-[20px] cursor-pointer"
+                  className="hover:bg-[#FDDDDD] bg-[#FFEFEF] min-h-[80px] flex items-center justify-center px-[10px] py-[5px] rounded-[20px] cursor-pointer"
                   onClick={() =>
                     showSeniorDetailCategory(subCategory.subCategory)
                   }
                 >
-                  <span className="text-[18px] font-6semibold text-center">
+                  <span className="text-base md:text-lg font-6semibold text-center break-keep">
                     {isKorean
                       ? subCategory.subCategory.category_ko
                       : subCategory.subCategory.category_en}
@@ -181,21 +188,21 @@ const SeniorCategories: React.FC<SeniorCategoriesProps> = ({
         <>
           <div
             onClick={() => setCurrentSeniorSubCategory(null)}
-            className="cursor-pointer rounded-[20px] items-center mt-[10px] text-[#686D76] flex flex-row font-4regular text-[20px] hover:text-black"
+            className="cursor-pointer rounded-[20px] items-center mt-[10px] text-[#686D76] flex flex-row font-4regular text-lg md:text-xl hover:text-black"
           >
-            <IoChevronBackOutline className="text-[28px] mr-[10px] bg-gray-200 rounded-full p-[5px]" />
+            <IoChevronBackOutline className="text-xl md:text-2xl mr-[10px] bg-gray-200 rounded-full p-[5px]" />
             {isKorean
               ? currentSeniorCategory.category_ko
               : currentSeniorCategory.category_en}
           </div>
           <div>
-            <div className="font-6semibold text-[20px] inline-block py-[5px] mt-[10px]">
+            <div className="font-6semibold text-lg md:text-xl inline-block py-[5px] mt-[10px]">
               {isKorean
                 ? `${currentSeniorSubCategory.category_ko} |`
                 : `${currentSeniorSubCategory.category_en} |`}
             </div>
           </div>
-          <div className="mt-[10px] w-full flex flex-wrap gap-[10px]">
+          <div className="mt-[10px] grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 w-full">
             {seniorCategories
               .find((category) =>
                 currentSeniorCategory
@@ -231,9 +238,9 @@ const SeniorCategories: React.FC<SeniorCategoriesProps> = ({
                         handleSendSeniorFaqId(matchedFaq.id);
                       }
                     }}
-                    className="hover:bg-[#FDDDDD] bg-[#FFEFEF] w-[160px] h-[80px] flex items-center justify-center px-[10px] rounded-[20px] cursor-pointer"
+                    className="hover:bg-[#FDDDDD] bg-[#FFEFEF] min-h-[80px] flex items-center justify-center px-[10px] py-[5px] rounded-[20px] cursor-pointer"
                   >
-                    <span className="text-[18px] font-6semibold text-center">
+                    <span className="text-base md:text-lg font-6semibold text-center break-keep">
                       {isKorean
                         ? detailCategory.category_ko
                         : detailCategory.category_en}

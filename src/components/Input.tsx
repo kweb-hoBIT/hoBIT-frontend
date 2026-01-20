@@ -53,12 +53,12 @@ const Input: React.FC = () => {
   };
 
   return (
-    <div className="bg-white border-t-2 fixed bottom-0 w-full h-[80px] flex items-center px-[20px]">
+    <div className="bg-white border-t-2 fixed bottom-0 w-full h-[60px] md:h-[80px] flex items-center px-[15px] md:px-[20px]">
       <AiFillHome
-        className="text-[32px] text-[#750E21] mr-[20px] hover:text-gray-600 cursor-pointer"
+        className="text-[28px] md:text-[32px] text-[#750E21] mr-[15px] md:mr-[20px] hover:text-gray-600 cursor-pointer"
         onClick={handleHomeClick}
       />
-      <div className="bg-gray-200 w-full h-[48px] px-4 rounded-[30px] flex flex-row items-center">
+      <div className="bg-gray-200 w-full h-[40px] md:h-[48px] px-4 rounded-[30px] flex flex-row items-center">
         <input
           type="text"
           ref={inputRef}
@@ -68,11 +68,11 @@ const Input: React.FC = () => {
           value={liveValue}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          className="bg-transparent w-full outline-none placeholder-[#aaaaaa] font-6semibold text-[20px]"
+          className="bg-transparent w-full outline-none placeholder-[#aaaaaa] font-6semibold text-[16px] md:text-[20px]"
         />
         <TbSend2
           onClick={handleSend}
-          className="ml-[10px] text-[24px] text-[#aaaaaa] hover:text-[#000000] cursor-pointer"
+          className="ml-[10px] text-[20px] md:text-[24px] text-[#aaaaaa] hover:text-[#000000] cursor-pointer"
         />
       </div>
     </div>

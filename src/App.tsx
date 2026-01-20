@@ -21,7 +21,7 @@ const PreloadImages: React.FC<PreloadImagesProps> = ({ children }) => {
 	const [loaded, setLoaded] = useState(false);
 	const [serverOk, setServerOk] = useState<boolean | null>(null);
 
-	// 1️⃣ 서버 연결 체크
+	// 서버 연결 체크
 	useEffect(() => {
 		const controller = new AbortController();
 		const timeout = setTimeout(() => controller.abort(), 3000);
@@ -37,7 +37,7 @@ const PreloadImages: React.FC<PreloadImagesProps> = ({ children }) => {
 			});
 	}, []);
 
-	// 2️⃣ 이미지 preload
+	// 이미지 preload
 	useEffect(() => {
 		if (serverOk !== true) return;
 
@@ -68,12 +68,12 @@ const PreloadImages: React.FC<PreloadImagesProps> = ({ children }) => {
 		);
 	}
 
-	// ❌ 서버 연결 실패
+	// 서버 연결 실패
 	if (serverOk === false) {
 		return <ErrorPage />;
 	}
 
-	// ⭕ 정상
+	// 정상
 	return loaded ? (
 		<>{children}</>
 	) : (

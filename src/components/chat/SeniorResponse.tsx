@@ -7,6 +7,7 @@ import { IoIosArrowForward } from 'react-icons/io';
 import { IoChevronBackOutline } from 'react-icons/io5';
 
 import SeniorHobitProfile from './SeniorHobitProfile';
+import HobitProfile from './HobitProfile';
 import { getSeniorFAQById } from '../../api/query';
 import { SeniorFAQ } from '../../types/faq';
 import { RootState } from '../../redux/store';
@@ -44,7 +45,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
 
   return (
     <div>
-      <SeniorHobitProfile />
+      {showCategories ? <HobitProfile /> : <SeniorHobitProfile />}
       {showCategories && seniorFAQ ? (
         <SeniorCategories
           subcategory={{
@@ -67,7 +68,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
               {isKorean ? seniorFAQ?.subcategory_ko : seniorFAQ?.subcategory_en}
             </div>
           </div>
-          <div className="flex flex-col md:flex-row md:flex-wrap w-full">
+          <div className="flex flex-col md:flex-row w-full md:overflow-x-auto md:items-start">
             {seniorFAQ &&
               Array.isArray(
                 isKorean ? seniorFAQ.answer_ko : seniorFAQ.answer_en
@@ -76,7 +77,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                 (answer, index) => (
                   <div
                     key={index}
-                    className="font-5medium text-lg md:text-xl bg-[#FFEFEF] mt-[10px] rounded-[20px] px-[20px] py-[15px] w-full md:w-[45%] break-words inline-block md:mr-[10px]"
+                    className="font-5medium text-lg md:text-xl bg-[#FFEFEF] mt-[10px] rounded-[20px] px-[20px] py-[15px] w-full max-w-[330px] md:max-w-none md:w-[350px] break-words md:mr-[10px] flex-shrink-0"
                   >
                     {index === 0 && (
                       <div>
@@ -99,9 +100,6 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                               : seniorFAQ.detailcategory_en}
                           </h3>
                         </div>
-                        <p className="font-7bold text-xl md:text-2xl mb-[10px]">
-                          {answer.title}
-                        </p>
                       </div>
                     )}
                       {answer.image && (
