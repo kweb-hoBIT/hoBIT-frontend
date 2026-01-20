@@ -30,7 +30,7 @@ const MainPage: React.FC = () => {
         ></div>
       )}
 
-      <div className="relative z-50" onClick={(e) => e.stopPropagation()}>
+      <div className="relative z-[60]" onClick={(e) => e.stopPropagation()}>
         <Modal />
       </div>
 
