@@ -41,6 +41,20 @@ const SeniorCategories: React.FC<SeniorCategoriesProps> = ({
 
   const seniorFaqTreeInitFlag = useRef(false);
 
+  useEffect(() => {
+    const container = document.querySelector(
+      '.flex.flex-col.h-full.overflow-y-auto'
+    );
+    if (container) {
+      setTimeout(() => {
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior: 'smooth',
+        });
+      }, 100);
+    }
+  }, [currentSeniorCategory, currentSeniorSubCategory]);
+
   const handleSendSeniorFaqId = (id: number) => {
     dispatch(setSeniorFaqId(id));
     setTimeout(() => {
