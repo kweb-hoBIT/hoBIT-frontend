@@ -40,6 +40,25 @@ const AllCategoriesResponse: React.FC = () => {
 	const faqTreeInitFlag = useRef(false);
 	const seniorFaqTreeInitFlag = useRef(false);
 
+  useEffect(() => {
+    const container = document.querySelector(
+      '.flex.flex-col.h-full.overflow-y-auto'
+    );
+    if (container) {
+      setTimeout(() => {
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior: 'smooth',
+        });
+      }, 100);
+    }
+  }, [
+    currentCategory,
+    currentSubCategory,
+    currentSeniorCategory,
+    currentSeniorSubCategory,
+  ]);
+
 	const handleSendKeyword = (message: string) => {
 		dispatch(sendInputValue(message));
 		setTimeout(() => {

@@ -24,6 +24,22 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
   const [showCategories, setShowCategories] = useState(false);
 
   useEffect(() => {
+    if (seniorFAQ) {
+      const container = document.querySelector(
+        '.flex.flex-col.h-full.overflow-y-auto'
+      );
+      if (container) {
+        setTimeout(() => {
+          container.scrollTo({
+            top: container.scrollHeight,
+            behavior: 'smooth',
+          });
+        }, 100);
+      }
+    }
+  }, [seniorFAQ]);
+
+  useEffect(() => {
     const fetchSeniorFAQById = async () => {
       try {
         const fetchedSeniorFAQ = await getSeniorFAQById({ id: seniorFaqId });
@@ -43,10 +59,10 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
     fetchSeniorFAQById();
   }, [seniorFaqId]);
 
-  return (
-    <div>
-      {showCategories ? <HobitProfile /> : <SeniorHobitProfile />}
-      {showCategories && seniorFAQ ? (
+  if (showCategories && seniorFAQ) {
+    return (
+      <div>
+        <HobitProfile />
         <SeniorCategories
           subcategory={{
             category_ko: seniorFAQ.subcategory_ko,
@@ -57,10 +73,16 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
             category_en: seniorFAQ.maincategory_en,
           }}
         />
-      ) : (
-        <div>
-          <div
-            onClick={() => setShowCategories(true)}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <SeniorHobitProfile />
+      <div>
+        <div
+          onClick={() => setShowCategories(true)}
             className="flex flex-row items-center mt-[10px] cursor-pointer text-[#686D76] hover:text-black"
           >
             <IoChevronBackOutline className="text-xl md:text-2xl mr-[10px] bg-gray-200 rounded-full p-[5px]" />
@@ -131,7 +153,9 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                       )}
                       {answer.url && (
                         <div className="flex flex-row items-center mt-[20px]">
-                          <FaLink className="mr-[10px] text-2xl md:text-3xl text-[#686D76] bg-white p-[8px] rounded-full" />
+                          <div className="flex items-center justify-center mr-[10px] bg-white p-[8px] rounded-full flex-shrink-0">
+                            <FaLink className="text-xl md:text-xl text-[#686D76]" />
+                          </div>
                           <a
                             href={
                               answer.url.startsWith('http')
@@ -148,19 +172,23 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                       )}
                       {answer.email && (
                         <div className="flex flex-row items-center mt-[10px]">
-                          <MdOutlineEmail className="mr-[10px] text-2xl md:text-3xl text-[#686D76] bg-white p-[8px] rounded-full" />
-                          <p className="text-base md:text-lg break-all">{answer.email}</p>
+                          <MdOutlineEmail className="mr-[10px] text-2xl md:text-3xl min-w-[36px] min-h-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
+                          <p className="text-base md:text-lg break-all">
+                            {answer.email}
+                          </p>
                         </div>
                       )}
                       {answer.phone && (
                         <div className="flex flex-row items-center mt-[10px]">
-                          <FaPhoneVolume className="mr-[10px] text-2xl md:text-3xl text-[#686D76] bg-white p-[8px] rounded-full" />
+                          <FaPhoneVolume className="mr-[10px] text-2xl md:text-3xl min-w-[36px] min-h-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
                           <p className="text-base md:text-lg">{answer.phone}</p>
                         </div>
                       )}
                       {answer.map.latitude && answer.map.longitude && (
                         <div className="flex flex-row items-center mt-[10px]">
-                          <TbMapPinFilled className="mr-[10px] text-2xl md:text-3xl text-[#686D76] bg-white p-[8px] rounded-full" />
+                          <div className="flex items-center justify-center mr-[10px] bg-white p-[8px] rounded-full flex-shrink-0">
+                            <TbMapPinFilled className="text-xl md:text-xl text-[#686D76]" />
+                          </div>
                           <a
                             href="https://www.korea.ac.kr/campusMap/ko/view.do"
                             target="_blank"
@@ -178,7 +206,6 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                 )}
           </div>
         </div>
-      )}
     </div>
   );
 };
