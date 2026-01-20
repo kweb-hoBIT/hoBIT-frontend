@@ -14,7 +14,7 @@ const Header: React.FC = () => {
   const i18n = isKorean ? lang.ko : lang.en;
 
   return (
-    <div className="h-[60px] md:h-[70px] bg-white fixed top-0 w-full border-b-2 border-[#bbbbbb] flex justify-between items-center relative px-[15px] md:px-[20px] py-[20px]">
+    <div className="h-[60px] md:h-[70px] bg-white fixed top-0 left-0 w-full border-b-2 border-[#bbbbbb] flex justify-between items-center z-50 px-[15px] md:px-[20px] py-[20px]">
       <div className="w-[60px] md:w-[84px] flex justify-start">
         <LuMenu
           className="text-[24px] md:text-[28px] text-gray-400 hover:text-black cursour-pointer"
@@ -23,7 +23,10 @@ const Header: React.FC = () => {
       </div>
 
       <p className="flex-1 text-center font-7bold text-[18px] md:text-[26px] whitespace-nowrap overflow-hidden text-ellipsis">
-        {i18n.headerTitle}
+        <span className="md:hidden">
+          {isKorean ? '정보대학(학부) 호빗' : i18n.headerTitle}
+        </span>
+        <span className="hidden md:inline">{i18n.headerTitle}</span>
       </p>
 
       <div className="w-[60px] md:w-[84px] flex justify-end">

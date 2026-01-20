@@ -22,7 +22,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
   return (
     <div>
       {text && (
-        <div className="bg-gray-100 font-5medium text-lg md:text-xl mt-[10px] rounded-[20px] px-[20px] py-[15px] w-fit max-w-[300px] md:max-w-md break-words inline-block">
+        <div className="h-fit bg-gray-100 font-5medium text-base md:text-xl mt-[10px] rounded-[20px] px-[20px] py-[15px] w-fit max-w-[330px] md:max-w-md break-words inline-block">
           {text &&
             text
               .split('\n')
@@ -47,11 +47,11 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
             }
 
             return (
-              <div key={index} className="flex flex-col md:flex-row w-full md:w-auto">
+              <div key={index} className="flex flex-col md:flex-row w-full md:w-auto h-fit">
                 {answers.map((item: any, itemIndex: number) => (
                   <div
                     key={itemIndex}
-                    className="bg-gray-100 font-5medium text-lg md:text-xl mt-[10px] rounded-[20px] px-[20px] py-[15px] w-fit min-w-[300px] max-w-[330px] md:max-w-none md:w-[350px] break-words inline-block md:mr-[10px]"
+                    className="h-fit bg-gray-100 font-5medium text-base md:text-lg mt-[10px] rounded-[20px] px-[20px] py-[15px] w-full max-w-[330px] md:max-w-none md:w-[350px] break-words inline-block md:mr-[10px]"
                   >
                     {itemIndex === 0 && (
                       <div className="flex flex-row text-sm md:text-base text-[#686D76] items-center rounded-[10px] w-fit mb-[10px]">
@@ -77,14 +77,10 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                       <div className="w-full h-[1px] bg-gray-300 mt-[20px]" />
                     )}
                     {item.url && (
-                      <div
-                        className={`flex flex-row ${
-                          item.url.length <= 30 ? 'items-center' : 'items-start'
-                        } mt-[20px]`}
-                      >
-                        <FaLink
-                          className="mr-[10px] text-2xl md:text-3xl min-w-[36px] min-h-[36px] text-[#686D76] bg-white p-[8px] rounded-full"
-                        />
+                      <div className="flex flex-row items-center mt-[20px]">
+                        <div className="flex items-center justify-center mr-[10px] bg-white p-[8px] rounded-full flex-shrink-0">
+                          <FaLink className="text-xl md:text-xl text-[#686D76]" />
+                        </div>
                         <a
                           href={
                             item.url.startsWith('http')

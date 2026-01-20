@@ -238,12 +238,12 @@ const Modal: React.FC = () => {
   return (
     <>
       <div
-        className={`fixed top-0 left-0 overflow-y-auto p-[20px] h-full bg-white shadow-lg z-50 transform transition-transform duration-500 ${
+        className={`fixed top-0 left-0 overflow-y-auto p-[20px] h-full bg-white shadow-lg z-[60] transform transition-transform duration-500 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        } w-full md:w-[350px]`}
+        } w-[300px] md:w-[350px]`}
       >
         <div className="flex flex-row justify-between items-center">
-          <p className="font-6semibold text-[20px] flex flex-row items-center">
+          <p className="font-6semibold text-lg md:text-xl flex flex-row items-center">
             <span className="mr-[5px]">
               {isKorean ? '카테고리' : 'Category'}
             </span>
@@ -253,7 +253,7 @@ const Modal: React.FC = () => {
             onClick={() => {
               dispatch(closeMenu());
             }}
-            className="text-gray-500 hover:text-black text-[20px] focus:outline-none"
+            className="text-gray-500 hover:text-black text-xl md:text-2xl focus:outline-none"
           >
             <IoClose />
           </button>
@@ -262,7 +262,7 @@ const Modal: React.FC = () => {
           {categories.map((category, index) => (
             <li key={index} className="mb-[10px] ">
               <div
-                className="hover:bg-gray-200 flex flex-row justify-between items-center cursor-pointer text-[16px] font-5medium text-[20px] text-[#686D76] bg-gray-100 px-[15px] py-[5px] rounded-[10px]"
+                className="hover:bg-gray-200 flex flex-row justify-between items-center cursor-pointer text-base md:text-lg font-5medium text-[#686D76] bg-gray-100 px-[15px] py-[5px] rounded-[10px]"
                 onClick={() =>
                   toggleCategory(
                     isKorean
@@ -313,7 +313,7 @@ const Modal: React.FC = () => {
                               : subCategory.category_en
                           )
                         }
-                        className="cursor-pointer font-5medium text-[18px] text-[#686D76] hover:text-black my-[5px]"
+                        className="cursor-pointer font-5medium text-base md:text-lg text-[#686D76] hover:text-black my-[5px]"
                       >
                         <div>
                           {isKorean
@@ -362,17 +362,17 @@ const Modal: React.FC = () => {
         <div className="w-full h-[1px] bg-gray-200 mt-[24px]" />
 
         <div className="mt-[20px] mb-4 flex flex-row items-center">
-          <span className="font-6semibold text-[20px]">
+          <span className="font-6semibold text-lg md:text-xl">
             {isKorean ? '선배모드' : 'Senior Mode'}
           </span>
-          <IoSparkles className="ml-[7px] text-[#E55604] text-[20px]" />
+          <IoSparkles className="ml-[7px] text-[#E55604] text-lg md:text-xl" />
         </div>
 
         <ul className="mt-4">
           {seniorCategories.map((category, index) => (
             <li key={index} className="mb-[10px] ">
               <div
-                className="hover:bg-[#FDDDDD] flex flex-row justify-between items-center cursor-pointer text-[16px] font-5medium text-[20px] text-[#686D76] bg-[#FFEFEF] px-[15px] py-[5px] rounded-[10px]"
+                className="hover:bg-[#FDDDDD] flex flex-row justify-between items-center cursor-pointer text-base md:text-lg font-5medium text-[#686D76] bg-[#FFEFEF] px-[15px] py-[5px] rounded-[10px]"
                 onClick={() =>
                   toggleSeniorMainCategory(
                     isKorean
@@ -423,7 +423,7 @@ const Modal: React.FC = () => {
                               : subCategory.category_en
                           )
                         }
-                        className="cursor-pointer font-5medium text-[18px] text-[#686D76] hover:text-black my-[5px]"
+                        className="cursor-pointer font-5medium text-base md:text-lg text-[#686D76] hover:text-black my-[5px]"
                       >
                         <div>
                           {isKorean
@@ -470,10 +470,10 @@ const Modal: React.FC = () => {
         <div className="w-full h-[1px] bg-gray-200 mt-[24px]" />
 
         <div className="mt-[20px] flex flex-row items-center">
-          <span className="font-6semibold text-[20px]">
+          <span className="font-6semibold text-lg md:text-xl">
             {isKorean ? '피드백 남기기' : 'Leave Feedback'}
           </span>
-          <RiEditFill className="ml-[5px] text-[#E55604] text-[20px]" />
+          <RiEditFill className="ml-[5px] text-[#E55604] text-lg md:text-xl" />
         </div>
         <div className="flex flex-col mt-4">
           <textarea
@@ -485,12 +485,12 @@ const Modal: React.FC = () => {
             rows={4}
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
-            className="w-full border-none bg-gray-100 font-5medium text-[18px] rounded-[8px] px-[15px] py-[10px] focus:outline-none focus:border-[#F075AA] resize-none"
+            className="w-full border-none bg-gray-100 font-5medium text-base rounded-[8px] px-[15px] py-[10px] focus:outline-none focus:border-[#F075AA] resize-none"
           />
           <button
             onClick={handleFeedbackSubmit}
             disabled={!feedback.trim() || isSubmitting}
-            className={`font-6semibold py-[5px] mt-[10px] rounded-[8px] text-[18px] transition ${
+            className={`font-6semibold py-[5px] mt-[10px] rounded-[8px] text-base transition ${
               feedback.trim()
                 ? 'bg-blue-500 text-white hover:bg-blue-600'
                 : 'bg-gray-200 text-gray-500 hover:bg-gray-300'

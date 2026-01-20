@@ -64,7 +64,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
             className="flex flex-row items-center mt-[10px] cursor-pointer text-[#686D76] hover:text-black"
           >
             <IoChevronBackOutline className="text-xl md:text-2xl mr-[10px] bg-gray-200 rounded-full p-[5px]" />
-            <div className="font-4regular text-lg md:text-xl">
+            <div className="font-4regular text-base md:text-xl">
               {isKorean ? seniorFAQ?.subcategory_ko : seniorFAQ?.subcategory_en}
             </div>
           </div>
@@ -77,7 +77,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                 (answer, index) => (
                   <div
                     key={index}
-                    className="font-5medium text-lg md:text-xl bg-[#FFEFEF] mt-[10px] rounded-[20px] px-[20px] py-[15px] w-full max-w-[330px] md:max-w-none md:w-[350px] break-words md:mr-[10px] flex-shrink-0"
+                    className="h-fit font-5medium text-base md:text-lg bg-[#FFEFEF] mt-[10px] rounded-[20px] px-[20px] py-[15px] w-full max-w-[330px] md:max-w-none md:w-[350px] break-words md:mr-[10px] flex-shrink-0"
                   >
                     {index === 0 && (
                       <div>
@@ -131,7 +131,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                       )}
                       {answer.url && (
                         <div className="flex flex-row items-center mt-[20px]">
-                          <FaLink className="mr-[10px] text-2xl md:text-3xl text-[#686D76] bg-white p-[8px] rounded-full" />
+                          <FaLink className="mr-[10px] text-3xl md:text-4xl text-[#686D76] bg-white p-[8px] rounded-full" />
                           <a
                             href={
                               answer.url.startsWith('http')
@@ -148,19 +148,19 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                       )}
                       {answer.email && (
                         <div className="flex flex-row items-center mt-[10px]">
-                          <MdOutlineEmail className="mr-[10px] text-2xl md:text-3xl text-[#686D76] bg-white p-[8px] rounded-full" />
+                          <MdOutlineEmail className="mr-[10px] text-3xl md:text-4xl text-[#686D76] bg-white p-[8px] rounded-full" />
                           <p className="text-base md:text-lg break-all">{answer.email}</p>
                         </div>
                       )}
                       {answer.phone && (
                         <div className="flex flex-row items-center mt-[10px]">
-                          <FaPhoneVolume className="mr-[10px] text-2xl md:text-3xl text-[#686D76] bg-white p-[8px] rounded-full" />
+                          <FaPhoneVolume className="mr-[10px] text-3xl md:text-4xl text-[#686D76] bg-white p-[8px] rounded-full" />
                           <p className="text-base md:text-lg">{answer.phone}</p>
                         </div>
                       )}
                       {answer.map.latitude && answer.map.longitude && (
                         <div className="flex flex-row items-center mt-[10px]">
-                          <TbMapPinFilled className="mr-[10px] text-2xl md:text-3xl text-[#686D76] bg-white p-[8px] rounded-full" />
+                          <TbMapPinFilled className="mr-[10px] text-3xl md:text-4xl text-[#686D76] bg-white p-[8px] rounded-full" />
                           <a
                             href="https://www.korea.ac.kr/campusMap/ko/view.do"
                             target="_blank"
