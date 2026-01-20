@@ -23,6 +23,7 @@ const GeneralResponse: React.FC<HobitResponseProps> = ({
   const [faqs, setFaqs] = useState<Faq[]>([]);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
   const sentValue = useSelector((state: RootState) => state.input.sentValue);
+  const [isImageReady, setIsImageReady] = useState(false);
 
   useEffect(() => {
     if (newFaqs) {
@@ -30,7 +31,23 @@ const GeneralResponse: React.FC<HobitResponseProps> = ({
     }
   }, [newFaqs]);
 
-  if (loading) {
+  useEffect(() => {
+    if (loading) {
+      setIsImageReady(false);
+      return;
+    }
+
+    if (newFaqs && newFaqs.length > 1) {
+      const img = new Image();
+      img.src = errorImg;
+      img.onload = () => setIsImageReady(true);
+      img.onerror = () => setIsImageReady(true);
+    } else {
+      setIsImageReady(true);
+    }
+  }, [loading, newFaqs]);
+
+  if (loading || !isImageReady) {
     return (
       <div>
         <HobitProfile />
@@ -61,9 +78,6 @@ const GeneralResponse: React.FC<HobitResponseProps> = ({
       ) : (
         <>
           <Response text="" faqs={faqs} />
-          {faqs.length > 0 && (
-            <Survey id={faqs[0].id} user_question={sentValue} />
-          )}
         </>
       )}
     </div>
