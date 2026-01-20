@@ -59,22 +59,8 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
     fetchSeniorFAQById();
   }, [seniorFaqId]);
 
-  if (showCategories && seniorFAQ) {
-    return (
-      <div>
-        <HobitProfile />
-        <SeniorCategories
-          subcategory={{
-            category_ko: seniorFAQ.subcategory_ko,
-            category_en: seniorFAQ.subcategory_en,
-          }}
-          maincategory={{
-            category_ko: seniorFAQ.maincategory_ko,
-            category_en: seniorFAQ.maincategory_en,
-          }}
-        />
-      </div>
-    );
+  if (showCategories) {
+    return null;
   }
 
   return (
