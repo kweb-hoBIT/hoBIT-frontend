@@ -160,7 +160,7 @@ const SeniorCategories: React.FC<SeniorCategoriesProps> = ({
             className="cursor-pointer rounded-[20px] items-center mt-[10px] text-[#686D76] flex flex-row font-4regular text-lg md:text-xl hover:text-black"
           >
             <IoChevronBackOutline className="text-xl md:text-2xl mr-[10px] bg-gray-200 rounded-full p-[5px]" />
-            {isKorean ? '전체 선배모드 보기' : 'All Senior Modes'}
+            {isKorean ? '전체 카테고리 보기' : 'All Categories'}
           </div>
           <div>
             <div className="font-6semibold text-lg md:text-xl inline-block py-[5px] mt-[10px]">

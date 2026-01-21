@@ -245,7 +245,7 @@ const Chatting: React.FC = () => {
       {chatHistory.map((chatItem, index) => (
         <div key={index}>
           {chatItem.seniorMode >= 0 ? (
-            <div className="mt-6 md:mt-[40px]">
+            <div className="mt-6 md:mt-[40px] empty:hidden">
               <SeniorResponse seniorFaqId={chatItem.seniorMode} />
             </div>
           ) : chatItem.flag ? (

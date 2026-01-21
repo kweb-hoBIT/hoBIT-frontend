@@ -59,22 +59,8 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
     fetchSeniorFAQById();
   }, [seniorFaqId]);
 
-  if (showCategories && seniorFAQ) {
-    return (
-      <div>
-        <HobitProfile />
-        <SeniorCategories
-          subcategory={{
-            category_ko: seniorFAQ.subcategory_ko,
-            category_en: seniorFAQ.subcategory_en,
-          }}
-          maincategory={{
-            category_ko: seniorFAQ.maincategory_ko,
-            category_en: seniorFAQ.maincategory_en,
-          }}
-        />
-      </div>
-    );
+  if (showCategories) {
+    return null;
   }
 
   return (
@@ -190,7 +176,9 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                             <TbMapPinFilled className="text-xl md:text-xl text-[#686D76]" />
                           </div>
                           <a
-                            href="https://www.korea.ac.kr/campusMap/ko/view.do"
+                            href={`https://www.korea.ac.kr/campusMap/ko/view.do?srchWrd=${encodeURIComponent(
+                              seniorFAQ?.detailcategory_ko ?? ''
+                            )}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-base md:text-lg text-[#0A5EB0]"
