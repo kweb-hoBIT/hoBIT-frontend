@@ -36,7 +36,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
       )}
 
       {faqs.length > 0 && (
-        <div className="flex flex-col md:flex-row md:flex-wrap w-full">
+        <div className="flex flex-col md:flex-row md:flex-nowrap w-full md:overflow-x-auto md:gap-4 pb-4">
           {faqs.map((faq, index) => {
             const rawAnswer = isKorean ? faq.answer_ko : faq.answer_en;
 
@@ -52,7 +52,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
             return (
               <div
                 key={index}
-                className="flex flex-col md:flex-row w-full md:w-auto h-fit"
+                className="flex flex-col md:flex-row w-full md:w-auto h-fit flex-shrink-0"
               >
                 {answers.map((item: any, itemIndex: number) => {
                   const cardContent = (
