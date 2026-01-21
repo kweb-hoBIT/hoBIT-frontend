@@ -110,6 +110,13 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                         </div>
                       </div>
                     )}
+
+                    {answer.title && (
+                      <p className="font-7bold text-lg md:text-xl mb-[10px]">
+                        {answer.title}
+                      </p>
+                    )}
+                    
                       {answer.image && (
                         <div className="mt-[20px]">
                           <img
