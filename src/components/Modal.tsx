@@ -449,7 +449,7 @@ const Modal: React.FC = () => {
                                   onClick={() => {
                                     handleSendSeniorFaqId(faq.id);
                                   }}
-                                  className="cursor-pointer text-[16px] text-black font-3light px-[10px] py-[5px] rounded-[10px] bg-gray-100 mb-[5px] hover:bg-gray-200"
+                                  className="cursor-pointer text-[16px] text-black font-3light px-[10px] py-[5px] rounded-[10px] bg-[#FFEFEF] mb-[5px] hover:bg-[#FDDDDD]"
                                 >
                                   {isKorean
                                     ? faq.detailcategory_ko

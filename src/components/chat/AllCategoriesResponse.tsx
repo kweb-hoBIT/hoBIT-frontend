@@ -4,13 +4,19 @@ import { IoChevronBackOutline } from 'react-icons/io5';
 import { sendInputValue, clearSentValue } from '../../redux/inputSlice';
 import { RootState } from '../../redux/store';
 import HobitProfile from './HobitProfile';
+import SeniorHobitProfile from './SeniorHobitProfile';
+import SeniorResponse from './SeniorResponse';
 import { Category, FaqTree } from '../../lib/FaqTree';
 import { SeniorFaqTree } from '../../lib/SeniorFaqTree';
 import { getAllFAQs, getAllSeniorFAQs } from '../../api/query';
 import { Faq, SeniorFAQ } from '../../types/faq';
 import { setSeniorFaqId, clearSeniorFaqId } from '../../redux/SeniorFaqIdSlice';
 
-const AllCategoriesResponse: React.FC = () => {
+interface AllCategoriesResponseProps {
+	initialSeniorFaqId?: number;
+}
+
+const AllCategoriesResponse: React.FC<AllCategoriesResponseProps> = ({ initialSeniorFaqId }) => {
 	const dispatch = useDispatch();
 	const isKorean = useSelector((state: RootState) => state.language.isKorean);
 
@@ -36,9 +42,33 @@ const AllCategoriesResponse: React.FC = () => {
 		useState<Category | null>(null);
 	const [currentSeniorSubCategory, setCurrentSeniorSubCategory] =
 		useState<Category | null>(null);
+	const [selectedSeniorFaqId, setSelectedSeniorFaqId] = useState<number | null>(initialSeniorFaqId || null);
 
 	const faqTreeInitFlag = useRef(false);
 	const seniorFaqTreeInitFlag = useRef(false);
+
+	useEffect(() => {
+		if (initialSeniorFaqId && allSeniorFaqs.length > 0) {
+			const faq = allSeniorFaqs.find(f => f.id === initialSeniorFaqId);
+			if (faq && seniorFaqTree) {
+				const mainCat = seniorCategories.find(c => 
+					c.mainCategory.category_ko === faq.maincategory_ko || 
+					c.mainCategory.category_en === faq.maincategory_en
+				);
+				if (mainCat) {
+					setCurrentSeniorCategory(mainCat.mainCategory);
+					const subCat = mainCat.subCategories.find(s => 
+						s.category_ko === faq.subcategory_ko || 
+						s.category_en === faq.subcategory_en
+					);
+					if (subCat) {
+						setCurrentSeniorSubCategory(subCat);
+					}
+				}
+				setSelectedSeniorFaqId(initialSeniorFaqId);
+			}
+		}
+	}, [initialSeniorFaqId, allSeniorFaqs, seniorFaqTree, seniorCategories]);
 
   useEffect(() => {
     const container = document.querySelector(
@@ -161,7 +191,7 @@ const AllCategoriesResponse: React.FC = () => {
 
 	return (
 		<div>
-			<HobitProfile />
+			{currentSeniorCategory || selectedSeniorFaqId ? <SeniorHobitProfile /> : <HobitProfile />}
 			{!currentCategory && !currentSeniorCategory && (
 				<>
 					<div className="mt-[10px] flex flex-row items-center">
@@ -351,7 +381,8 @@ const AllCategoriesResponse: React.FC = () => {
 			{!currentCategory &&
 				!currentSubCategory &&
 				currentSeniorCategory &&
-				currentSeniorSubCategory && (
+				currentSeniorSubCategory &&
+				!selectedSeniorFaqId && (
 					<>
 						<div
 							onClick={() => setCurrentSeniorSubCategory(null)}
@@ -377,7 +408,7 @@ const AllCategoriesResponse: React.FC = () => {
 									return (
 										<div
 											key={index}
-											onClick={() => handleSendSeniorFaqId(faq.id)}
+										onClick={() => setSelectedSeniorFaqId(faq.id)}
 											className="hover:bg-[#FDDDDD] bg-[#FFEFEF] min-h-[80px] flex items-center justify-center px-[10px] py-[5px] rounded-[20px] cursor-pointer"
 										>
 											<span className="text-base md:text-lg font-6semibold text-center break-keep">
@@ -391,6 +422,19 @@ const AllCategoriesResponse: React.FC = () => {
 						</div>
 					</>
 				)}
+
+			{!currentCategory &&
+				!currentSubCategory &&
+				currentSeniorCategory &&
+				selectedSeniorFaqId && (
+			<div className="mt-[10px]">
+				<SeniorResponse 
+					seniorFaqId={selectedSeniorFaqId} 
+					onBack={() => setSelectedSeniorFaqId(null)}
+					hideProfile={true}
+				/>
+			</div>
+		)}
 		</div>
 	);
 };

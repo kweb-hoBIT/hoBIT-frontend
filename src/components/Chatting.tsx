@@ -25,6 +25,7 @@ interface ChatItem {
   is_greet: boolean;
   is_able: boolean;
   is_freq: boolean;
+  initialSeniorFaqId?: number;
 }
 
 const Chatting: React.FC = () => {
@@ -44,6 +45,10 @@ const Chatting: React.FC = () => {
   const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const newChatItemRef = useRef<ChatItem | null>(null);
+
+  const removeLastChatItem = () => {
+    setChatHistory((prevHistory) => prevHistory.slice(0, -1));
+  };
 
   useEffect(() => {
     const fetchAllQuestions = async () => {
@@ -208,10 +213,11 @@ const Chatting: React.FC = () => {
         response: [],
         loading: false,
         flag: false,
-        seniorMode: seniorFaqId,
+        seniorMode: -1,
         is_greet: false,
-        is_able: false,
+        is_able: true,
         is_freq: false,
+        initialSeniorFaqId: seniorFaqId,
       };
       newChatItemRef.current = newChatItem;
       setChatHistory((prevHistory) => [...prevHistory, newChatItem]);
@@ -246,7 +252,10 @@ const Chatting: React.FC = () => {
         <div key={index}>
           {chatItem.seniorMode >= 0 ? (
             <div className="mt-6 md:mt-[40px] empty:hidden">
-              <SeniorResponse seniorFaqId={chatItem.seniorMode} />
+              <SeniorResponse 
+                seniorFaqId={chatItem.seniorMode} 
+                onBack={removeLastChatItem}
+              />
             </div>
           ) : chatItem.flag ? (
             <div className="mt-6 md:mt-[40px]">
@@ -254,17 +263,18 @@ const Chatting: React.FC = () => {
             </div>
           ) : (
             <>
-              <Query text={chatItem.query} />
+              <div className={!chatItem.query ? 'invisible' : ''}>
+                <Query text={chatItem.query} />
+              </div>
               {chatItem.query === '자주 묻는 질문' ||
               chatItem.query === 'FAQs' ? (
                 <FAQResponse />
               ) : chatItem.query === '할 수 있는 일' ||
-                chatItem.query === 'What I Can Do' ? (
-                <AllCategoriesResponse />
+                chatItem.query === 'What I Can Do' ||
+                chatItem.is_able ? (
+                <AllCategoriesResponse initialSeniorFaqId={chatItem.initialSeniorFaqId} />
               ) : chatItem.is_greet == true ? (
                 <GreetResponse />
-              ) : chatItem.is_able == true ? (
-                <AllCategoriesResponse />
               ) : chatItem.is_freq == true ? (
                 <FAQResponse />
               ) : (

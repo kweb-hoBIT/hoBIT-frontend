@@ -63,17 +63,22 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                       }`}
                     >
                       {itemIndex === 0 && (
-                        <div className="flex flex-row text-sm md:text-base text-[#686D76] items-center rounded-[10px] w-fit mb-[10px]">
-                          <h3 className="text-center">
-                            {isKorean
-                              ? faq.maincategory_ko
-                              : faq.maincategory_en}
-                          </h3>
-                          <IoIosArrowForward className="mx-1" />
-                          <h3 className="font-4regular text-center">
-                            {isKorean ? faq.subcategory_ko : faq.subcategory_en}
-                          </h3>
-                        </div>
+                        <>
+                          <div className="flex flex-row text-sm md:text-base text-[#686D76] items-center rounded-[10px] w-fit mb-[10px]">
+                            <h3 className="text-center">
+                              {isKorean
+                                ? faq.maincategory_ko
+                                : faq.maincategory_en}
+                            </h3>
+                            <IoIosArrowForward className="mx-1" />
+                            <h3 className="font-4regular text-center">
+                              {isKorean ? faq.subcategory_ko : faq.subcategory_en}
+                            </h3>
+                          </div>
+                          <div className="text-black font-7bold text-base md:text-lg mb-[15px] break-words">
+                            {isKorean ? faq.question_ko : faq.question_en}
+                          </div>
+                        </>
                       )}
                       {typeof item.answer === 'string' &&
                         item.answer
