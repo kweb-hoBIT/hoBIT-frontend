@@ -16,9 +16,11 @@ import { TbMapPinFilled } from 'react-icons/tb';
 
 interface SeniorResponseProps {
   seniorFaqId: number;
+  onBack?: () => void;
+  hideProfile?: boolean;
 }
 
-const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
+const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId, onBack, hideProfile = false }) => {
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
   const [seniorFAQ, setSeniorFAQ] = useState<SeniorFAQ | null>(null);
   const [showCategories, setShowCategories] = useState(false);
@@ -65,12 +67,18 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
 
   return (
     <div>
-      <SeniorHobitProfile />
+      {!hideProfile && <SeniorHobitProfile />}
       <div>
         <div
-          onClick={() => setShowCategories(true)}
-            className="flex flex-row items-center mt-[10px] cursor-pointer text-[#686D76] hover:text-black"
-          >
+          onClick={() => {
+            if (onBack) {
+              onBack();
+            } else {
+              setShowCategories(true);
+            }
+          }}
+          className="flex flex-row items-center mt-[10px] cursor-pointer text-[#686D76] hover:text-black"
+        >
             <IoChevronBackOutline className="text-xl md:text-2xl mr-[10px] bg-gray-200 rounded-full p-[5px]" />
             <div className="font-4regular text-lg md:text-xl">
               {isKorean ? seniorFAQ?.subcategory_ko : seniorFAQ?.subcategory_en}
@@ -85,7 +93,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                 (answer, index) => (
                   <div
                     key={index}
-                    className="font-5medium text-lg md:text-xl bg-[#FFEFEF] mt-[10px] rounded-[20px] px-[20px] py-[15px] w-full max-w-[330px] md:max-w-none md:w-[350px] break-words md:mr-[10px] flex-shrink-0"
+                    className="font-5medium text-base md:text-lg bg-[#FFEFEF] mt-[10px] rounded-[20px] px-[20px] py-[15px] w-full max-w-[330px] md:max-w-none md:w-[350px] break-words md:mr-[10px] flex-shrink-0"
                   >
                     {index === 0 && (
                       <div>
@@ -111,8 +119,8 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId }) => {
                       </div>
                     )}
 
-                    {answer.title && (
-                      <p className="font-7bold text-lg md:text-xl mb-[10px]">
+                    {index === 0 && answer.title && (
+                      <p className="font-7bold text-base md:text-lg mb-[15px] break-words">
                         {answer.title}
                       </p>
                     )}
