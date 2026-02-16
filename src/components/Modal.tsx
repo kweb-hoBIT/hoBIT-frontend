@@ -60,19 +60,17 @@ const Modal: React.FC = () => {
 
     setIsSubmitting(true);
     try {
+      // 1차: korcen으로 욕설 검사 (한국어일 때만)
+      if (isKorean && korcenCheck(feedback)){
+        alert('부적절한 내용이 포함되어 있습니다.');
+        return;
+      }
+      
+      // 2차: OpenAI moderation 검사 (한/영 모두)
       const moderationResult = await moderateContent(feedback);
       const allowed = moderationResult?.allowed ?? true;
       const reason = moderationResult?.reason ?? {};
-
-      if (korcenCheck(feedback)){
-        alert(
-          isKorean
-          ? `부적절한 내용이 포함되어 있습니다.`
-          : `Inappropriate content detected`
-        );
-        return;
-      }
-
+      
       if (!allowed) {
         const categories = Object.entries(reason)
           .filter(([_, value]) => value)
@@ -496,7 +494,33 @@ const Modal: React.FC = () => {
                 : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
             }`}
           >
-            {isKorean ? '제출' : 'Submit'}
+            {isSubmitting ? (
+              <span className="flex items-center justify-center">
+                <svg
+                  className="animate-spin h-5 w-5 mr-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                {isKorean ? '전송 중...' : 'Sending...'}
+              </span>
+            ) : (
+              isKorean ? '제출' : 'Submit'
+            )}
           </button>
         </div>
         <div className="w-full flex flex-col mt-[20px] items-center font-4regular text-[16px] text-gray-400">

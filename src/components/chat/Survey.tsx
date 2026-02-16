@@ -26,6 +26,7 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
   const [feedbackReason, setFeedbackReason] = useState<string | null>(null);
   const [feedbackDetail, setFeedbackDetail] = useState<string>('');
   const [flag, setFlag] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleThumbUpClick = async () => {
     try {
@@ -41,6 +42,17 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
           language: isKorean ? 'ko' : 'en',
         });
       } else {
+        // 확인 팝업 추가
+        const confirmed = window.confirm(
+          isKorean
+            ? '피드백을 전송하시겠습니까?'
+            : 'Would you like to send feedback?'
+        );
+        
+        if (!confirmed) {
+          return;
+        }
+
         // rate positive
         await rateFAQ({
           id: rate_id,
@@ -57,6 +69,12 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
             ? '피드백이 성공적으로 전송되었습니다.'
             : 'Feedback sent successfully!'
         );
+        
+        // 피드백 전송 완료 시 버튼 비활성화
+        setFlag(true);
+        setThumbUp(true);
+        setThumbDown(false);
+        return;
       }
       clearSentValue();
       setFlag(false);
@@ -71,31 +89,36 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
     try {
       if (!thumbDown) return;
 
-    const detail = feedbackDetail || '';
+      setIsSubmitting(true);
 
-    // 1차: korcen으로 욕설 검사 (한국어일 때만)
-    if (isKorean && korcenCheck(detail)) {
-      alert('부적절한 내용이 포함되어 있습니다.');
-      return;
-    }
+      const detail = feedbackDetail.trim();
 
-    // 2차: OpenAI moderation 검사 (한/영 모두)
-    const moderationResult = await moderateContent(detail);
-    const allowed = moderationResult?.allowed ?? true;
-    const reason = moderationResult?.reason ?? {};
+      // feedbackDetail이 있을 때만 검사 수행
+      if (detail) {
+        // 1차: korcen으로 욕설 검사 (한국어일 때만)
+        if (isKorean && korcenCheck(detail)) {
+          alert('부적절한 내용이 포함되어 있습니다.');
+          return;
+        }
 
-    if (!allowed) {
-      const categories = Object.entries(reason)
-        .filter(([_, v]) => v)
-        .map(([k]) => k)
-        .join(', ');
-      alert(
-        isKorean
-          ? `부적절한 내용이 포함되어 있습니다.`
-          : `Inappropriate content detected.`
-      );
-      return;
-    }
+        // 2차: OpenAI moderation 검사 (한/영 모두)
+        const moderationResult = await moderateContent(detail);
+        const allowed = moderationResult?.allowed ?? true;
+        const reason = moderationResult?.reason ?? {};
+
+        if (!allowed) {
+          const categories = Object.entries(reason)
+            .filter(([_, v]) => v)
+            .map(([k]) => k)
+            .join(', ');
+          alert(
+            isKorean
+              ? `부적절한 내용이 포함되어 있습니다.`
+              : `Inappropriate content detected.`
+          );
+          return;
+        }
+      }
 
       if (thumbDown) {
         await rateFAQ({
@@ -120,6 +143,8 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
       }
     } catch (error) {
       console.error('Error sending feedback:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -130,15 +155,15 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
           {isKorean ? '호빗의 응답이 도움이 되었어요!' : 'Was hoBIT helpful?'}
         </p>
         <div className="flex justify-end ml-auto">
-          <div className="bg-white p-[8px] md:p-[10px] rounded-full cursor-pointer hover:bg-gray-200">
+          <div className={`bg-white p-[8px] md:p-[10px] rounded-full ${flag ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:bg-gray-200'}`}>
             <TbThumbUpFilled
-              onClick={handleThumbUpClick}
+              onClick={flag ? undefined : handleThumbUpClick}
               className={`text-lg md:text-xl ${thumbUp ? 'text-[#E55604]' : 'text-gray-400'}`}
             />
           </div>
-          <div className="bg-white p-[8px] md:p-[10px] rounded-full ml-[10px] md:ml-[15px] cursor-pointer hover:bg-gray-200">
+          <div className={`bg-white p-[8px] md:p-[10px] rounded-full ml-[10px] md:ml-[15px] ${flag ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:bg-gray-200'}`}>
             <TbThumbDownFilled
-              onClick={() => {
+              onClick={flag ? undefined : () => {
                 setThumbDown(!thumbDown);
                 dispatch(setFeedbackClicked());
                 if (thumbDown) setFeedbackReason('');
@@ -189,22 +214,21 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
               <label
                 key={option.value}
                 className="flex items-center mt-[10px] cursor-pointer hover:text-black"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (feedbackReason === option.value) {
-                    setFeedbackReason('');
-                  } else {
-                    setFeedbackReason(option.value);
-                  }
-                }}
               >
                 <input
                   type="radio"
                   name="feedback"
                   value={option.value}
                   checked={feedbackReason === option.value}
-                  readOnly
-                  className="mr-[10px] w-4 h-4 md:w-5 md:h-5 accent-[#E55604]"
+                  onClick={() => {
+                    if (feedbackReason === option.value) {
+                      setFeedbackReason('');
+                    } else {
+                      setFeedbackReason(option.value);
+                    }
+                  }}
+                  onChange={() => {}}
+                  className="mr-[10px] w-4 h-4 md:w-5 md:h-5 accent-[#E55604] cursor-pointer"
                 />
                 {option.label}
               </label>
@@ -218,7 +242,13 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
             }
             rows={4}
             value={feedbackDetail}
-            onChange={(e) => setFeedbackDetail(e.target.value)}
+            onChange={(e) => {
+              setFeedbackDetail(e.target.value);
+              // 텍스트 입력 시 자동으로 "기타" 선택
+              if (e.target.value.trim() && !feedbackReason) {
+                setFeedbackReason('기타');
+              }
+            }}
             className="my-[10px] w-full border-none bg-white font-4regular text-base md:text-lg rounded-[20px] px-[15px] py-[10px] focus:outline-none focus:border-[#F075AA] resize-none"
           />
           <button
@@ -230,13 +260,40 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
                 : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
             }`}
             disabled={
+              isSubmitting ||
               !(
                 (feedbackReason && !(feedbackReason == '기타')) ||
                 (feedbackReason == '기타' && feedbackDetail)
               )
             }
           >
-            {isKorean ? '제출' : 'Submit'}
+            {isSubmitting ? (
+              <span className="flex items-center justify-center">
+                <svg
+                  className="animate-spin h-5 w-5 mr-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                {isKorean ? '전송 중...' : 'Sending...'}
+              </span>
+            ) : (
+              isKorean ? '제출' : 'Submit'
+            )}
           </button>
         </div>
       )}
