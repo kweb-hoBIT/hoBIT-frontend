@@ -15,9 +15,21 @@ export class SeniorFaqTree {
 
 	private initializeTree(faqs: SeniorFAQ[]) {
 		const sortedFaqs = [...faqs].sort((a, b) => {
-			const orderA = parseInt(a.category_order);
-			const orderB = parseInt(b.category_order);
-			return orderA - orderB;
+			const mainOrderA = parseInt(a.category_order);
+			const mainOrderB = parseInt(b.category_order);
+			if (mainOrderA !== mainOrderB) {
+				return mainOrderA - mainOrderB;
+			}
+			
+			const subOrderA = parseInt(a.subcategory_order);
+			const subOrderB = parseInt(b.subcategory_order);
+			if (subOrderA !== subOrderB) {
+				return subOrderA - subOrderB;
+			}
+			
+			const detailOrderA = parseInt(a.detailcategory_order);
+			const detailOrderB = parseInt(b.detailcategory_order);
+			return detailOrderA - detailOrderB;
 		});
 
 		sortedFaqs.forEach((faq) => {

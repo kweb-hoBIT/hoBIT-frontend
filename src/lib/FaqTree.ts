@@ -17,7 +17,12 @@ export class FaqTree {
 		const sortedFaqs = [...faqs].sort((a, b) => {
 			const orderA = parseInt(a.category_order);
 			const orderB = parseInt(b.category_order);
-			return orderA - orderB;
+			if (orderA !== orderB) {
+				return orderA - orderB;
+			}
+			const subOrderA = parseInt(a.subcategory_order);
+			const subOrderB = parseInt(b.subcategory_order);
+			return subOrderA - subOrderB;
 		});
 
 		sortedFaqs.forEach((faq) => {
