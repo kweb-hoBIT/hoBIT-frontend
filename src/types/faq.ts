@@ -26,6 +26,7 @@ export type Faq = {
 	answer_en: string;
 	manager: string;
 	category_order: string;
+	subcategory_order: string;
 	created_by: number | null;
 	updated_by: number | null;
 };
@@ -91,6 +92,8 @@ export type SeniorFAQ = {
 	}[];
 	manager: string;
 	category_order: string;
+	subcategory_order: string;
+	detailcategory_order: string;
 	created_at: string;
 	updated_at: string;
 };
