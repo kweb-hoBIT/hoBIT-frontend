@@ -11,20 +11,23 @@ import {
 	DirectUserFeedbacksResponse,
 } from './feedback';
 import { QuestionRequest, QuestionResponse } from './question';
+import { ChatRequest, ChatResponse } from './chat';
 
 export type HobitApiRequest =
 	| ({ type: 'question' } & QuestionRequest)
 	| ({ type: 'rate_faq' } & RateFaqRequest)
 	| ({ type: 'all_questions' } & AllQuestionsRequest)
 	| ({ type: 'all_faqs' } & AllFaqsRequest)
-	| ({ type: 'direct_user_feedback' } & DirectUserFeedbacksRequest);
+	| ({ type: 'direct_user_feedback' } & DirectUserFeedbacksRequest)
+	| ({ type: 'chat' } & ChatRequest);
 
 export type HobitApiResponse =
 	| ({ type: 'question' } & QuestionResponse)
 	| ({ type: 'rate' } & RateFaqResponse)
 	| ({ type: 'all_questions' } & AllQuestionsResponse)
 	| ({ type: 'all_faqs' } & AllFaqsResponse)
-	| ({ type: 'direct_user_feedback' } & DirectUserFeedbacksResponse);
+	| ({ type: 'direct_user_feedback' } & DirectUserFeedbacksResponse)
+	| ({ type: 'chat' } & ChatResponse);
 
 export type ApiResponse<P> = {
 	error: ApiErrorPayload | null;

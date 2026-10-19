@@ -77,14 +77,14 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId, onBack, hi
               setShowCategories(true);
             }
           }}
-          className="flex flex-row items-center mt-[10px] cursor-pointer text-[#686D76] hover:text-black"
+          className="flex flex-row items-center mt-[10px] cursor-pointer text-ink-2 hover:text-ink"
         >
-            <IoChevronBackOutline className="text-xl md:text-2xl mr-[10px] bg-gray-200 rounded-full p-[5px]" />
-            <div className="font-4regular text-lg md:text-xl">
+            <IoChevronBackOutline className="text-f-xl mr-[10px] bg-card-2 rounded-full p-[5px]" />
+            <div className="font-4regular text-f-lg">
               {isKorean ? seniorFAQ?.subcategory_ko : seniorFAQ?.subcategory_en}
             </div>
           </div>
-          <div className="flex flex-col md:flex-row w-full md:overflow-x-auto md:items-start">
+          <div className="hobit-scroll-x flex flex-col md:flex-row w-full md:overflow-x-auto md:items-start md:pb-[14px]">
             {seniorFAQ &&
               Array.isArray(
                 isKorean ? seniorFAQ.answer_ko : seniorFAQ.answer_en
@@ -93,11 +93,11 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId, onBack, hi
                 (answer, index) => (
                   <div
                     key={index}
-                    className="font-5medium text-base md:text-lg bg-[#FFEFEF] mt-[10px] rounded-[20px] px-[20px] py-[15px] w-full max-w-[330px] md:max-w-none md:w-[350px] break-words md:mr-[10px] flex-shrink-0"
+                    className="font-5medium text-f-base bg-senior mt-[10px] rounded-[20px] px-[20px] py-[15px] w-full max-w-[330px] md:max-w-none md:w-[350px] break-words md:mr-[10px] flex-shrink-0"
                   >
                     {index === 0 && (
                       <div>
-                        <div className="flex flex-wrap text-sm md:text-base text-[#686D76] items-center rounded-[10px] w-fit mb-[10px]">
+                        <div className="flex flex-wrap text-f-sm text-ink-2 items-center rounded-[10px] w-fit mb-[10px]">
                           <h3 className="font-5medium text-center">
                             {isKorean
                               ? seniorFAQ.maincategory_ko
@@ -120,7 +120,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId, onBack, hi
                     )}
 
                     {index === 0 && answer.title && (
-                      <p className="font-7bold text-base md:text-lg mb-[15px] break-words">
+                      <p className="font-7bold text-f-base mb-[15px] break-words">
                         {answer.title}
                       </p>
                     )}
@@ -150,12 +150,12 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId, onBack, hi
                         answer.email ||
                         answer.phone ||
                         answer.map) && (
-                        <div className="w-full h-[1px] bg-gray-300 mt-[20px]" />
+                        <div className="w-full h-[1px] bg-card-3 mt-[20px]" />
                       )}
                       {answer.url && (
                         <div className="flex flex-row items-center mt-[20px]">
-                          <div className="flex items-center justify-center mr-[10px] bg-white p-[8px] rounded-full flex-shrink-0">
-                            <FaLink className="text-xl md:text-xl text-[#686D76]" />
+                          <div className="flex items-center justify-center mr-[10px] bg-surface p-[8px] rounded-full flex-shrink-0">
+                            <FaLink className="text-xl text-ink-2" />
                           </div>
                           <a
                             href={
@@ -165,7 +165,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId, onBack, hi
                             }
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-base md:text-lg text-[#0A5EB0] cursor-pointer hover:underline break-all"
+                            className="text-f-base text-link cursor-pointer hover:underline break-all"
                           >
                             {isKorean ? '사이트 바로가기' : 'Visit Site'}
                           </a>
@@ -173,22 +173,22 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId, onBack, hi
                       )}
                       {answer.email && (
                         <div className="flex flex-row items-center mt-[10px]">
-                          <MdOutlineEmail className="mr-[10px] text-2xl md:text-3xl min-w-[36px] min-h-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
-                          <p className="text-base md:text-lg break-all">
+                          <MdOutlineEmail className="mr-[10px] text-2xl md:text-3xl min-w-[36px] min-h-[36px] text-ink-2 bg-surface p-[8px] rounded-full" />
+                          <p className="text-f-base break-all">
                             {answer.email}
                           </p>
                         </div>
                       )}
                       {answer.phone && (
                         <div className="flex flex-row items-center mt-[10px]">
-                          <FaPhoneVolume className="mr-[10px] text-2xl md:text-3xl min-w-[36px] min-h-[36px] text-[#686D76] bg-white p-[8px] rounded-full" />
-                          <p className="text-base md:text-lg">{answer.phone}</p>
+                          <FaPhoneVolume className="mr-[10px] text-2xl md:text-3xl min-w-[36px] min-h-[36px] text-ink-2 bg-surface p-[8px] rounded-full" />
+                          <p className="text-f-base">{answer.phone}</p>
                         </div>
                       )}
                       {answer.map.latitude && answer.map.longitude && (
                         <div className="flex flex-row items-center mt-[10px]">
-                          <div className="flex items-center justify-center mr-[10px] bg-white p-[8px] rounded-full flex-shrink-0">
-                            <TbMapPinFilled className="text-xl md:text-xl text-[#686D76]" />
+                          <div className="flex items-center justify-center mr-[10px] bg-surface p-[8px] rounded-full flex-shrink-0">
+                            <TbMapPinFilled className="text-xl text-ink-2" />
                           </div>
                           <a
                             href={`https://www.korea.ac.kr/campusMap/ko/view.do?srchWrd=${encodeURIComponent(
@@ -196,7 +196,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId, onBack, hi
                             )}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-base md:text-lg text-[#0A5EB0]"
+                            className="text-f-base text-link"
                           >
                             {isKorean
                               ? '고려대학교 캠퍼스맵'

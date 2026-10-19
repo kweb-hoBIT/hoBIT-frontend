@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>hoBIT 임베드 테스트</title>
+  <style>
+    /* 정보대학 홈페이지에 붙였을 때를 미리 보기 위한 모의 페이지 (실제 학교 사이트 아님) */
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; color: #222; background: #f6f6f6; }
+    .notice-bar { background: #fff6d6; color: #6b5300; font-size: 13px; text-align: center; padding: 6px 12px; }
+    header { background: #8b0029; color: #fff; }
+    .top { max-width: 1100px; margin: 0 auto; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .logo { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+    nav a { color: #fff; text-decoration: none; margin-left: 22px; font-size: 15px; opacity: .92; }
+    .hero { background: linear-gradient(120deg, #8b0029, #b3123f); color: #fff; }
+    .hero div { max-width: 1100px; margin: 0 auto; padding: 48px 20px; }
+    .hero h1 { margin: 0 0 8px; font-size: 28px; }
+    main { max-width: 1100px; margin: 0 auto; padding: 28px 20px 80px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    section { background: #fff; border-radius: 12px; padding: 20px 22px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+    section h2 { margin: 0 0 12px; font-size: 18px; color: #8b0029; }
+    li { padding: 9px 0; border-bottom: 1px solid #eee; font-size: 14px; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+    ul { margin: 0; padding: 0; }
+    li span { color: #999; white-space: nowrap; }
+    footer { background: #2b2b2b; color: #bbb; font-size: 13px; padding: 28px 20px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="notice-bar">이 페이지는 hoBIT 위젯 임베드 테스트용 모의 페이지입니다 (실제 정보대학 홈페이지가 아님)</div>
+  <header>
+    <div class="top">
+      <div class="logo">정보대학 (테스트)</div>
+      <nav><a href="#">대학소개</a><a href="#">학부</a><a href="#">대학원</a><a href="#">공지사항</a><a href="#">진로정보</a></nav>
+    </div>
+  </header>
+  <div class="hero"><div><h1>College of Informatics</h1><p>오른쪽 아래 호빗 버튼을 눌러 보세요.</p></div></div>
+  <main>
+    <section>
+      <h2>학부 공지사항</h2>
+      <ul>
+        <li>2026-2학기 수강신청 일정 안내 <span>07.20</span></li>
+        <li>2026학년도 2학기 손세찬장학금 신청 안내 <span>10.07</span></li>
+        <li>2027학년도 1학기 융합전공 전형 시행 안내 <span>10.06</span></li>
+        <li>2026-2학기 수강포기신청 시행 안내 <span>09.15</span></li>
+      </ul>
+    </section>
+    <section>
+      <h2>진로정보</h2>
+      <ul>
+        <li>[채용] 신입사원 공개채용 <span>10.06</span></li>
+        <li>[인턴] 하계 인턴십 모집 <span>09.28</span></li>
+        <li>[교육] AI 엔지니어 과정 수강생 모집 <span>09.20</span></li>
+      </ul>
+    </section>
+    <section>
+      <h2>학사일정</h2>
+      <ul>
+        <li>제2학기 중간고사 <span>10.20 ~ 10.26</span></li>
+        <li>융합전공 신청 <span>10.14 ~ 10.16</span></li>
+        <li>학생설계전공 신청 <span>10.01 ~ 10.30</span></li>
+      </ul>
+    </section>
+  </main>
+  <footer>embed 테스트 페이지 · 아래 한 줄이 실제 홈페이지에 넣을 코드입니다</footer>
+
+  <!-- 실제 홈페이지에 넣을 코드는 이 한 줄 (배포 후에는 src를 https://widget.hobit.kr/embed.js 로) -->
+  <script src="/embed.js" defer></script>
+</body>
+</html>

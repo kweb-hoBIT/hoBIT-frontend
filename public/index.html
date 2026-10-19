@@ -9,7 +9,16 @@
       href="%PUBLIC_URL%/profile_clear.png"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#ffffff" />
+    <script>
+      (function () {
+        var saved = null;
+        try { saved = localStorage.getItem('hobit-theme'); } catch (e) {}
+        var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.classList.toggle('dark', dark);
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#1c1c1f' : '#ffffff');
+      })();
+    </script>
     <meta name="description" content="고려대학교 정보대학 챗봇 호빗(hoBIT)에게 학사행정, 학교생활 관련 질문이 있다면 언제든지 물어보세요" />
     <meta property="og:title" content="챗봇 호빗(hoBIT)" />
     <meta property="og:description" content="고려대학교 정보대학(학부) 챗봇 서비스" />

@@ -18,7 +18,7 @@ const MainOptions: React.FC = () => {
   };
 
   return (
-    <div className="bg-gray-100 w-full max-w-[330px] md:max-w-none md:w-[350px] h-auto mt-[20px] rounded-[20px] flex flex-col items-center p-[20px]">
+    <div className="bg-card w-full max-w-[330px] md:max-w-none md:w-[350px] h-auto mt-[20px] rounded-[20px] flex flex-col items-center p-[20px]">
       <img
         src={homeImg}
         alt="home image"
@@ -28,16 +28,16 @@ const MainOptions: React.FC = () => {
       <div className="flex w-full justify-between items-center">
         <button
           onClick={() => handleSendOption(isKorean ? '자주 묻는 질문' : 'FAQs')}
-          className="w-full text-[#686D76] font-6semibold text-base md:text-lg py-[5px] hover:text-black"
+          className="w-full text-ink-2 font-6semibold text-f-base py-[5px] hover:text-ink"
         >
           {isKorean ? '자주 묻는 질문' : 'FAQs'}
         </button>
-        <span className="text-lg md:text-xl text-gray-400 font-1thin">|</span>
+        <span className="text-f-lg text-ink-3 font-1thin">|</span>
         <button
           onClick={() =>
             handleSendOption(isKorean ? '할 수 있는 일' : 'What I Can Do')
           }
-          className="w-full text-[#686D76] font-6semibold text-base md:text-lg py-[5px] hover:text-black"
+          className="w-full text-ink-2 font-6semibold text-f-base py-[5px] hover:text-ink"
         >
           {isKorean ? '할 수 있는 일' : 'What I Can Do'}
         </button>

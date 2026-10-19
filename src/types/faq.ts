@@ -33,11 +33,30 @@ export type Faq = {
 
 export type FaqAnswer = FaqCard[];
 
+export type AttachmentItem = {
+	name: string;
+	url: string;
+	type: string;
+};
+
+export type SourceItem = {
+	source_label?: string;
+	source_title: string;
+	source_category: string;
+	source_link: string;
+	attachments?: AttachmentItem[];
+};
+
 export type FaqCard = {
 	answer: string;
 	url: string;
 	email: string;
 	phone: string;
+	source_title?: string;
+	source_category?: string;
+	source_link?: string;
+	attachments?: AttachmentItem[];
+	sources?: SourceItem[];
 };
 
 export type Question = {

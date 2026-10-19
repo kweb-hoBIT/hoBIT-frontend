@@ -2,7 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 색 토큰 (R G B) — tailwind.config.js의 colors가 참조 */
+:root {
+  --c-page: 255 255 255;
+  --c-surface: 255 255 255;
+  --c-card: 243 244 246;
+  --c-card-2: 229 231 235;
+  --c-card-3: 209 213 219;
+  --c-senior: 255 239 239;
+  --c-senior-2: 253 221 221;
+  --c-ink: 31 35 41;
+  --c-ink-2: 104 109 118;
+  --c-ink-3: 156 163 175;
+  --c-link: 10 94 176;
+  --c-line: 209 213 219;
+  --c-accent: 117 14 33;
+  --c-accent-ink: 117 14 33;
+  --c-on-accent-ink: 255 255 255; /* accent-ink 배경 위 글자 */
+  color-scheme: light;
+}
+html.dark {
+  --c-page: 17 17 19;
+  --c-surface: 30 30 34;
+  --c-card: 50 50 56;
+  --c-card-2: 64 64 71;
+  --c-card-3: 84 84 92;
+  /* 나이트의 선배 카드: 바탕은 일반 카드와 같고 로즈색 테두리로 구분 (색을 섞으면 탁한 보라빛이 됐음) */
+  --c-senior: 50 50 56;
+  --c-senior-2: 64 64 71;
+  --c-ink: 236 236 240;
+  --c-ink-2: 170 174 182;
+  --c-ink-3: 122 126 134;
+  --c-link: 108 176 255;
+  --c-line: 70 70 78;
+  --c-accent: 150 28 50;
+  --c-accent-ink: 222 140 154;  /* 차분한 로즈 (예전 255 128 150은 너무 쨍했음) */
+  --c-on-accent-ink: 46 10 18;    /* 밝은 핑크 위에서는 짙은 글자가 읽기 쉬움 */
+  color-scheme: dark;
+}
+
 body {
+  background: rgb(var(--c-page));
+  color: rgb(var(--c-ink));
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -84,4 +125,66 @@ code {
     format('woff2');
   font-weight: 100;
   font-style: normal;
+}
+
+/* 답변이 끝난 뒤 붙는 출처·피드백·추천 칩이 한 번에 툭 튀어나오지 않게 살짝 나타남 */
+@keyframes hobit-appear {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.hobit-appear {
+  animation: hobit-appear 0.35s ease-out both;
+}
+/* 추천 칩 — 답변 카드를 먼저 읽을 수 있게 조금 늦게, 하나씩 이어서 나타남 (지연은 칩마다 style로 지정).
+   자리는 처음부터 잡혀 있어(투명) 칩이 나타날 때 화면이 다시 밀리지 않음 */
+.hobit-appear-late {
+  animation: hobit-appear 0.45s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hobit-appear, .hobit-appear-late { animation: none; }
+}
+
+/* 네비바 아이콘 hover 흔들림 (hiyseo.com 블로그 네비바와 같은 모션) */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(-22deg); }
+  35% { transform: rotate(16deg); }
+  55% { transform: rotate(-10deg); }
+  75% { transform: rotate(5deg); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .wiggle:hover .wiggle-icon,
+  .wiggle:focus-visible .wiggle-icon {
+    animation: wiggle 0.65s ease-in-out;
+  }
+}
+
+/* 카드가 가로로 넘칠 때의 스크롤바 — 카드 아래 여백(pb)에 그려져 카드와 겹치지 않게, 얇고 테마 색으로 */
+.hobit-scroll-x {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--c-card-3)) transparent;
+}
+.hobit-scroll-x::-webkit-scrollbar { height: 8px; }
+.hobit-scroll-x::-webkit-scrollbar-track { background: transparent; }
+.hobit-scroll-x::-webkit-scrollbar-thumb { background: rgb(var(--c-card-3)); border-radius: 999px; }
+.hobit-scroll-x::-webkit-scrollbar-thumb:hover { background: rgb(var(--c-ink-3)); }
+
+/* 나이트 모드 선배 카드 표시 — 얇은 로즈 테두리 (레이아웃에 영향 없는 inset 그림자) */
+html.dark .bg-senior {
+  box-shadow: inset 0 0 0 1.5px rgb(var(--c-accent-ink) / 0.45);
+}
+
+/* 위젯 창(iframe, ?embed=1) 안에서는 글자를 한 단계 작게 — 데스크톱 위에 뜬 작은 창이라 모바일 크기가 크게 보였음 */
+html.embed {
+  --fs-scale: 0.8;
+}
+/* 위젯 안 카드는 여백·모서리를 줄여 더 촘촘하게 (hobit.kr 전체 화면은 그대로) */
+html.embed .bg-card,
+html.embed .bg-senior {
+  padding: 10px 14px !important;
+  border-radius: 14px !important;
+}
+html.embed .bg-card img {
+  width: 110px !important;
+  margin-bottom: 6px !important;
 }

@@ -8,6 +8,7 @@ import { homeReducer } from './homeSlice';
 import { SeniorFaqIdReducer } from './SeniorFaqIdSlice';
 import { feedbackReducer } from './feedbackSlice';
 import { imageReducer } from './imageSlice';
+import { liveChatReducer } from './liveChatSlice';
 
 const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ const store = configureStore({
     home: homeReducer,
     seniorFaqId: SeniorFaqIdReducer,
     feedback: feedbackReducer,
+    liveChat: liveChatReducer,
   },
 });
 

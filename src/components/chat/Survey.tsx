@@ -10,14 +10,16 @@ import { RootState } from '../../redux/store';
 import { clearSentValue } from '../../redux/inputSlice';
 
 import { setFeedbackClicked } from '../../redux/feedbackSlice';
+import { appAlert, appConfirm } from '../ui/Dialog';
 import { check as korcenCheck } from 'korcen';
 
 type SurveyProps = {
   id: number;
   user_question: string;
+  isSenior?: boolean;
 };
 
-const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
+const Survey: React.FC<SurveyProps> = ({ id, user_question, isSenior = false }) => {
   const dispatch = useDispatch();
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
   const rate_id = useSelector((state: RootState) => state.input.id);
@@ -43,7 +45,7 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
         });
       } else {
         // 확인 팝업 추가
-        const confirmed = window.confirm(
+        const confirmed = await appConfirm(
           isKorean
             ? '피드백을 전송하시겠습니까?'
             : 'Would you like to send feedback?'
@@ -64,7 +66,7 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
           language: isKorean ? 'ko' : 'en',
         });
 
-        alert(
+        appAlert(
           isKorean
             ? '피드백이 성공적으로 전송되었습니다.'
             : 'Feedback sent successfully!'
@@ -97,7 +99,7 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
       if (detail) {
         // 1차: korcen으로 욕설 검사 (한국어일 때만)
         if (isKorean && korcenCheck(detail)) {
-          alert('부적절한 내용이 포함되어 있습니다.');
+          appAlert('부적절한 내용이 포함되어 있습니다.');
           return;
         }
 
@@ -111,7 +113,7 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
             .filter(([_, v]) => v)
             .map(([k]) => k)
             .join(', ');
-          alert(
+          appAlert(
             isKorean
               ? `부적절한 내용이 포함되어 있습니다.`
               : `Inappropriate content detected.`
@@ -135,7 +137,7 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
         setFeedbackDetail('');
         setFlag(true);
 
-        alert(
+        appAlert(
           isKorean
             ? '피드백이 성공적으로 전송되었습니다.'
             : 'Feedback sent successfully!'
@@ -150,18 +152,18 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
 
   return (
     <div>
-      <div className="flex flex-row w-full max-w-[330px] md:max-w-none md:w-[350px] items-center bg-gray-100 font-5medium text-[#686D76] text-base md:text-lg mt-[10px] rounded-[20px] px-[20px] py-[10px]">
+      <div className={`flex flex-row w-full max-w-[330px] md:max-w-none md:w-[350px] items-center ${isSenior ? 'bg-senior' : 'bg-card'} font-5medium text-ink-2 text-f-base mt-[8px] rounded-[20px] px-[20px] py-[10px]`}>
         <p>
           {isKorean ? '호빗의 응답이 도움이 되었어요!' : 'Was hoBIT helpful?'}
         </p>
         <div className="flex justify-end ml-auto">
-          <div className={`bg-white p-[8px] md:p-[10px] rounded-full ${flag ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:bg-gray-200'}`}>
+          <div className={`bg-surface p-[8px] md:p-[10px] rounded-full ${flag ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:bg-card-2'}`}>
             <TbThumbUpFilled
               onClick={flag ? undefined : handleThumbUpClick}
-              className={`text-lg md:text-xl ${thumbUp ? 'text-[#E55604]' : 'text-gray-400'}`}
+              className={`text-f-lg ${thumbUp ? 'text-[#E55604]' : 'text-ink-3'}`}
             />
           </div>
-          <div className={`bg-white p-[8px] md:p-[10px] rounded-full ml-[10px] md:ml-[15px] ${flag ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:bg-gray-200'}`}>
+          <div className={`bg-surface p-[8px] md:p-[10px] rounded-full ml-[10px] md:ml-[15px] ${flag ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:bg-card-2'}`}>
             <TbThumbDownFilled
               onClick={flag ? undefined : () => {
                 setThumbDown(!thumbDown);
@@ -169,19 +171,19 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
                 if (thumbDown) setFeedbackReason('');
                 if (thumbUp) setThumbUp(false);
               }}
-              className={`text-lg md:text-xl ${thumbDown ? 'text-[#E55604]' : 'text-gray-400'}`}
+              className={`text-f-lg ${thumbDown ? 'text-[#E55604]' : 'text-ink-3'}`}
             />
           </div>
         </div>
       </div>
       {thumbDown && !flag && (
-        <div className="flex flex-col w-full max-w-[330px] md:max-w-none md:w-[350px] bg-gray-100 font-4regular text-[#686D76] text-base md:text-lg mt-[10px] rounded-[20px] px-[20px] py-[10px] ">
+        <div className={`flex flex-col w-full max-w-[330px] md:max-w-none md:w-[350px] ${isSenior ? 'bg-senior' : 'bg-card'} font-4regular text-ink-2 text-f-base mt-[8px] rounded-[20px] px-[20px] py-[10px]`}>
           <p className="font-5medium">
             {isKorean
               ? '도움이 되지 않은 이유가 무엇인가요?'
               : 'What is the reason for your unsatisfaction?'}
           </p>
-          <div className="w-full h-[1px] bg-gray-300 mt-[10px] mb-[5px]" />
+          <div className="w-full h-[1px] bg-card-3 mt-[10px] mb-[5px]" />
           <form>
             {[
               {
@@ -213,7 +215,7 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
             ].map((option) => (
               <label
                 key={option.value}
-                className="flex items-center mt-[10px] cursor-pointer hover:text-black"
+                className="flex items-center mt-[10px] cursor-pointer hover:text-ink"
               >
                 <input
                   type="radio"
@@ -249,7 +251,7 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
                 setFeedbackReason('기타');
               }
             }}
-            className="my-[10px] w-full border-none bg-white font-4regular text-base md:text-lg rounded-[20px] px-[15px] py-[10px] focus:outline-none focus:border-[#F075AA] resize-none"
+            className="my-[10px] w-full border-none bg-surface font-4regular text-f-base rounded-[20px] px-[15px] py-[10px] focus:outline-none focus:border-[#F075AA] resize-none"
           />
           <button
             onClick={handleSendFeedback}
@@ -257,7 +259,7 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question }) => {
               (feedbackReason && !(feedbackReason == '기타')) ||
               (feedbackReason == '기타' && feedbackDetail)
                 ? 'bg-blue-500 text-white hover:bg-blue-600'
-                : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+                : 'bg-card-2 text-ink-3 hover:bg-card-3'
             }`}
             disabled={
               isSubmitting ||

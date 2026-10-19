@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { sendInputValue } from '../../redux/inputSlice';
+import { sendFaqById } from '../../redux/inputSlice';
 import { RootState } from '../../redux/store';
 
 import HobitProfile from './HobitProfile';
@@ -15,8 +15,8 @@ const FAQResponse: React.FC = () => {
   const [faqs, setFaqs] = useState<Faq[]>([]);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
 
-  const handleSendKeyword = (message: string) => {
-    dispatch(sendInputValue(message));
+  const handleClickFaq = (faq: Faq) => {
+    dispatch(sendFaqById({ id: faq.id, query: isKorean ? faq.question_ko : faq.question_en }));
   };
 
   useEffect(() => {
@@ -47,11 +47,9 @@ const FAQResponse: React.FC = () => {
         {faqs.map((faq, index) => (
           <div
             key={index}
-            onClick={() =>
-              handleSendKeyword(isKorean ? faq.question_ko : faq.question_en)
-            }
-            className="faq-item border border-gray-300 font-5medium text-base md:text-xl w-fit md:w-fit md:max-w-none mt-[10px] rounded-[20px] px-[20px] py-[15px] break-words inline-block
-              hover:bg-gray-100 transition-colors cursor-pointer md:mr-[10px]"
+            onClick={() => handleClickFaq(faq)}
+            className="faq-item border border-line font-5medium text-f-base-xl w-fit md:w-fit md:max-w-none mt-[10px] rounded-[20px] px-[20px] py-[15px] break-words inline-block
+              hover:bg-card transition-colors cursor-pointer md:mr-[10px]"
           >
             <h3>{isKorean ? faq.question_ko : faq.question_en}</h3>
           </div>

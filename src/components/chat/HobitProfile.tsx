@@ -8,7 +8,7 @@ const HobitProfile: React.FC = () => {
         alt="Profile"
         className="w-[40px] h-[40px] md:w-[50px] md:h-[50px] rounded-full"
       />
-      <p className="font-8extrabold text-lg md:text-[20px] text-[#686D76] pl-[15px]">
+      <p className="font-8extrabold text-f-lg text-ink-2 pl-[15px]">
         hoBIT
       </p>
     </div>

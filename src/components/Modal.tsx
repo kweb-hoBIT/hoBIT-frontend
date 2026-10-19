@@ -1,4 +1,4 @@
-import { IoClose } from 'react-icons/io5';
+import { IoClose, IoChatbubbles } from 'react-icons/io5';
 import { FaChevronDown } from 'react-icons/fa6';
 import { FaChevronUp } from 'react-icons/fa6';
 import { BiSolidCategory } from 'react-icons/bi';
@@ -8,14 +8,17 @@ import { IoSparkles } from 'react-icons/io5';
 import { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../redux/store';
+import ProfilePanel from './ProfilePanel';
 import { closeMenu } from '../redux/menuSlice';
-import { sendInputValue, clearSentValue } from '../redux/inputSlice';
+import { sendFaqById } from '../redux/inputSlice';
 import { setSeniorFaqId, clearSeniorFaqId } from '../redux/SeniorFaqIdSlice';
+import { openLiveChat } from '../redux/liveChatSlice';
 
 import { Category, FaqTree } from '../lib/FaqTree';
 import { directUserFeedback, getAllFAQs, getAllSeniorFAQs, moderateContent } from '../api/query';
 import { SeniorFaqTree } from '../lib/SeniorFaqTree';
 import { Faq, SeniorFAQ } from '../types/faq';
+import { appAlert } from './ui/Dialog';
 import {check as korcenCheck} from 'korcen';
 
 const Modal: React.FC = () => {
@@ -62,7 +65,7 @@ const Modal: React.FC = () => {
     try {
       // 1차: korcen으로 욕설 검사 (한국어일 때만)
       if (isKorean && korcenCheck(feedback)){
-        alert('부적절한 내용이 포함되어 있습니다.');
+        appAlert('부적절한 내용이 포함되어 있습니다.');
         return;
       }
       
@@ -77,7 +80,7 @@ const Modal: React.FC = () => {
           .map(([key]) => key)
           .join(', ');
 
-          alert(
+          appAlert(
             isKorean
             ? `부적절한 내용이 포함되어 있습니다.`
             : `Inappropriate content detected`
@@ -90,7 +93,7 @@ const Modal: React.FC = () => {
         language: isKorean ? 'KO' : 'EN',
       });
       setFeedback('');
-      alert(
+      appAlert(
         isKorean
           ? '피드백이 성공적으로 전송되었습니다.'
           : 'Feedback sent successfully!'
@@ -177,12 +180,9 @@ const Modal: React.FC = () => {
     });
   };
 
-  const handleSendKeyword = (message: string) => {
-    dispatch(sendInputValue(message));
+  const handleSendFaqById = (id: number, query: string) => {
+    dispatch(sendFaqById({ id, query }));
     dispatch(closeMenu());
-    setTimeout(() => {
-      dispatch(clearSentValue());
-    }, 100);
   };
 
   const handleSendSeniorFaqId = (id: number) => {
@@ -236,12 +236,12 @@ const Modal: React.FC = () => {
   return (
     <>
       <div
-        className={`fixed top-0 left-0 overflow-y-auto p-[20px] h-full bg-white shadow-lg z-[60] transform transition-transform duration-500 ${
+        className={`fixed top-0 left-0 overflow-y-auto p-[20px] h-full bg-surface shadow-lg z-[60] transform transition-transform duration-500 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        } w-[300px] md:w-[350px]`}
+        } w-[min(88vw,320px)] md:w-[380px] lg:w-[440px] xl:w-[480px]`}
       >
         <div className="flex flex-row justify-between items-center">
-          <p className="font-6semibold text-lg md:text-xl flex flex-row items-center">
+          <p className="font-6semibold text-f-lg flex flex-row items-center">
             <span className="mr-[5px]">
               {isKorean ? '카테고리' : 'Category'}
             </span>
@@ -251,16 +251,17 @@ const Modal: React.FC = () => {
             onClick={() => {
               dispatch(closeMenu());
             }}
-            className="text-gray-500 hover:text-black text-xl md:text-2xl focus:outline-none"
+            className="text-ink-3 hover:text-ink text-f-xl focus:outline-none"
           >
             <IoClose />
           </button>
         </div>
+        <ProfilePanel />
         <ul className="mt-4">
           {categories.map((category, index) => (
             <li key={index} className="mb-[10px] ">
               <div
-                className="hover:bg-gray-200 flex flex-row justify-between items-center cursor-pointer text-base md:text-lg font-5medium text-[#686D76] bg-gray-100 px-[15px] py-[5px] rounded-[10px]"
+                className="hover:bg-card-2 flex flex-row justify-between items-center cursor-pointer text-f-menu font-5medium text-ink-2 bg-card px-[15px] py-[5px] lg:py-[8px] rounded-[10px]"
                 onClick={() =>
                   toggleCategory(
                     isKorean
@@ -279,9 +280,9 @@ const Modal: React.FC = () => {
                     ? category.mainCategory.category_ko
                     : category.mainCategory.category_en
                 ) ? (
-                  <FaChevronUp className="text-[16px] text-gray-400" />
+                  <FaChevronUp className="text-[0.85em] text-ink-3" />
                 ) : (
-                  <FaChevronDown className="text-[16px] text-gray-400" />
+                  <FaChevronDown className="text-[0.85em] text-ink-3" />
                 )}
               </div>
               {expandedCategories.includes(
@@ -291,7 +292,7 @@ const Modal: React.FC = () => {
               ) && (
                 <div className="relative ml-[25px]">
                   <div
-                    className="absolute left-[-10px] w-[2px] bg-gray-200"
+                    className="absolute left-[-10px] w-[2px] bg-card-2"
                     style={{
                       top: '5px',
                       bottom: '5px',
@@ -311,7 +312,7 @@ const Modal: React.FC = () => {
                               : subCategory.category_en
                           )
                         }
-                        className="cursor-pointer font-5medium text-base md:text-lg text-[#686D76] hover:text-black my-[5px]"
+                        className="cursor-pointer font-5medium text-f-base text-ink-2 hover:text-ink my-[5px]"
                       >
                         <div>
                           {isKorean
@@ -335,13 +336,12 @@ const Modal: React.FC = () => {
                                 <li
                                   key={faqIndex}
                                   onClick={() =>
-                                    handleSendKeyword(
-                                      isKorean
-                                        ? faq.question_ko
-                                        : faq.question_en
+                                    handleSendFaqById(
+                                      faq.id,
+                                      isKorean ? faq.question_ko : faq.question_en
                                     )
                                   }
-                                  className="cursor-pointer text-[16px] text-black font-3light px-[10px] py-[5px] rounded-[10px] bg-gray-100 mb-[5px] hover:bg-gray-200"
+                                  className="cursor-pointer text-f-base text-ink font-3light px-[10px] py-[5px] rounded-[10px] bg-card mb-[5px] hover:bg-card-2"
                                 >
                                   {isKorean ? faq.question_ko : faq.question_en}
                                 </li>
@@ -357,20 +357,20 @@ const Modal: React.FC = () => {
           ))}
         </ul>
 
-        <div className="w-full h-[1px] bg-gray-200 mt-[24px]" />
+        <div className="w-full h-[1px] bg-card-2 mt-[24px]" />
 
         <div className="mt-[20px] mb-4 flex flex-row items-center">
-          <span className="font-6semibold text-lg md:text-xl">
+          <span className="font-6semibold text-f-lg">
             {isKorean ? '선배모드' : 'Senior Mode'}
           </span>
-          <IoSparkles className="ml-[7px] text-[#E55604] text-lg md:text-xl" />
+          <IoSparkles className="ml-[7px] text-[#E55604] text-f-lg" />
         </div>
 
         <ul className="mt-4">
           {seniorCategories.map((category, index) => (
             <li key={index} className="mb-[10px] ">
               <div
-                className="hover:bg-[#FDDDDD] flex flex-row justify-between items-center cursor-pointer text-base md:text-lg font-5medium text-[#686D76] bg-[#FFEFEF] px-[15px] py-[5px] rounded-[10px]"
+                className="hover:bg-senior-2 flex flex-row justify-between items-center cursor-pointer text-f-menu font-5medium text-ink-2 bg-senior px-[15px] py-[5px] lg:py-[8px] rounded-[10px]"
                 onClick={() =>
                   toggleSeniorMainCategory(
                     isKorean
@@ -389,9 +389,9 @@ const Modal: React.FC = () => {
                     ? category.mainCategory.category_ko
                     : category.mainCategory.category_en
                 ) ? (
-                  <FaChevronUp className="text-[16px] text-gray-400" />
+                  <FaChevronUp className="text-[0.85em] text-ink-3" />
                 ) : (
-                  <FaChevronDown className="text-[16px] text-gray-400" />
+                  <FaChevronDown className="text-[0.85em] text-ink-3" />
                 )}
               </div>
               {expandedSeniorMainCategories.includes(
@@ -401,7 +401,7 @@ const Modal: React.FC = () => {
               ) && (
                 <div className="relative ml-[25px]">
                   <div
-                    className="absolute left-[-10px] w-[2px] bg-gray-200"
+                    className="absolute left-[-10px] w-[2px] bg-card-2"
                     style={{
                       top: '5px',
                       bottom: '5px',
@@ -421,7 +421,7 @@ const Modal: React.FC = () => {
                               : subCategory.category_en
                           )
                         }
-                        className="cursor-pointer font-5medium text-base md:text-lg text-[#686D76] hover:text-black my-[5px]"
+                        className="cursor-pointer font-5medium text-f-base text-ink-2 hover:text-ink my-[5px]"
                       >
                         <div>
                           {isKorean
@@ -447,7 +447,7 @@ const Modal: React.FC = () => {
                                   onClick={() => {
                                     handleSendSeniorFaqId(faq.id);
                                   }}
-                                  className="cursor-pointer text-[16px] text-black font-3light px-[10px] py-[5px] rounded-[10px] bg-[#FFEFEF] mb-[5px] hover:bg-[#FDDDDD]"
+                                  className="cursor-pointer text-f-base text-ink font-3light px-[10px] py-[5px] rounded-[10px] bg-senior mb-[5px] hover:bg-senior-2"
                                 >
                                   {isKorean
                                     ? faq.detailcategory_ko
@@ -465,13 +465,42 @@ const Modal: React.FC = () => {
           ))}
         </ul>
 
-        <div className="w-full h-[1px] bg-gray-200 mt-[24px]" />
+        <div className="w-full h-[1px] bg-card-2 mt-[24px]" />
+
+        {/* 실시간 채팅 — 행정실(일반) / 근로장학생 선배(선배 채팅) */}
+        <div className="mt-[20px] mb-[12px] flex flex-row items-center">
+          <span className="font-6semibold text-f-lg">{isKorean ? '실시간 채팅' : 'Live chat'}</span>
+          <IoChatbubbles className="ml-[7px] text-[#E55604] text-f-lg" />
+        </div>
+        <div className="flex flex-col gap-[8px]">
+          {([
+            ['staff', isKorean ? '행정실 채팅' : 'Chat with the office', isKorean ? '평일 운영 시간에 행정실 담당자와 연결' : 'Office staff on weekdays'],
+            ['senior', isKorean ? '선배 채팅' : 'Chat with a senior', isKorean ? '근로장학생 선배가 있을 때 연결' : 'When a student assistant is available'],
+          ] as const).map(([chatMode, title, desc]) => (
+            <button
+              key={chatMode}
+              type="button"
+              onClick={() => {
+                dispatch(closeMenu());
+                dispatch(openLiveChat(chatMode));
+              }}
+              className={`flex flex-col items-start rounded-[12px] px-[15px] py-[8px] text-left ${
+                chatMode === 'senior' ? 'bg-senior hover:bg-senior-2' : 'bg-card hover:bg-card-2'
+              }`}
+            >
+              <span className="text-f-base font-5medium text-ink">{title}</span>
+              <span className="text-f-xs text-ink-3">{desc}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="w-full h-[1px] bg-card-2 mt-[24px]" />
 
         <div className="mt-[20px] flex flex-row items-center">
-          <span className="font-6semibold text-lg md:text-xl">
+          <span className="font-6semibold text-f-lg">
             {isKorean ? '피드백 남기기' : 'Leave Feedback'}
           </span>
-          <RiEditFill className="ml-[5px] text-[#E55604] text-lg md:text-xl" />
+          <RiEditFill className="ml-[5px] text-[#E55604] text-f-lg" />
         </div>
         <div className="flex flex-col mt-4">
           <textarea
@@ -483,7 +512,7 @@ const Modal: React.FC = () => {
             rows={4}
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
-            className="w-full border-none bg-gray-100 font-5medium text-base rounded-[8px] px-[15px] py-[10px] focus:outline-none focus:border-[#F075AA] resize-none"
+            className="w-full border-none bg-card font-5medium text-base rounded-[8px] px-[15px] py-[10px] focus:outline-none focus:border-[#F075AA] resize-none"
           />
           <button
             onClick={handleFeedbackSubmit}
@@ -491,7 +520,7 @@ const Modal: React.FC = () => {
             className={`font-6semibold py-[5px] mt-[10px] rounded-[8px] text-base transition ${
               feedback.trim()
                 ? 'bg-blue-500 text-white hover:bg-blue-600'
-                : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+                : 'bg-card-2 text-ink-3 hover:bg-card-3'
             }`}
           >
             {isSubmitting ? (
@@ -523,7 +552,7 @@ const Modal: React.FC = () => {
             )}
           </button>
         </div>
-        <div className="w-full flex flex-col mt-[20px] items-center font-4regular text-[16px] text-gray-400">
+        <div className="w-full flex flex-col mt-[20px] items-center font-4regular text-[16px] text-ink-3">
           <span>copyrights@KWEB</span>
         </div>
       </div>
