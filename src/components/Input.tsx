@@ -80,7 +80,7 @@ const Input: React.FC = () => {
             placeholder={
               isLoading
                 ? (isKorean ? '답변 생성 중...' : 'Generating response...')
-                : (isKorean ? '호빗에게 물어보세요!' : 'Ask Anything to HoBIT!')
+                : (isKorean ? '호빗에게 물어보세요!' : 'Ask Anything to hoBIT!')
             }
             value={liveValue}
             onChange={handleChange}
