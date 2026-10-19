@@ -1,0 +1,50 @@
+# 베타 자동 배포 — renewal 브랜치에 push하면 빌드 확인 후 kwebhobit 저장소의 renewal 브랜치로 보냄
+# → Vercel에서 beta(-admin).hobit.kr 을 그 브랜치에 연결 (운영 main·미리보기 develop과 별개)
+name: beta-deploy
+
+on:
+  push:
+    branches:
+      - renewal
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Build frontend
+        run: |
+          npm run build
+
+      - name: creates output
+        run: sh ./build.sh
+
+      - name: Pushes to another repository
+        id: push_directory
+        uses: cpina/github-action-push-to-another-repository@v1.7.2
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.KWEBHOBIT_PERSONAL_ACCESS_TOKEN }}
+        with:
+          source-directory: 'output'
+          destination-github-username: kwebhobit
+          destination-repository-name: hoBIT-frontend
+          user-email: ${{ secrets.KWEBHOBIT_EMAIL }}
+          commit-message: ${{ github.event.head_commit.message }}
+          target-branch: 'renewal'
+          create-target-branch-if-needed: true
+
+      - name: Test get variable exported by push-to-another-repository
+        run: echo $DESTINATION_CLONED_DIRECTORY
