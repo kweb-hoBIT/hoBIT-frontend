@@ -512,13 +512,8 @@ const Chatting: React.FC = () => {
               {chatItem.query && !chatItem.loading && (
                 <RecChips
                   widthClass="w-0 min-w-full"
-                  title={
-                    chatItem.recommendations?.some((r) => r.reason === 'next')
-                      ? isKorean ? '이어서 많이 묻는 질문' : 'People also ask'
-                      : chatItem.recommendations?.some((r) => r.reason === 'answer')
-                        ? isKorean ? '이어서 물어볼 만한 질문' : 'You might also ask'
-                        : isKorean ? '관련 질문' : 'Related questions'
-                  }
+                  // 고른 근거(reason: next·answer·related)와 상관없이 같은 제목 — 학생에게는 차이가 와닿지 않아 헷갈렸음
+                  title={isKorean ? '이어서 물어볼 만한 질문' : 'You might also ask'}
                   items={chatItem.recommendations ?? []}
                 />
               )}
