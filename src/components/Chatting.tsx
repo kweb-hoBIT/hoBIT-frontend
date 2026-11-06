@@ -508,7 +508,7 @@ const Chatting: React.FC = () => {
                     : 'AI answers may be inaccurate. Please confirm with the college website or the administrative office.'}
                 </p>
               )}
-              {/* 추천 질문은 어떤 응답 뒤에도 — 사용자 질문 기준 (요즘 많이 묻는 질문은 시작 화면에만) */}
+              {/* 추천 질문은 어떤 응답 뒤에도 — 사용자 질문 기준 (시작 화면 "이런 질문은 어때요?"는 처음에만) */}
               {chatItem.query && !chatItem.loading && (
                 <RecChips
                   widthClass="w-0 min-w-full"

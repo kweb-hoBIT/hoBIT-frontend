@@ -1,23 +1,18 @@
 import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
-import { sendFaqById } from '../../redux/inputSlice';
 import { RootState } from '../../redux/store';
 
 import HobitProfile from './HobitProfile';
 import Response from './Response';
 import { Faq } from '../../types/faq';
 import { getFAQs } from '../../api/query';
+import RecChips, { RecItem } from './RecChips';
 
 const FAQResponse: React.FC = () => {
-  const dispatch = useDispatch();
   const [mocks, _setMocks] = useState<Faq[]>([]);
   const [faqs, setFaqs] = useState<Faq[]>([]);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
-
-  const handleClickFaq = (faq: Faq) => {
-    dispatch(sendFaqById({ id: faq.id, query: isKorean ? faq.question_ko : faq.question_en }));
-  };
 
   useEffect(() => {
     const fetchFAQs = async () => {
@@ -32,6 +27,14 @@ const FAQResponse: React.FC = () => {
     fetchFAQs();
   }, []);
 
+  const chips: RecItem[] = faqs.map((faq) => ({
+    intent_id: `faq-${faq.id}`,
+    intent_name: '',
+    text: faq.question_ko,
+    text_en: faq.question_en,
+    faq_id: faq.id,
+  }));
+
   return (
     <div>
       <HobitProfile />
@@ -43,18 +46,8 @@ const FAQResponse: React.FC = () => {
         }
         faqs={mocks}
       />
-      <div className="flex flex-col w-full">
-        {faqs.map((faq, index) => (
-          <div
-            key={index}
-            onClick={() => handleClickFaq(faq)}
-            className="faq-item border border-line font-5medium text-f-base-xl w-fit md:w-fit md:max-w-none mt-[10px] rounded-[20px] px-[20px] py-[15px] break-words inline-block
-              hover:bg-card transition-colors cursor-pointer md:mr-[10px]"
-          >
-            <h3>{isKorean ? faq.question_ko : faq.question_en}</h3>
-          </div>
-        ))}
-      </div>
+      {/* 시작 화면 "이런 질문은 어때요?"와 같은 칩 모양 — 누르면 FAQ 원문으로 바로 답 */}
+      <RecChips items={chips} />
     </div>
   );
 };

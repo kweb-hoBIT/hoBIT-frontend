@@ -31,7 +31,7 @@ const HelloHobit: React.FC = () => {
         }
         faqs={faqs}
       />
-      <RecChips title={isKorean ? '요즘 많이 묻는 질문' : 'Popular questions'} items={startItems} />
+      <RecChips title={isKorean ? '이런 질문은 어때요?' : 'Try asking'} items={startItems} />
     </div>
   );
 };
