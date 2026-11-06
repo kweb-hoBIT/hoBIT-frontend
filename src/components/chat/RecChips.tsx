@@ -28,7 +28,10 @@ const REPLAY_DELAY = 0.05;
 const CARD_WIDTH_1 = 'w-full max-w-[330px] md:max-w-[350px]';
 
 // widthClass: 위 카드 줄과 같은 폭 (기본은 카드 한 장 폭), title이 없으면 제목 줄 없이 칩만 (자주 묻는 질문 답변)
-const RecChips: React.FC<{ title?: string; items: RecItem[]; widthClass?: string }> = ({ title, items, widthClass = CARD_WIDTH_1 }) => {
+// stacked: 한 줄에 하나씩 (시작 화면·자주 묻는 질문 — 위에서 아래로 읽는 목록). 대화 중 추천은 가로로 흐르게
+const RecChips: React.FC<{ title?: string; items: RecItem[]; widthClass?: string; stacked?: boolean }> = ({
+  title, items, widthClass = CARD_WIDTH_1, stacked = false,
+}) => {
   const dispatch = useDispatch();
   const listRef = useRef<HTMLDivElement>(null);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
@@ -96,13 +99,12 @@ const RecChips: React.FC<{ title?: string; items: RecItem[]; widthClass?: string
       {title && (
         <p className="text-f-sm font-5medium text-ink-2 mb-[8px] md:mb-[10px] hobit-appear-late" style={{ animationDelay: `${baseDelay}s` }}>{title}</p>
       )}
-      <div ref={listRef} className="flex flex-wrap gap-[8px] md:gap-[10px]">
+      <div ref={listRef} className={`flex gap-[8px] md:gap-[10px] ${stacked ? 'flex-col items-start' : 'flex-wrap'}`}>
         {items.map((item, i) => {
           const label = !isKorean && item.text_en ? item.text_en : item.text;
           return (
           <button
             key={`${item.intent_id}-${item.text}`}
-            title={label}
             style={{ animationDelay: `${baseDelay + APPEAR_STAGGER * (i + 1)}s` }}
             onClick={() =>
               item.faq_id
