@@ -37,7 +37,7 @@ interface ChatItem {
   followup_fields?: string[]; // 답변과 함께 보여주는 추가 정보 요청 (막지 않는 질문)
   streamText?: string;           // 스트리밍 중인 답변
   streamStyle?: string;          // senior면 스트리밍 말풍선도 선배 색
-  recommendations?: RecItem[];   // 답변 아래 "이어서 많이 묻는 질문"
+  recommendations?: RecItem[];   // 답변 아래 "이어서 물어볼 만한 질문"
   initialSeniorFaqId?: number;
 }
 
