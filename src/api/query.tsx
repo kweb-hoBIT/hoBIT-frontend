@@ -307,13 +307,3 @@ export const getRecommendationsAfterFaq = async (id: number): Promise<any[]> => 
 	}
 };
 
-// 대화 시작 화면 '곧 마감되는 공지' — 7일 안에 마감되는 학부 공지·장학 (프로필이 있으면 대상이 맞는 것만)
-export type ClosingNotice = { title: string; link: string; due_end_date: string; d_day: number; count?: number };
-export const getClosingNotices = async (): Promise<{ items: ClosingNotice[]; personalized: boolean }> => {
-	try {
-		const r = await apiClient.get('/closing_notices');
-		return { items: r.data.items ?? [], personalized: Boolean(r.data.personalized) };
-	} catch {
-		return { items: [], personalized: false };
-	}
-};
