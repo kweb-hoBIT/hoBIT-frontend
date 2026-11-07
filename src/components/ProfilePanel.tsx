@@ -5,7 +5,8 @@ import { FaChevronDown, FaChevronUp } from 'react-icons/fa6';
 import { RootState } from '../redux/store';
 import { deleteProfile, getProfile, saveProfile, ProfileData, StoredProfile } from '../api/query';
 import { appConfirm } from './ui/Dialog';
-import { FIELD_OPTIONS, optionConflict, toDisplayValue, toStoredValue } from './chat/ProfileInput';
+import { optionConflict, toDisplayValue, toStoredValue } from './chat/ProfileInput';
+import { FIELD_OPTIONS, useProfileOptions } from './chat/profileOptions';
 
 const FIELDS = ['department', 'admission_year', 'grade', 'major_type', 'student_status'] as const;
 type Field = (typeof FIELDS)[number];
@@ -17,6 +18,7 @@ type Field = (typeof FIELDS)[number];
 const ProfilePanel: React.FC = () => {
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
   const isOpen = useSelector((state: RootState) => state.menu.isOpen);
+  useProfileOptions(); // 관리자 사이트 '프로필 항목' 선택지
   const [expanded, setExpanded] = useState(true);
   const [data, setData] = useState<StoredProfile | null>(null);
   const [editing, setEditing] = useState<Field | null>(null);

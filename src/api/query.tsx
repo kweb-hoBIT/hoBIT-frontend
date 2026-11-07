@@ -255,6 +255,21 @@ export type StoredProfile = {
 	ttl_seconds: number | null;
 };
 
+type ProfileOptionItem = { value: string; label_en: string; first_cohort: number | null };
+export type ProfileOptionsResponse = {
+	department: ProfileOptionItem[];
+	major_type: ProfileOptionItem[];
+	student_status: ProfileOptionItem[];
+	grade: number[];
+	admission_year: number[];
+};
+
+/** 프로필 선택지 — 학과 등은 관리자 사이트 '프로필 항목', 학번은 올해 기준 자동 */
+export const getProfileOptions = async (): Promise<ProfileOptionsResponse> => {
+	const response = await apiClient.get('/profile_options');
+	return response.data;
+};
+
 /** 화면의 '내 정보' — 저장된 프로필과 남은 보관 시간 */
 export const getProfile = async (): Promise<StoredProfile> => {
 	const response = await apiClient.get('/profile');

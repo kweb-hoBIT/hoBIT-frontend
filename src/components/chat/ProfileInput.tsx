@@ -4,50 +4,18 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import HobitProfile from './HobitProfile';
 import { getProfile, saveProfile, ProfileData } from '../../api/query';
+import { FIELD_OPTIONS, DEPARTMENT_FIRST_COHORT, useProfileOptions } from './profileOptions';
 
-export const FIELD_OPTIONS: Record<string, { label_ko: string; label_en: string; options_ko: string[]; options_en: string[] }> = {
-  department: {
-    label_ko: '학과',
-    label_en: 'Department',
-    options_ko: ['컴퓨터학과', '데이터과학과', '인공지능학과'],
-    options_en: ['Computer Science', 'Data Science', 'Artificial Intelligence'],
-  },
-  major_type: {
-    label_ko: '전공 유형',
-    label_en: 'Major Type',
-    options_ko: ['심화전공', '이중전공', '복수전공', '부전공'],
-    options_en: ['Intensive Major', 'Double Major', 'Multiple Major', 'Minor'],
-  },
-  grade: {
-    label_ko: '학년',
-    label_en: 'Grade',
-    options_ko: ['1학년', '2학년', '3학년', '4학년'],
-    options_en: ['1st year', '2nd year', '3rd year', '4th year'],
-  },
-  admission_year: {
-    label_ko: '학번',
-    label_en: 'Admission Year',
-    options_ko: ['20학번', '21학번', '22학번', '23학번', '24학번', '25학번', '26학번'],
-    // 'Class of 2020'은 영어로 2020년 졸업생이라는 뜻이라 학번(입학 연도)과 반대 — 입학 연도로 표기
-    options_en: ['Admitted 2020', 'Admitted 2021', 'Admitted 2022', 'Admitted 2023', 'Admitted 2024', 'Admitted 2025', 'Admitted 2026'],
-  },
-  student_status: {
-    label_ko: '학적 상태',
-    label_en: 'Student Status',
-    options_ko: ['재학', '편입', '휴학', '수료'],
-    options_en: ['Enrolled', 'Transfer', 'Leave of Absence', 'Completed'],
-  },
-};
+// 선택지 목록은 관리자 사이트 '프로필 항목'에서 관리 — profileOptions.ts가 서버에서 받아 채움
+export { FIELD_OPTIONS, DEPARTMENT_FIRST_COHORT, useProfileOptions } from './profileOptions';
 
 /**
- * 선택지 → 저장값 (학년은 1~4, 학번은 20~26, 나머지는 한국어 표준값).
+ * 선택지 → 저장값 (학년은 1~4, 학번은 2자리, 나머지는 한국어 공식 이름).
  * 영어 모드에서 골라도 한국어로 저장 — 검색 필터·문서 태그가 한국어 값 기준이라
  * (예전엔 "Multiple Major", "Transfer"처럼 영어로 저장돼 필터가 맞지 않을 수 있었음)
  */
 export const toStoredValue = (field: string, index: number, option: string): string =>
-  field === 'grade' ? String(index + 1)
-    : field === 'admission_year' ? String(20 + index)
-      : FIELD_OPTIONS[field]?.options_ko[index] ?? option;
+  FIELD_OPTIONS[field]?.values[index] ?? option;
 
 /** 저장값 → 화면 표시 */
 export const toDisplayValue = (field: string, value: string | number, isKorean: boolean): string => {
@@ -63,11 +31,6 @@ export const toDisplayValue = (field: string, value: string | number, isKorean: 
   return String(value);
 };
 
-/**
- * 학과별 첫 입학 학번 — 이보다 앞선 학번은 없는 조합이라 선택지에서 비활성화
- * (RAG main.py DEPARTMENT_FOUNDED와 같은 값으로 유지)
- */
-export const DEPARTMENT_FIRST_COHORT: Record<string, number> = { 데이터과학과: 22, 인공지능학과: 25 };
 
 /** 저장값(한국어·예전 영어 값 모두)을 한국어 표준값으로 */
 const toKo = (field: string, value?: string | number | null): string | undefined => {
@@ -110,6 +73,7 @@ interface ProfileInputProps {
 
 const ProfileInput: React.FC<ProfileInputProps> = ({ missingFields, onSaved, variant = 'blocking' }) => {
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
+  useProfileOptions(); // 관리자 사이트에서 바꾼 선택지를 받으면 다시 그림
   const [selections, setSelections] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   // 이미 저장된 학과·학번 (묻지 않는 항목) — 선택지 비활성화 판단에 사용
