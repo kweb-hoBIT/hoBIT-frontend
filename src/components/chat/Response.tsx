@@ -146,6 +146,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
 
             const metaSources = collectSources(answers);
             const hasSourceCard = metaSources.length > 0 && hasMetaCard(answers);
+            const related = faq.related_notices ?? [];
             // 선배 답변: 백엔드가 senior로 표시했거나(스트리밍 때와 같은 기준) 출처에 선배 FAQ
             const isSeniorBySource = faq.subcategory_ko === 'senior' || metaSources.some(isSeniorFaqSource);
 
@@ -296,8 +297,9 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                     </div>
                   </div>
 
-                  {hasSourceCard && (
+                  {(hasSourceCard || related.length > 0) && (
                     <div className="flex flex-col hobit-appear">
+                      {hasSourceCard && (
                       <div className={`h-fit ${isSeniorBySource ? 'bg-senior' : 'bg-card'} font-5medium text-f-base mt-[8px] rounded-[20px] px-[20px] py-[15px] w-full max-w-[330px] md:max-w-none md:w-[350px] break-words inline-block`}>
                         <p className="text-sm text-ink-2 font-4regular mb-[8px]">
                           {isKorean ? '출처' : 'Source'}
@@ -362,9 +364,39 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                           </button>
                         )}
                       </div>
+                      )}
+                      {/* 관련 공지 — 질문 주제와 맞고 아직 신청할 수 있는 공지 (출처 카드와 같은 모양) */}
+                      {related.length > 0 && (
+                        <div className="h-fit bg-card font-5medium text-f-base mt-[8px] rounded-[20px] px-[20px] py-[15px] w-full max-w-[330px] md:max-w-none md:w-[350px] break-words inline-block">
+                          <p className="text-sm text-ink-2 font-4regular mb-[8px]">{isKorean ? '관련 공지' : 'Related notices'}</p>
+                          <div className="flex flex-col gap-[12px]">
+                            {related.map((n) => (
+                              <div key={n.link || n.title}>
+                                <p className="text-xs font-4regular mb-[3px] text-ink-2">
+                                  <span className={n.status === 'open' && n.d_day <= 2 ? 'font-6semibold text-accent-ink' : ''}>
+                                    {n.status === 'upcoming'
+                                      ? (isKorean ? '신청 예정' : 'Upcoming')
+                                      : n.d_day === 0 ? (isKorean ? '오늘 마감' : 'Due today') : `D-${n.d_day}`}
+                                  </span>
+                                  {` · ${isKorean ? '마감' : 'Due'} ${Number(n.due_end_date.slice(5, 7))}/${Number(n.due_end_date.slice(8, 10))}`}
+                                </p>
+                                {n.link ? (
+                                  <a href={n.link} target="_blank" rel="noopener noreferrer" className="text-f-sm text-link hover:underline break-words cursor-pointer">
+                                    {n.title}
+                                  </a>
+                                ) : (
+                                  <p className="text-f-sm text-ink break-words">{n.title}</p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {hasSourceCard && (
                       <div className="mt-0">
                         <Survey id={faq.id} user_question={sentValue} isSenior={isSeniorBySource} logId={faq.log_id} />
                       </div>
+                      )}
                     </div>
                   )}
                 </div>

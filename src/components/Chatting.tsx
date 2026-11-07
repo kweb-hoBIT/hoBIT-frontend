@@ -1,4 +1,3 @@
-import RelatedNotices, { RelatedNotice } from './chat/RelatedNotices';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -39,7 +38,6 @@ interface ChatItem {
   streamText?: string;           // 스트리밍 중인 답변
   streamStyle?: string;          // senior면 스트리밍 말풍선도 선배 색
   recommendations?: RecItem[];   // 답변 아래 "이어서 물어볼 만한 질문"
-  related_notices?: RelatedNotice[]; // 답변 아래 "관련 공지" (아직 신청할 수 있는 공지)
   initialSeniorFaqId?: number;
 }
 
@@ -339,7 +337,6 @@ const Chatting: React.FC = () => {
                 item.uid === uid
                   ? { ...item, response: serverResponse.faqs, loading: false, streamText: undefined,
                       followup_fields: serverResponse.followup_fields ?? [],
-                      related_notices: serverResponse.related_notices ?? [],
                       recommendations: serverResponse.recommendations ?? [] }
                   : item
               )
@@ -432,7 +429,6 @@ const Chatting: React.FC = () => {
         } else if (Array.isArray(serverResponse.faqs)) {
           update({ response: serverResponse.faqs, loading: false, streamText: undefined,
                    followup_fields: serverResponse.followup_fields ?? [],
-                      related_notices: serverResponse.related_notices ?? [],
                    recommendations: serverResponse.recommendations ?? [] });
         } else {
           update({ loading: false });
@@ -512,7 +508,6 @@ const Chatting: React.FC = () => {
                     : 'AI answers may be inaccurate. Please confirm with the college website or the administrative office.'}
                 </p>
               )}
-              {!chatItem.loading && <RelatedNotices items={chatItem.related_notices ?? []} />}
               {/* 추천 질문은 어떤 응답 뒤에도 — 사용자 질문 기준 (시작 화면 "이런 질문은 어때요?"는 처음에만) */}
               {chatItem.query && !chatItem.loading && (
                 <RecChips
