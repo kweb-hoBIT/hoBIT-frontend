@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 
 import HobitProfile from './HobitProfile';
 import MainOptions from './MainOptions';
+import ClosingNotices from './ClosingNotices';
 import Response from './Response';
 import { Faq } from '../../types/faq';
 import { RootState } from '../../redux/store';
@@ -23,6 +24,7 @@ const HelloHobit: React.FC = () => {
     <div className="pr-[28px] md:pr-0">
       <HobitProfile />
       <MainOptions />
+      <ClosingNotices />
       <Response
         text={
           isKorean
