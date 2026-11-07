@@ -16,6 +16,7 @@ export type RateFaqResponse = {
 
 export type Faq = {
 	id: number;
+	log_id?: number; // AI 답변의 질문 기록 번호 (👍·👎를 이 기록에 저장)
 	maincategory_ko: string;
 	maincategory_en: string;
 	subcategory_ko: string;

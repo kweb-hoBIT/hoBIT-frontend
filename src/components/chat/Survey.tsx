@@ -17,12 +17,15 @@ type SurveyProps = {
   id: number;
   user_question: string;
   isSenior?: boolean;
+  logId?: number; // 이 답변의 질문 기록 번호 (AI 답변) — 없으면 마지막 응답 번호
 };
 
-const Survey: React.FC<SurveyProps> = ({ id, user_question, isSenior = false }) => {
+const Survey: React.FC<SurveyProps> = ({ id, user_question, isSenior = false, logId }) => {
   const dispatch = useDispatch();
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
-  const rate_id = useSelector((state: RootState) => state.input.id);
+  const lastId = useSelector((state: RootState) => state.input.id);
+  // 화면에 여러 답변이 있을 때 이전 답변에 👎를 눌러도 그 답변 기록에 붙게 — 답변마다 받은 번호를 우선
+  const rate_id = logId && logId > 0 ? logId : lastId;
   const [thumbUp, setThumbUp] = useState(false);
   const [thumbDown, setThumbDown] = useState(false);
   const [feedbackReason, setFeedbackReason] = useState<string | null>(null);
@@ -84,6 +87,7 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question, isSenior = false }) 
       setThumbDown(false);
     } catch (error) {
       console.error('Error rating FAQ (Thumb Up):', error);
+      appAlert(isKorean ? '피드백을 보내지 못했어요. 잠시 후 다시 시도해 주세요.' : "Couldn't send feedback. Please try again later.");
     }
   };
 
@@ -145,6 +149,7 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question, isSenior = false }) 
       }
     } catch (error) {
       console.error('Error sending feedback:', error);
+      appAlert(isKorean ? '피드백을 보내지 못했어요. 잠시 후 다시 시도해 주세요.' : "Couldn't send feedback. Please try again later.");
     } finally {
       setIsSubmitting(false);
     }

@@ -285,7 +285,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                             <div key={itemIndex} className="flex flex-col">
                               {cardContent}
                               <div className="mt-0">
-                                <Survey id={faq.id} user_question={sentValue} isSenior={isSeniorBySource} />
+                                <Survey id={faq.id} user_question={sentValue} isSenior={isSeniorBySource} logId={faq.log_id} />
                               </div>
                             </div>
                           );
@@ -363,7 +363,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                         )}
                       </div>
                       <div className="mt-0">
-                        <Survey id={faq.id} user_question={sentValue} isSenior={isSeniorBySource} />
+                        <Survey id={faq.id} user_question={sentValue} isSenior={isSeniorBySource} logId={faq.log_id} />
                       </div>
                     </div>
                   )}
