@@ -1,5 +1,4 @@
 import React from 'react';
-import { FaDownload, FaFile, FaFilePdf } from 'react-icons/fa6';
 import { MdOutlineEmail, MdOpenInNew } from 'react-icons/md';
 import { FaPhoneVolume } from 'react-icons/fa6';
 import { IoIosArrowForward } from 'react-icons/io';
@@ -7,7 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 import { useSelector } from 'react-redux';
-import { AttachmentItem, Faq, FaqCard, SourceItem } from '../../types/faq';
+import { Faq, FaqCard, SourceItem } from '../../types/faq';
 import { RootState } from '../../redux/store';
 import Survey from './Survey';
 
@@ -50,14 +49,13 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
     cards.some(
       (card) =>
         (card.sources && card.sources.length > 0) ||
-        (card.source_link && card.source_title) ||
-        (card.attachments && card.attachments.length > 0)
+        (card.source_link && card.source_title)
     );
 
   const collectSources = (cards: FaqCard[]): SourceItem[] => {
     const expanded = cards.flatMap((card) => {
       if (card.sources && card.sources.length > 0) return card.sources;
-      if ((card.source_link && card.source_title) || (card.attachments && card.attachments.length > 0)) {
+      if (card.source_link && card.source_title) {
         return [
           {
             source_title: card.source_title || '',
@@ -96,25 +94,6 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
 
   const sanitizeJSON = (jsonString: string): string => {
     return jsonString.replace(/\n/g, '\\n');
-  };
-
-  const downloadAttachment = async (attachment: AttachmentItem) => {
-    try {
-      const response = await fetch(attachment.url);
-      if (!response.ok) throw new Error('download failed');
-      const blob = await response.blob();
-      const objectUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = objectUrl;
-      link.download = attachment.name || 'attachment';
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(objectUrl);
-    } catch (error) {
-      // 외부 도메인 CORS 제한 시 새 탭으로 fallback
-      window.open(attachment.url, '_blank', 'noopener,noreferrer');
-    }
   };
 
   return (
@@ -325,30 +304,6 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                                 </p>
                               )}
 
-                              {source.attachments && source.attachments.length > 0 && (
-                                <div className="mt-[8px]">
-                                  <p className="text-sm text-ink-2 font-4regular mb-[6px]">
-                                    {isKorean ? '첨부파일' : 'Attachments'}
-                                  </p>
-                                  <div className="flex flex-col gap-[6px]">
-                                    {source.attachments.map((attachment: AttachmentItem, attIndex: number) => (
-                                      <button
-                                        key={`${sourceIndex}-${attIndex}`}
-                                        type="button"
-                                        onClick={() => downloadAttachment(attachment)}
-                                        className="flex items-center text-left text-link hover:underline break-all text-f-sm"
-                                      >
-                                        {attachment.type === 'pdf' ? (
-                                          <FaFilePdf className="mr-[8px] text-base flex-shrink-0" />
-                                        ) : (
-                                          <FaFile className="mr-[8px] text-base flex-shrink-0" />
-                                        )}
-                                        {attachment.name}
-                                      </button>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
                             </div>
                           ))}
                         </div>
