@@ -6,6 +6,8 @@ const HobitProfile: React.FC = () => {
       <img
         src={profileImg}
         alt="Profile"
+        width={128}
+        height={128}
         className="w-[40px] h-[40px] md:w-[50px] md:h-[50px] rounded-full"
       />
       <p className="font-8extrabold text-f-lg text-ink-2 pl-[15px]">

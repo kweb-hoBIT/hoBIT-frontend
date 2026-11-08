@@ -30,7 +30,9 @@ const GreetResponse: React.FC = () => {
         <img
           src={helloImg}
           alt="hello image"
-          className="w-[150px] md:w-[200px] mb-[10px]"
+          width={400}
+          height={400}
+          className="w-[150px] md:w-[200px] h-auto aspect-square mb-[10px]"
           loading="eager"
         />
         <div className="flex w-full justify-between items-center">

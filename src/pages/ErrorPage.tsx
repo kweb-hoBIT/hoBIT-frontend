@@ -6,7 +6,9 @@ const ErrorPage: React.FC<{ title?: string; message?: string }> = ({ title, mess
       <img
         src={errorImage}
         alt="Server Error"
-        className="w-48 md:w-64 mb-6"
+        width={400}
+        height={400}
+        className="w-48 md:w-64 h-auto aspect-square mb-6"
       />
       <h1 className="text-f-xl font-semibold mb-2 text-center">
         {title ?? '서버에 연결할 수 없습니다'}

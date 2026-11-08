@@ -42,19 +42,7 @@ const SeniorCategories: React.FC<SeniorCategoriesProps> = ({
 
   const seniorFaqTreeInitFlag = useRef(false);
 
-  useEffect(() => {
-    const container = document.querySelector(
-      '.flex.flex-col.h-full.overflow-y-auto'
-    );
-    if (container) {
-      setTimeout(() => {
-        container.scrollTo({
-          top: container.scrollHeight,
-          behavior: 'smooth',
-        });
-      }, 100);
-    }
-  }, [currentSeniorCategory, currentSeniorSubCategory]);
+  // 맨 아래로 붙이기는 Chatting이 내용 높이 변화를 보고 한 곳에서만 처리 (사용자가 위로 올려 읽는 중이면 건드리지 않음)
 
   const handleSendSeniorFaqId = (id: number) => {
     dispatch(setSeniorFaqId(id));

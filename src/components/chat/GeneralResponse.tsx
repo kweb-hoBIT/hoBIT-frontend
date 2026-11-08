@@ -95,7 +95,10 @@ const GeneralResponse: React.FC<HobitResponseProps> = ({
           <img
             src={errorImg}
             alt="error image"
-            className="w-[150px] md:w-[200px] my-[10px] ml-[50px] md:ml-[60px]"
+            width={400}
+            height={400}
+            decoding="async"
+            className="w-[150px] md:w-[200px] h-auto aspect-square my-[10px] ml-[50px] md:ml-[60px]"
           />
           <MultipleResponse
             text={

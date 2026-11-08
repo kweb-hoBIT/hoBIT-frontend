@@ -25,21 +25,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId, onBack, hi
   const [seniorFAQ, setSeniorFAQ] = useState<SeniorFAQ | null>(null);
   const [showCategories, setShowCategories] = useState(false);
 
-  useEffect(() => {
-    if (seniorFAQ) {
-      const container = document.querySelector(
-        '.flex.flex-col.h-full.overflow-y-auto'
-      );
-      if (container) {
-        setTimeout(() => {
-          container.scrollTo({
-            top: container.scrollHeight,
-            behavior: 'smooth',
-          });
-        }, 100);
-      }
-    }
-  }, [seniorFAQ]);
+  // 맨 아래로 붙이기는 Chatting이 내용 높이 변화를 보고 한 곳에서만 처리 (사용자가 위로 올려 읽는 중이면 건드리지 않음)
 
   useEffect(() => {
     const fetchSeniorFAQById = async () => {
@@ -130,6 +116,8 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId, onBack, hi
                           <img
                             src={answer.image}
                             alt={isKorean ? '관련 이미지' : 'Related Image'}
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-auto rounded-[10px] object-cover"
                           />
                         </div>

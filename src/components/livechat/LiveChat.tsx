@@ -20,6 +20,7 @@ import {
 import { getRecentExchanges } from '../../lib/recentChat';
 import { IoChatbubbles } from 'react-icons/io5';
 import { closeMenu } from '../../redux/menuSlice';
+import { prefersReducedMotion } from '../../lib/motion';
 
 /**
  * 실시간 채팅 창 (학생)
@@ -474,7 +475,7 @@ const StudentInfoForm: React.FC<{ t: typeof T.ko; mode: ChatMode; value: Student
                 role="radio"
                 aria-checked={on}
                 onClick={() => set('program', p)}
-                className={`h-[36px] rounded-[9px] text-f-sm transition-all ${
+                className={`h-[36px] rounded-[9px] text-f-sm transition-colors ${
                   on ? 'bg-surface font-6semibold text-ink shadow-[0_1px_3px_rgba(0,0,0,0.12)]' : 'font-5medium text-ink-3 hover:text-ink-2'
                 }`}
               >
@@ -669,6 +670,8 @@ const Bubble: React.FC<{ m: ChatMessage; t: typeof T.ko; canModify?: boolean; on
               <img
                 src={fileUrl(m.attachment.url)}
                 alt={m.attachment.name}
+                loading="lazy"
+                decoding="async"
                 className="block max-h-[calc(var(--fs-scale,1)*260px)] w-auto max-w-full object-cover"
                 style={m.attachment.width && m.attachment.height ? { aspectRatio: `${m.attachment.width}/${m.attachment.height}` } : undefined}
               />
@@ -802,8 +805,27 @@ const ChatRoom: React.FC<{
     return () => window.clearTimeout(id);
   }, [session.status, session.mode]);
 
+  // 새 메시지가 오면 맨 아래로 — 단, 위로 올려 지난 대화를 읽는 중이면 끌어내리지 않음 (내가 보낸 메시지는 항상 내려감)
+  const nearBottomRef = useRef(true);
+  const firstScrollRef = useRef(true);
   useEffect(() => {
-    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
+    const list = listRef.current;
+    if (!list) return;
+    const onScroll = () => {
+      nearBottomRef.current = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
+    };
+    list.addEventListener('scroll', onScroll, { passive: true });
+    return () => list.removeEventListener('scroll', onScroll);
+  }, []);
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+    const mine = messages[messages.length - 1]?.sender === 'student';
+    if (!nearBottomRef.current && !mine) return;
+    // 처음 열 때는 애니메이션 없이 바로 맨 아래 (긴 기록을 훑어 내려가며 번쩍이지 않게)
+    list.scrollTo({ top: list.scrollHeight, behavior: firstScrollRef.current || prefersReducedMotion() ? 'auto' : 'smooth' });
+    firstScrollRef.current = false;
+    nearBottomRef.current = true;
   }, [messages.length, agentTyping, session.status]);
 
   const canModify = (m: ChatMessage) =>
