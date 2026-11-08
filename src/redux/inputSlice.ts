@@ -33,7 +33,10 @@ const inputSlice = createSlice({
 		setIsEmpty: (state, action: PayloadAction<boolean>) => {
 			state.isEmpty = action.payload;
 		},
+		// 질문 보내기 3종 — 모든 버튼·칩·입력창이 여기를 거침. 바로 isLoading을 켜서 같은 순간 두 번 눌러도 한 번만 보냄
 		sendInputValue: (state, action: PayloadAction<string>) => {
+			if (state.isLoading || !action.payload.trim()) return;  // 답변 중에는 새 질문을 받지 않음 (칩을 눌러 LLM이 두 번 불리던 문제)
+			state.isLoading = true;
 			state.sentValue = action.payload;
 			state.liveValue = '';
 			state.isEmpty = true;
@@ -43,6 +46,8 @@ const inputSlice = createSlice({
 		},
 		// 추천 칩 클릭 (행정실 FAQ가 없는 칩) — 질문으로 보내되 "칩에서 보냄" 표시
 		sendRecommendedQuestion: (state, action: PayloadAction<string>) => {
+			if (state.isLoading || !action.payload.trim()) return;  // 답변 중에는 새 질문을 받지 않음 (칩을 눌러 LLM이 두 번 불리던 문제)
+			state.isLoading = true;
 			state.sentValue = action.payload;
 			state.liveValue = '';
 			state.isEmpty = true;
@@ -51,6 +56,8 @@ const inputSlice = createSlice({
 			state.standalone = true;
 		},
 		sendFaqById: (state, action: PayloadAction<{ id: number; query: string }>) => {
+			if (state.isLoading || !action.payload.query.trim()) return;  // 답변 중에는 새 질문을 받지 않음 (칩을 눌러 LLM이 두 번 불리던 문제)
+			state.isLoading = true;
 			state.sentValue = action.payload.query;
 			state.liveValue = '';
 			state.isEmpty = true;

@@ -35,6 +35,7 @@ const RecChips: React.FC<{ title?: string; items: RecItem[]; widthClass?: string
   const dispatch = useDispatch();
   const listRef = useRef<HTMLDivElement>(null);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
+  const isLoading = useSelector((state: RootState) => state.input.isLoading);
 
   // 언어·테마가 바뀌면 칩을 새로 그려 등장 효과를 다시 재생 (replay 값이 key로 쓰임)
   const [replay, setReplay] = useState(0);
@@ -106,12 +107,13 @@ const RecChips: React.FC<{ title?: string; items: RecItem[]; widthClass?: string
           <button
             key={`${item.intent_id}-${item.text}`}
             style={{ animationDelay: `${baseDelay + APPEAR_STAGGER * (i + 1)}s` }}
+            disabled={isLoading}
             onClick={() =>
               item.faq_id
                 ? dispatch(sendFaqById({ id: item.faq_id, query: label }))
                 : dispatch(sendRecommendedQuestion(label))
             }
-            className="hobit-appear-late max-w-full text-left break-keep px-[14px] md:px-[18px] py-[7px] md:py-[9px] rounded-[18px] md:rounded-[22px] text-f-chip leading-[1.35] font-5medium text-ink bg-surface border border-line hover:border-accent-ink hover:text-accent-ink transition-colors"
+            className="hobit-appear-late max-w-full text-left break-keep px-[14px] md:px-[18px] py-[7px] md:py-[9px] rounded-[18px] md:rounded-[22px] text-f-chip leading-[1.35] font-5medium text-ink bg-surface border border-line hover:border-accent-ink hover:text-accent-ink transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-line disabled:hover:text-ink"
           >
             {label}
           </button>

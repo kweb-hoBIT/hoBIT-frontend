@@ -356,6 +356,9 @@ const Chatting: React.FC = () => {
             item.uid === uid ? { ...item, loading: false } : item
           )
         );
+      } finally {
+        // 응답이 비어 와도(null) 입력이 잠긴 채 남지 않게
+        dispatch(setIsLoading(false));
       }
     };
 
@@ -411,6 +414,7 @@ const Chatting: React.FC = () => {
     const retryLanguage = isKorean ? 'KO' : 'EN';
     const update = (patch: Partial<ChatItem>) =>
       setChatHistory((prev) => prev.map((item) => (item.uid === uid ? { ...item, ...patch } : item)));
+    dispatch(setIsLoading(true));
     update({ loading: true, needs_profile: false, missing_fields: [], followup_fields: [], streamText: '' });
     sendQuestionStream(retryQuery, retryLanguage, (delta) => appendStream(uid, delta), (meta) => update({ streamStyle: meta.style }))
       .then((serverResponse) => {
@@ -437,7 +441,8 @@ const Chatting: React.FC = () => {
       .catch((err) => {
         console.error('재시도 중 오류:', err);
         update({ loading: false });
-      });
+      })
+      .finally(() => dispatch(setIsLoading(false)));
   };
 
   return (
