@@ -92,8 +92,18 @@ const PreloadImages: React.FC<PreloadImagesProps> = ({ children }) => {
 	return loaded ? <>{children}</> : <Splash />;
 };
 
+// 첫 화면(index.html)에서 흔들리던 박자를 그대로 이어 가도록 음수 지연으로 위상을 맞춤 (0.4초 등장 후 1.6초 주기)
+const bobDelay = () => `-${Math.max(0, performance.now() - 400) % 1600}ms`;
+
 const Splash: React.FC = () => (
-	<div className="hobit-splash hobit-splash--cont" role="status" aria-label="호빗을 불러오는 중">
+	<div
+		className="hobit-splash hobit-splash--cont"
+		role="status"
+		aria-label="호빗을 불러오는 중"
+		style={{ '--bob-delay': bobDelay() } as React.CSSProperties}
+	>
+		<img className="hobit-splash__char" src={`${process.env.PUBLIC_URL}/hobit-splash.png`} width={96} height={96} alt="" />
+		<div className="hobit-splash__shadow" aria-hidden="true" />
 		<div className="hobit-splash__mark">hoBIT</div>
 		<div className="hobit-splash__dots" aria-hidden="true">
 			<i />

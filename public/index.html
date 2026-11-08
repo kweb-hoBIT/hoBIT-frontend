@@ -16,6 +16,8 @@
       })();
     </script>
     <!-- 웹폰트: 연결을 미리 열고, 본문에 가장 많이 쓰는 두 굵기는 미리 받아 둠 (글꼴이 늦게 바뀌며 줄이 밀리는 현상 줄이기) -->
+    <!-- 첫 로딩 화면의 호빗 캐릭터 — 다른 파일보다 먼저 받기 -->
+    <link rel="preload" as="image" href="%PUBLIC_URL%/hobit-splash.png" fetchpriority="high" />
     <link rel="preconnect" href="https://fastly.jsdelivr.net" crossorigin />
     <link rel="preload" as="font" type="font/woff2" crossorigin href="https://fastly.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-5Medium.woff2" />
     <link rel="preload" as="font" type="font/woff2" crossorigin href="https://fastly.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-6SemiBold.woff2" />
@@ -30,17 +32,30 @@
         font-family: 'Freesentation-8ExtraBold', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
       }
       html.dark .hobit-splash { background: #111113; color: #de8c9a; }
-      .hobit-splash__mark { font-size: 30px; font-weight: 800; letter-spacing: -0.01em; animation: hobit-splash-in 0.4s ease-out both; }
-      .hobit-splash__dots { display: flex; gap: 7px; opacity: 0; animation: hobit-splash-in 0.3s ease-out 0.15s both; }
-      .hobit-splash__dots i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: 0.25; animation: hobit-splash-dot 1.2s ease-in-out infinite; }
+      /* 호빗 캐릭터 — 이미지가 오기 전에도 같은 자리에 연한 원이 보여 화면이 밀리지 않음 */
+      .hobit-splash__char {
+        width: 96px; height: 96px; border-radius: 50%; background: #fde3dc; display: block;
+        animation: hobit-splash-in 0.4s ease-out both, hobit-splash-bob 1.6s ease-in-out 0.4s infinite;
+      }
+      html.dark .hobit-splash__char { background: #2a2326; }
+      .hobit-splash__shadow { width: 56px; height: 8px; margin-top: -10px; border-radius: 50%; background: currentColor; opacity: 0.12;
+        animation: hobit-splash-shadow 1.6s ease-in-out 0.4s infinite; }
+      .hobit-splash__mark { font-size: 22px; font-weight: 800; letter-spacing: -0.01em; animation: hobit-splash-in 0.4s ease-out 0.1s both; }
+      .hobit-splash__dots { display: flex; gap: 7px; margin-top: -8px; opacity: 0; animation: hobit-splash-in 0.3s ease-out 0.2s both; }
+      .hobit-splash__dots i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.25; animation: hobit-splash-dot 1.2s ease-in-out infinite; }
       .hobit-splash__dots i:nth-child(2) { animation-delay: 0.15s; }
       .hobit-splash__dots i:nth-child(3) { animation-delay: 0.3s; }
       @keyframes hobit-splash-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+      @keyframes hobit-splash-bob { 0%, 100% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-5px) rotate(-3deg); } 50% { transform: translateY(-8px) rotate(0deg); } 75% { transform: translateY(-5px) rotate(3deg); } }
+      @keyframes hobit-splash-shadow { 0%, 100% { transform: scaleX(1); opacity: 0.12; } 50% { transform: scaleX(0.75); opacity: 0.06; } }
       @keyframes hobit-splash-dot { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.9; } }
-      /* React가 이어받은 로딩 화면 — 등장 효과를 다시 재생하지 않음 */
+      /* React가 이어받은 로딩 화면 — 등장 효과를 다시 재생하지 않음 (흔들림은 App이 같은 박자로 이어 감) */
       .hobit-splash--cont .hobit-splash__mark, .hobit-splash--cont .hobit-splash__dots { animation: none; opacity: 1; }
+      .hobit-splash--cont .hobit-splash__char { animation-name: none, hobit-splash-bob; animation-delay: 0s, var(--bob-delay, 0s); }
+      .hobit-splash--cont .hobit-splash__shadow { animation-delay: var(--bob-delay, 0s); }
       @media (prefers-reduced-motion: reduce) {
-        .hobit-splash__mark, .hobit-splash__dots, .hobit-splash__dots i { animation: none; opacity: 1; }
+        .hobit-splash__char, .hobit-splash__shadow, .hobit-splash__mark, .hobit-splash__dots, .hobit-splash__dots i { animation: none !important; opacity: 1; }
+        .hobit-splash__shadow { opacity: 0.12; }
       }
     </style>
     <meta name="description" content="고려대학교 정보대학 챗봇 호빗(hoBIT)에게 학사행정, 학교생활 관련 질문이 있다면 언제든지 물어보세요" />
@@ -71,6 +86,8 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root">
       <div class="hobit-splash" role="status" aria-label="호빗을 불러오는 중">
+        <img class="hobit-splash__char" src="%PUBLIC_URL%/hobit-splash.png" width="96" height="96" alt="" />
+        <div class="hobit-splash__shadow" aria-hidden="true"></div>
         <div class="hobit-splash__mark">hoBIT</div>
         <div class="hobit-splash__dots" aria-hidden="true"><i></i><i></i><i></i></div>
       </div>
