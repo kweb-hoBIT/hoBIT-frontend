@@ -72,7 +72,7 @@
     '@media (prefers-color-scheme: dark) { .panel, .launcher { background: #1e1e22; border-color: rgba(255,255,255,.14); } }',
     '</style>',
     '<button class="launcher" type="button" aria-label="호빗에게 물어보기" aria-expanded="false">',
-    '  <img alt="" src="' + ORIGIN + '/profile_clear.png" />',
+    '  <img alt="" src="' + ORIGIN + '/logo192.png" />',
     '</button>'
   ].join('\n');
 

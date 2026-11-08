@@ -9,6 +9,7 @@ import {
   ChatApiError,
   ChatMessage,
   ChatMode,
+  ChatProgram,
   ChatSession,
   ChatStatus,
   clearToken,
@@ -21,6 +22,7 @@ import {
 import { getRecentExchanges } from '../../lib/recentChat';
 import { IoChatbubbles } from 'react-icons/io5';
 import { closeMenu } from '../../redux/menuSlice';
+import { loadProgram } from '../../redux/programSlice';
 import { prefersReducedMotion } from '../../lib/motion';
 import { DelayedSpinner } from '../ui/Skeleton';
 
@@ -34,6 +36,7 @@ type Step = 'loading' | 'away' | 'closed' | 'verify' | 'ready' | 'chat' | 'switc
 const T = {
   ko: {
     staff: '행정실 채팅',
+    staffGrad: '대학원 행정팀 채팅', // 대학원 과정이면 대학원 행정팀으로 연결
     senior: '근로장학생 채팅',
     close: '닫기',
     loading: '확인하고 있어요…',
@@ -44,7 +47,7 @@ const T = {
       s.hours?.today
         ? `오늘 운영 시간: ${s.hours.today.start}–${s.hours.today.end}${s.hours.lunch ? ` (점심 ${s.hours.lunch.start}–${s.hours.lunch.end} 제외)` : ''}`
         : '오늘은 휴무일이에요. 평일 학기 중 09:00–17:30, 방학 중 10:00–17:00에 채팅할 수 있어요.',
-    offlineBody: '아래로 문의를 남겨 주시면 행정실에서 확인 후 답변드려요.',
+    offlineBody: (grad: boolean): string => `아래로 문의를 남겨 주시면 ${grad ? '대학원 행정팀' : '행정실'}에서 확인 후 답변드려요.`,
     contactEmail: '이메일',
     contactPhone: '전화',
     contactPlace: '위치',
@@ -75,7 +78,7 @@ const T = {
     editSave: '수정',
     showTranslation: '번역 보기',
     sentTo: (e: string): string => `${e}로 인증 코드를 보냈어요. 메일함(스팸함 포함)을 확인해 주세요.`,
-    readyTitle: (m: ChatMode): string => (m === 'senior' ? '근로장학생에게 연결할게요' : '행정실에 연결할게요'),
+    readyTitle: (m: ChatMode, grad = false): string => (m === 'senior' ? '근로장학생에게 연결할게요' : grad ? '대학원 행정팀에 연결할게요' : '행정실에 연결할게요'),
     switchTitle: (cur: ChatMode): string => `진행 중인 ${cur === 'senior' ? '근로장학생 채팅' : '행정실 채팅'}이 있어요`,
     switchBody: (cur: ChatMode, next: ChatMode): string =>
       `채팅은 한 번에 하나만 할 수 있어요. ${next === 'senior' ? '근로장학생 채팅' : '행정실 채팅'}을 시작하면 지금 ${cur === 'senior' ? '근로장학생 채팅' : '행정실 채팅'}은 종료돼요.`,
@@ -142,6 +145,7 @@ const T = {
   },
   en: {
     staff: 'Office chat',
+    staffGrad: 'Graduate office chat',
     senior: 'Chat with a student assistant',
     close: 'Close',
     loading: 'Checking…',
@@ -152,7 +156,7 @@ const T = {
       s.hours?.today
         ? `Today: ${s.hours.today.start}–${s.hours.today.end}${s.hours.lunch ? ` (except lunch ${s.hours.lunch.start}–${s.hours.lunch.end})` : ''}`
         : 'Closed today. Weekdays 09:00–17:30 during the semester, 10:00–17:00 during breaks.',
-    offlineBody: 'Please contact the office below and they will get back to you.',
+    offlineBody: (grad: boolean): string => `Please contact the ${grad ? 'graduate office' : 'office'} below and they will get back to you.`,
     contactEmail: 'Email',
     contactPhone: 'Phone',
     contactPlace: 'Office',
@@ -183,7 +187,7 @@ const T = {
     editSave: 'Save',
     showTranslation: 'Show translation',
     sentTo: (e: string): string => `We sent a code to ${e}. Check your inbox (and spam).`,
-    readyTitle: (m: ChatMode): string => (m === 'senior' ? 'Connect to a senior' : 'Connect to the office'),
+    readyTitle: (m: ChatMode, grad = false): string => (m === 'senior' ? 'Connect to a senior' : grad ? 'Connect to the graduate office' : 'Connect to the office'),
     switchTitle: (cur: ChatMode): string => `You already have an open ${cur === 'senior' ? 'chat with a senior' : 'office chat'}`,
     switchBody: (cur: ChatMode, next: ChatMode): string =>
       `You can have one chat at a time. Starting a ${next === 'senior' ? 'chat with a senior' : 'office chat'} will end your current ${cur === 'senior' ? 'chat with a senior' : 'office chat'}.`,
@@ -542,27 +546,34 @@ const StudentInfoForm: React.FC<{ t: typeof T.ko; mode: ChatMode; value: Student
   );
 };
 
-const OFFICE_PHONE = '02-3290-4132~4';
-const ContactInfo: React.FC<{ t: typeof T.ko; email: string }> = ({ t, email }) => (
-  <ul className="mt-[10px] flex flex-col gap-[4px] text-f-sm">
-    <li className="flex items-center gap-[8px]">
-      <span className="w-[48px] shrink-0 text-f-xs text-ink-3">{t.contactEmail}</span>
-      <a href={`mailto:${email}`} className="font-6semibold text-accent-ink underline">
-        {email}
-      </a>
-    </li>
-    <li className="flex items-center gap-[8px]">
-      <span className="w-[48px] shrink-0 text-f-xs text-ink-3">{t.contactPhone}</span>
-      <a href="tel:0232904132" className="font-6semibold text-ink">
-        {OFFICE_PHONE}
-      </a>
-    </li>
-    <li className="flex items-center gap-[8px]">
-      <span className="w-[48px] shrink-0 text-f-xs text-ink-3">{t.contactPlace}</span>
-      <span className="text-ink">{t.place}</span>
-    </li>
-  </ul>
-);
+/** 과정별 행정팀 연락처 (홈페이지 아래쪽 안내 기준) — 메일 주소는 서버가 과정별로 줌 */
+const OFFICE_PHONE = { undergraduate: { label: '02-3290-4132~4133', tel: '0232904132' }, graduate: { label: '02-3290-4137~4138', tel: '0232904137' } };
+const ContactInfo: React.FC<{ t: typeof T.ko; email: string; grad?: boolean }> = ({ t, email, grad = false }) => {
+  const phone = OFFICE_PHONE[grad ? 'graduate' : 'undergraduate'];
+  return (
+    <ul className="mt-[10px] flex flex-col gap-[4px] text-f-sm">
+      <li className="flex items-center gap-[8px]">
+        <span className="w-[48px] shrink-0 text-f-xs text-ink-3">{t.contactEmail}</span>
+        <a href={`mailto:${email}`} className="font-6semibold text-accent-ink underline">
+          {email}
+        </a>
+      </li>
+      <li className="flex items-center gap-[8px]">
+        <span className="w-[48px] shrink-0 text-f-xs text-ink-3">{t.contactPhone}</span>
+        <a href={`tel:${phone.tel}`} className="font-6semibold text-ink">
+          {phone.label}
+        </a>
+      </li>
+      {/* 위치는 학부 행정실만 안내 (대학원 행정팀 위치는 확인 전) */}
+      {!grad && (
+        <li className="flex items-center gap-[8px]">
+          <span className="w-[48px] shrink-0 text-f-xs text-ink-3">{t.contactPlace}</span>
+          <span className="text-ink">{t.place}</span>
+        </li>
+      )}
+    </ul>
+  );
+};
 
 // ── 메시지 하나 ───────────────────────────────────────────
 /** 서버의 안내 문구(한국어)를 학생 화면 말로 — 학생 입장에서 "학생이 종료했어요"는 어색해서 */
@@ -964,7 +975,7 @@ const ChatRoom: React.FC<{
           <div className="mt-[12px] rounded-[14px] bg-card p-[12px] text-f-sm">
             <p className="font-6semibold text-ink">{t.longWait}</p>
             <p className="mt-[2px] text-ink-2">{t.longWaitBody}</p>
-            <ContactInfo t={t} email={officeEmail} />
+            <ContactInfo t={t} email={officeEmail} grad={session.program === 'graduate'} />
           </div>
         )}
         {closed && (
@@ -1086,11 +1097,17 @@ const LiveChat: React.FC = () => {
   const { open, mode } = useSelector((s: RootState) => s.liveChat);
   const menuOpen = useSelector((s: RootState) => s.menu.isOpen);
   const isKorean = useSelector((s: RootState) => s.language.isKorean);
+  const switchProgram = useSelector((s: RootState) => s.program.value); // 헤더의 학부/대학원 스위치
   const t = isKorean ? T.ko : T.en;
   const [step, setStep] = useState<Step>('loading');
   const [status, setStatus] = useState<ChatStatus | null>(null);
   const [room, setRoom] = useState<{ session: ChatSession; messages: ChatMessage[]; position: number } | null>(null);
-  const [info, setInfo] = useState<StudentInfo>(loadInfo);
+  const [roomEmail, setRoomEmail] = useState<string | null>(null); // 진행 중인 채팅의 과정별 문의 메일
+  // 학생 정보의 과정이 비어 있으면 헤더 스위치 값으로 미리 골라 둠
+  const [info, setInfo] = useState<StudentInfo>(() => {
+    const v = loadInfo();
+    return v.program ? v : { ...v, program: loadProgram() === 'graduate' ? 'grad' : 'undergrad' };
+  });
   const [infoBad, setInfoBad] = useState<(keyof StudentInfo)[]>([]);
   const [infoError, setInfoError] = useState<string | null>(null);
   const [editInfo, setEditInfo] = useState(() => infoProblems(loadInfo()).length > 0); // 처음이거나 빠진 게 있으면 입력 칸부터
@@ -1182,6 +1199,7 @@ const LiveChat: React.FC = () => {
           const me = await chatApi.me();
           if (me.session) {
             setRoom({ session: me.session, messages: me.messages, position: me.position ?? 0 });
+            setRoomEmail(me.officeEmail ?? null);
             // 다른 종류 채팅을 누른 경우 (예: 행정실 채팅 중에 선배 채팅) — 화면이 섞이지 않게 먼저 물어봄
             return setStep(me.session.mode !== mode ? 'switch' : 'chat');
           }
@@ -1189,7 +1207,7 @@ const LiveChat: React.FC = () => {
           clearToken();
         }
       }
-      const st = await chatApi.status(mode);
+      const st = await chatApi.status(mode, switchProgram);
       setStatus(st);
       if (st.reason === 'disabled') {
         setError(t.disabledChat); // 관리자가 끈 채팅 (메뉴에서는 숨기지만 열려 있던 창 등)
@@ -1201,7 +1219,7 @@ const LiveChat: React.FC = () => {
       setError(t.errors.generic);
       return setStep('error');
     }
-  }, [mode, t]);
+  }, [mode, t, switchProgram]);
 
   useEffect(() => {
     if (open) decide();
@@ -1233,8 +1251,9 @@ const LiveChat: React.FC = () => {
     saveInfo(profile);
     setStep('loading');
     try {
-      const r = await chatApi.start({ mode, language: isKorean ? 'KO' : 'EN', profile, botContext: getRecentExchanges() });
+      const r = await chatApi.start({ mode, program: formProgram, language: isKorean ? 'KO' : 'EN', profile, botContext: getRecentExchanges() });
       setRoom({ session: r.session, messages: r.messages, position: r.position });
+      setRoomEmail(r.officeEmail ?? null);
       setStep('chat');
     } catch (e) {
       // 그 사이 운영시간이 끝났거나 선배가 자리를 비웠을 수 있음
@@ -1243,6 +1262,11 @@ const LiveChat: React.FC = () => {
       setStep('error');
     }
   };
+
+  // 지금 화면의 과정 — 채팅 중이면 그 채팅의 과정, 시작 전이면 학생 정보에서 고른 과정(기본은 헤더 스위치)
+  const formProgram: ChatProgram = info.program === 'grad' ? 'graduate' : info.program === 'undergrad' ? 'undergraduate' : switchProgram;
+  const grad = (step === 'chat' || step === 'switch' ? room?.session.program : step === 'ready' ? formProgram : switchProgram) === 'graduate';
+  const staffTitle = grad ? t.staffGrad : t.staff;
 
   if (!open) return null;
 
@@ -1254,7 +1278,7 @@ const LiveChat: React.FC = () => {
       className="fixed inset-y-0 right-0 z-[80] flex w-full flex-col bg-page shadow-2xl md:w-[var(--livechat-w)] md:border-l md:border-line hobit-appear"
       style={{ ['--livechat-w' as string]: `${width}px`, ['--fs-scale' as string]: String(fontScale) }}
       role="dialog"
-      aria-label={mode === 'senior' ? t.senior : t.staff}
+      aria-label={mode === 'senior' ? t.senior : staffTitle}
     >
       {/* 너비 조절 (데스크톱) — 끌거나, 키보드 ←→ */}
       <div
@@ -1280,7 +1304,7 @@ const LiveChat: React.FC = () => {
         <div className="min-w-0">
           <p className="flex items-center gap-[6px] font-7bold text-f-lg text-ink">
             <IoChatbubbles className="shrink-0 text-[0.9em] text-[#E55604]" aria-hidden="true" />
-            {mode === 'senior' ? t.senior : t.staff}
+            {mode === 'senior' ? t.senior : staffTitle}
           </p>
           {status?.open && status.hours?.today && step !== 'chat' && <p className="text-f-xs text-ink-3">{t.hours(status)}</p>}
         </div>
@@ -1327,8 +1351,8 @@ const LiveChat: React.FC = () => {
           <section className="rounded-[16px] bg-card p-[16px]">
             <p className="font-6semibold text-f-base text-ink">{t.offlineTitle}</p>
             <p className="mt-[4px] text-f-sm text-ink-2">{t.hours(status)}</p>
-            <p className="mt-[8px] text-f-sm text-ink-2">{t.offlineBody}</p>
-            <ContactInfo t={t} email={status.officeEmail} />
+            <p className="mt-[8px] text-f-sm text-ink-2">{t.offlineBody(grad)}</p>
+            <ContactInfo t={t} email={status.officeEmail} grad={grad} />
           </section>
         </div>
       )}
@@ -1337,7 +1361,7 @@ const LiveChat: React.FC = () => {
         <div className="min-h-0 flex-1 overflow-y-auto p-[20px]">
           {/* 안내 */}
           <section className="rounded-[16px] bg-card p-[16px]">
-            <p className="font-6semibold text-f-base text-ink">{t.readyTitle(mode)}</p>
+            <p className="font-6semibold text-f-base text-ink">{t.readyTitle(mode, grad)}</p>
             <p className="mt-[4px] text-f-sm leading-relaxed text-ink-2">{t.readyBody}</p>
             <span className="mt-[10px] inline-flex items-center gap-[6px] rounded-full bg-surface px-[10px] py-[4px] text-f-xs text-ink-2">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-[12px] w-[12px]" aria-hidden="true">
@@ -1429,7 +1453,7 @@ const LiveChat: React.FC = () => {
         </div>
       )}
 
-      {step === 'chat' && room && <ChatRoom t={t} initial={room} officeEmail={status?.officeEmail ?? 'cscoi@korea.ac.kr'} onNew={decide} />}
+      {step === 'chat' && room && <ChatRoom t={t} initial={room} officeEmail={roomEmail ?? (room.session.program === 'graduate' ? 'infograd@korea.ac.kr' : 'cscoi@korea.ac.kr')} onNew={decide} />}
 
 
 

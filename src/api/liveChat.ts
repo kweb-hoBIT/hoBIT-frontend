@@ -11,12 +11,15 @@ const BASE = `${BACKEND}/api/v0/chat`;
 const TOKEN_KEY = 'hobit-chat-token';
 
 export type ChatMode = 'staff' | 'senior';
+/** 학부/대학원 (헤더 스위치와 같은 값) — 문의 메일 주소가 과정별로 다름 */
+export type ChatProgram = 'undergraduate' | 'graduate';
 export type ChatStatus = {
 	mode: ChatMode;
 	open: boolean;
 	reason: 'open' | 'away' | 'disabled' | 'holiday' | 'weekend' | 'lunch' | 'before' | 'after';
 	hours: { today: { start: string; end: string } | null; lunch: { start: string; end: string } | null; period: string } | null;
-	officeEmail: string;
+	program?: ChatProgram;
+	officeEmail: string; // 과정별 행정팀 메일 (학부 cscoi / 대학원 infograd)
 	emailVerification: boolean; // false면 개발 모드 (코드 인증 생략)
 };
 export type Attachment = { id: string; name: string; mime: string; size: number; width: number | null; height: number | null; url: string | null };
@@ -37,6 +40,7 @@ export const EDIT_WINDOW_MS = 5 * 60 * 1000;
 export type ChatSession = {
 	id: string;
 	mode: ChatMode;
+	program?: ChatProgram;
 	status: 'waiting' | 'active' | 'closed';
 	assignedName: string | null;
 	startedAt: string | null; // 담당자가 연결된 시각 (없으면 연결 전에 끝난 채팅)
@@ -107,7 +111,7 @@ async function call<T>(method: string, path: string, body?: unknown, auth = fals
 }
 
 export const chatApi = {
-	status: (mode: ChatMode) => call<ChatStatus>('GET', `/status?mode=${mode}`),
+	status: (mode: ChatMode, program: ChatProgram = 'undergraduate') => call<ChatStatus>('GET', `/status?mode=${mode}&program=${program}`),
 	// 관리자가 켜 둔 채팅 (끈 채팅은 메뉴에 버튼을 보이지 않음)
 	features: () => call<{ staff: boolean; senior: boolean; emailVerification: boolean }>('GET', '/features'),
 	sendCode: (email: string) => call<{ ok: true }>('POST', '/email/code', { email }),
@@ -123,13 +127,13 @@ export const chatApi = {
 		return r;
 	},
 	me: () =>
-		call<{ email: string; session: ChatSession | null; messages: ChatMessage[]; position?: number }>('GET', '/me', undefined, true),
-	start: (body: { mode: ChatMode; language: 'KO' | 'EN'; profile: unknown; botContext: unknown }) =>
-		call<{ session: ChatSession; messages: ChatMessage[]; position: number }>('POST', '/sessions', body, true),
+		call<{ email: string; session: ChatSession | null; messages: ChatMessage[]; position?: number; officeEmail?: string }>('GET', '/me', undefined, true),
+	start: (body: { mode: ChatMode; program: ChatProgram; language: 'KO' | 'EN'; profile: unknown; botContext: unknown }) =>
+		call<{ session: ChatSession; messages: ChatMessage[]; position: number; officeEmail?: string }>('POST', '/sessions', body, true),
 	/** 진행 중인 채팅 종료 (다른 종류 채팅으로 바꿀 때) */
 	close: (sessionId: string) => call('POST', `/sessions/${sessionId}/close`, undefined, true),
 	rate: (sessionId: string, rating: number, comment: string) => call('POST', `/sessions/${sessionId}/rating`, { rating, comment }, true),
-	offlineMail: (subject: string, body: string) => call('POST', '/offline-email', { subject, body }, true),
+	offlineMail: (subject: string, body: string, program?: ChatProgram) => call('POST', '/offline-email', { subject, body, program }, true),
 	upload: (sessionId: string, file: File) => {
 		const form = new FormData();
 		form.append('file', file);
