@@ -52,75 +52,200 @@ const CapIcon = () => (
   </svg>
 );
 
+type SlideOption<T extends string> = { value: T; label: string; icon?: React.ReactNode };
+
 /**
- * 학부 / 대학원 스위치 — 누르면 동그란 판이 옆으로 미끄러짐. 데스크톱은 글자, 모바일은 아이콘(책·학사모)
- * 바꾸면 짧은 안내를 띄움 (아이콘만으로는 뜻을 모를 수 있어서)
+ * 슬라이딩 스위치 (두 칸) — 누르면 동그란 판이 옆으로 미끄러짐. 헤더의 학부/대학원, 설정 패널(계기판)의 세 스위치가 함께 씀
+ * labels: always = 항상 글자, md = 태블릿 폭부터 글자(그 전엔 아이콘만)
  */
-const ProgramSwitch: React.FC<{ isKorean: boolean }> = ({ isKorean }) => {
+function SlideSwitch<T extends string>({ ariaLabel, options, value, onChange, disabled, labels = 'always', wide }: {
+  ariaLabel: string;
+  options: [SlideOption<T>, SlideOption<T>];
+  value: T;
+  onChange: (v: T) => void;
+  disabled?: boolean;
+  labels?: 'always' | 'md';
+  wide?: boolean; // 패널 안에서 칸을 넓게 (두 칸 같은 폭)
+}) {
+  const second = value === options[1].value;
+  return (
+    <div
+      role="radiogroup"
+      aria-label={ariaLabel}
+      className={`relative grid grid-cols-2 rounded-full bg-card p-[3px] ${wide ? 'w-full' : ''} ${disabled ? 'opacity-60' : ''}`}
+    >
+      <span
+        aria-hidden
+        className={`absolute top-[3px] bottom-[3px] left-[3px] w-[calc(50%-3px)] rounded-full bg-surface shadow-sm border border-line transition-transform duration-200 ease-out ${second ? 'translate-x-full' : 'translate-x-0'}`}
+      />
+      {options.map((it) => {
+        const on = it.value === value;
+        return (
+          <button
+            key={it.value}
+            type="button"
+            role="radio"
+            aria-checked={on}
+            aria-label={it.label}
+            title={it.label}
+            disabled={disabled}
+            onClick={() => !on && onChange(it.value)}
+            className={`relative z-[1] flex items-center justify-center gap-[5px] rounded-full h-[30px] md:h-[34px] text-f-nav transition-colors outline-none focus-visible:ring-2 focus-visible:ring-line disabled:cursor-not-allowed ${
+              wide ? 'px-[10px]' : 'px-[8px] md:px-[10px] xl:px-[14px]'
+            } ${on ? 'text-accent-ink font-6semibold' : 'text-ink-3 hover:text-ink-2 font-5medium'}`}
+          >
+            {it.icon}
+            <span className={`${labels === 'md' ? 'hidden md:inline' : 'inline'} whitespace-nowrap`}>{it.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** 학부/대학원 바꾸기 — 답변 중에는 바꾸지 않고(보낸 질문과 기준이 달라짐), 바꾸면 짧은 안내 */
+const useProgramChooser = (isKorean: boolean) => {
   const dispatch = useDispatch();
   const program = useSelector((state: RootState) => state.program.value);
   const isLoading = useSelector((state: RootState) => state.input.isLoading);
-  const grad = program === 'graduate';
   const [toast, setToast] = useState<string | null>(null);
   const timer = useRef<number | null>(null);
-
+  useEffect(() => () => {
+    if (timer.current) window.clearTimeout(timer.current);
+  }, []);
   const choose = (next: Program) => {
-    if (next === program || isLoading) return; // 답변 중에는 바꾸지 않음 (보낸 질문과 기준이 달라짐)
+    if (next === program || isLoading) return;
     dispatch(setProgram(next));
     const g = next === 'graduate';
     setToast(isKorean ? `${g ? '대학원' : '학부'} 기준으로 답할게요` : `Answering for ${g ? 'graduate' : 'undergraduate'} students`);
     if (timer.current) window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => setToast(null), 1800);
   };
-  useEffect(() => () => {
-    if (timer.current) window.clearTimeout(timer.current);
-  }, []);
-
-  const items: { value: Program; label: string; icon: React.ReactNode }[] = [
+  const options: [SlideOption<Program>, SlideOption<Program>] = [
     { value: 'undergraduate', label: isKorean ? '학부' : 'Undergrad', icon: <BookIcon /> },
     { value: 'graduate', label: isKorean ? '대학원' : 'Graduate', icon: <CapIcon /> },
   ];
+  return { program, isLoading, toast, choose, options };
+};
 
+const Toast: React.FC<{ text: string | null }> = ({ text }) =>
+  text ? (
+    <div role="status" className="hobit-appear absolute right-0 top-full mt-[10px] whitespace-nowrap rounded-full bg-ink text-surface px-[14px] py-[6px] text-f-caption shadow-lg">
+      {text}
+    </div>
+  ) : null;
+
+/** 헤더의 학부/대학원 스위치 (넓은 화면) — 아이콘 + 글자(태블릿 폭부터) */
+const ProgramSwitch: React.FC<{ isKorean: boolean }> = ({ isKorean }) => {
+  const { program, isLoading, toast, choose, options } = useProgramChooser(isKorean);
   return (
     <div className="relative">
-      <div
-        role="radiogroup"
-        aria-label={isKorean ? '학부·대학원 선택' : 'Undergraduate or graduate'}
-        className={`relative grid grid-cols-2 rounded-full bg-card p-[3px] ${isLoading ? 'opacity-60' : ''}`}
+      <SlideSwitch
+        ariaLabel={isKorean ? '학부·대학원 선택' : 'Undergraduate or graduate'}
+        options={options}
+        value={program}
+        onChange={choose}
+        disabled={isLoading}
+        labels="md"
+      />
+      <Toast text={toast} />
+    </div>
+  );
+};
+
+const SlidersIcon = () => (
+  <svg {...iconProps} className="wiggle-icon w-[24px] h-[24px]">
+    <path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4" />
+  </svg>
+);
+const SunSmall = () => (
+  <svg {...iconProps} className="w-[18px] h-[18px]">
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+  </svg>
+);
+const MoonSmall = () => (
+  <svg {...iconProps} className="w-[18px] h-[18px]">
+    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+  </svg>
+);
+
+/**
+ * 좁은 휴대폰 — 오른쪽 버튼 셋(학부/대학원·언어·테마)을 아이콘 하나로 합침.
+ * 누르면 아래로 계기판 패널이 펼쳐지고, 세 가지를 같은 슬라이딩 스위치로 고름 (제목은 항상 가운데)
+ */
+const ControlsMenu: React.FC<{ isKorean: boolean; dark: boolean; setDark: (d: boolean) => void }> = ({ isKorean, dark, setDark }) => {
+  const dispatch = useDispatch();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const { program, isLoading, toast, choose, options } = useProgramChooser(isKorean);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent | TouchEvent) => !ref.current?.contains(e.target as Node) && setOpen(false);
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('touchstart', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('touchstart', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  const rows: { label: string; control: React.ReactNode }[] = [
+    {
+      label: isKorean ? '과정' : 'Program',
+      control: (
+        <SlideSwitch wide ariaLabel={isKorean ? '학부·대학원 선택' : 'Undergraduate or graduate'} options={options}
+          value={program} onChange={choose} disabled={isLoading} />
+      ),
+    },
+    {
+      label: isKorean ? '언어' : 'Language',
+      control: (
+        <SlideSwitch wide ariaLabel={isKorean ? '언어 선택' : 'Language'}
+          options={[{ value: 'ko', label: '한국어' }, { value: 'en', label: 'English' }]}
+          value={isKorean ? 'ko' : 'en'} onChange={(v) => dispatch(v === 'ko' ? setKorean() : setEnglish())} />
+      ),
+    },
+    {
+      label: isKorean ? '화면' : 'Theme',
+      control: (
+        <SlideSwitch wide ariaLabel={isKorean ? '화면 모드' : 'Theme'}
+          options={[{ value: 'light', label: 'Light', icon: <SunSmall /> }, { value: 'dark', label: 'Night', icon: <MoonSmall /> }]}
+          value={dark ? 'dark' : 'light'} onChange={(v) => setDark(v === 'dark')} />
+      ),
+    },
+  ];
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        aria-label={isKorean ? '설정' : 'Settings'}
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className={`${actionClass} relative`}
       >
-        {/* 미끄러지는 판 */}
-        <span
-          aria-hidden
-          className={`absolute top-[3px] bottom-[3px] left-[3px] w-[calc(50%-3px)] rounded-full bg-surface shadow-sm border border-line transition-transform duration-200 ease-out ${grad ? 'translate-x-full' : 'translate-x-0'}`}
-        />
-        {items.map((it) => {
-          const on = it.value === program;
-          return (
-            <button
-              key={it.value}
-              type="button"
-              role="radio"
-              aria-checked={on}
-              aria-label={it.label}
-              title={it.label}
-              disabled={isLoading}
-              onClick={() => choose(it.value)}
-              className={`relative z-[1] flex items-center justify-center gap-[5px] rounded-full px-[8px] md:px-[10px] xl:px-[14px] h-[30px] md:h-[34px] text-f-nav transition-colors outline-none focus-visible:ring-2 focus-visible:ring-line disabled:cursor-not-allowed ${
-                on ? 'text-accent-ink font-6semibold' : 'text-ink-3 hover:text-ink-2 font-5medium'
-              }`}
-            >
-              {/* 아이콘은 항상, 글자는 태블릿 폭부터 (좁을수록 여백·글자 간격을 줄임) */}
-              {it.icon}
-              <span className="hidden md:inline whitespace-nowrap">{it.label}</span>
-            </button>
-          );
-        })}
-      </div>
-      {toast && (
-        <div role="status" className="hobit-appear absolute right-0 top-full mt-[10px] whitespace-nowrap rounded-full bg-ink text-surface px-[14px] py-[6px] text-f-caption shadow-lg">
-          {toast}
+        <SlidersIcon />
+        {/* 대학원 모드면 작은 점 — 패널을 열지 않아도 지금 기준을 알 수 있게 */}
+        {program === 'graduate' && <span className="absolute -right-[2px] -top-[2px] h-[8px] w-[8px] rounded-full bg-accent-ink ring-2 ring-surface" />}
+      </button>
+      {open && (
+        <div className="hobit-appear absolute right-0 top-[calc(100%+12px)] w-[min(300px,calc(100vw-28px))] rounded-[18px] border border-line bg-surface p-[14px] shadow-lg">
+          <div className="flex flex-col gap-[12px]">
+            {rows.map((r) => (
+              <div key={r.label} className="grid grid-cols-[52px_minmax(0,1fr)] items-center gap-[10px]">
+                <span className="text-f-sm font-6semibold text-ink-2">{r.label}</span>
+                {r.control}
+              </div>
+            ))}
+          </div>
         </div>
       )}
+      {!open && <Toast text={toast} />}
     </div>
   );
 };
@@ -157,13 +282,14 @@ const useTheme = () => {
     return () => mq.removeEventListener('change', onChange);
   }, []);
 
-  const toggle = () => {
-    apply(!dark);
+  const set = (next: boolean) => {
+    apply(next);
     try {
-      localStorage.setItem(THEME_KEY, !dark ? 'dark' : 'light');
+      localStorage.setItem(THEME_KEY, next ? 'dark' : 'light');
     } catch {}
   };
-  return { dark, toggle };
+  const toggle = () => set(!dark);
+  return { dark, toggle, set };
 };
 
 const actionClass =
@@ -173,7 +299,7 @@ const Header: React.FC = () => {
   const dispatch = useDispatch();
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
   const i18n = isKorean ? lang.ko : lang.en;
-  const { dark, toggle } = useTheme();
+  const { dark, toggle, set: setDark } = useTheme();
 
   // 버튼 라벨은 "누르면 바뀔 상태" (블로그와 같은 방식)
   const langLabel = isKorean ? 'English' : '한국어';
@@ -181,7 +307,7 @@ const Header: React.FC = () => {
 
   return (
     <div className="h-[60px] md:h-[70px] bg-surface fixed top-0 left-0 w-full border-b border-line flex items-center z-50 px-[14px] sm:px-[16px] md:px-[22px] xl:px-[36px]">
-      <div className="flex-none sm:flex-1 sm:basis-0 flex justify-start">
+      <div className="flex-1 flex justify-start">
         <button
           type="button"
           aria-label={isKorean ? '메뉴' : 'Menu'}
@@ -192,14 +318,19 @@ const Header: React.FC = () => {
         </button>
       </div>
 
-      {/* 좁은 휴대폰(640px 미만)에서는 양옆이 같은 폭을 차지하지 않게 — 제목이 남는 폭을 쓰고 말줄임이 생기지 않음 */}
-      <p data-hobit-title className="flex-1 sm:flex-none min-w-0 shrink text-center font-7bold text-f-title text-ink whitespace-nowrap overflow-hidden text-ellipsis px-[8px]">
+      {/* 제목은 항상 화면 정가운데 (양옆 버튼 폭과 상관없이) */}
+      <p data-hobit-title className="pointer-events-none absolute left-1/2 -translate-x-1/2 max-w-[calc(100%-150px)] text-center font-7bold text-f-title text-ink whitespace-nowrap overflow-hidden text-ellipsis">
         <span className="lg:hidden">{isKorean ? '정보대학 호빗' : 'hoBIT'}</span>
         <span className="hidden lg:inline">{i18n.headerTitle}</span>
       </p>
 
+      {/* 480px 미만: 설정 아이콘 하나 → 누르면 계기판 패널 */}
+      <div className="flex-1 flex justify-end min-[480px]:hidden">
+        <ControlsMenu isKorean={isKorean} dark={dark} setDark={setDark} />
+      </div>
+
       {/* 오른쪽 끝은 글자라 아이콘(안쪽 여백 있음)보다 바깥에 붙어 보임 → 조금 더 띄워 좌우 균형 */}
-      <nav className="flex-none sm:flex-1 sm:basis-0 flex justify-end items-center gap-[10px] sm:gap-[14px] md:gap-[16px] xl:gap-[28px] pr-[2px] md:pr-[6px]" aria-label={isKorean ? '설정' : 'Settings'}>
+      <nav className="hidden min-[480px]:flex flex-1 justify-end items-center gap-[12px] sm:gap-[14px] md:gap-[16px] xl:gap-[28px] pr-[2px] md:pr-[6px]" aria-label={isKorean ? '설정' : 'Settings'}>
         <ProgramSwitch isKorean={isKorean} />
         <button
           type="button"
