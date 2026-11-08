@@ -9,6 +9,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../redux/store';
 import ProfilePanel from './ProfilePanel';
+import { chatApi } from '../api/liveChat';
 import { closeMenu } from '../redux/menuSlice';
 import { sendFaqById } from '../redux/inputSlice';
 import { setSeniorFaqId, clearSeniorFaqId } from '../redux/SeniorFaqIdSlice';
@@ -24,6 +25,15 @@ import {check as korcenCheck} from 'korcen';
 const Modal: React.FC = () => {
   const dispatch = useDispatch();
   const isOpen = useSelector((state: RootState) => state.menu.isOpen);
+  // 관리자가 켜 둔 채팅만 — 메뉴를 열 때마다 확인 (모르면 둘 다 보임)
+  const [chatModes, setChatModes] = useState<('staff' | 'senior')[]>(['staff', 'senior']);
+  useEffect(() => {
+    if (!isOpen) return;
+    chatApi
+      .features()
+      .then((f) => setChatModes((['staff', 'senior'] as const).filter((m) => f[m])))
+      .catch(() => {});
+  }, [isOpen]);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
 
   const [faqTree, setFaqTree] = useState<FaqTree | null>(null);
@@ -465,9 +475,10 @@ const Modal: React.FC = () => {
           ))}
         </ul>
 
-        <div className="w-full h-[1px] bg-card-2 mt-[24px]" />
+        {chatModes.length > 0 && <div className="w-full h-[1px] bg-card-2 mt-[24px]" />}
 
-        {/* 실시간 채팅 — 행정실(일반) / 근로장학생 선배(선배 채팅) */}
+        {/* 실시간 채팅 — 행정실 채팅 / 근로장학생 채팅 (관리자 사이트 > 관리 > 채팅에서 끈 채팅은 숨김) */}
+        {chatModes.length > 0 && (<>
         <div className="mt-[20px] mb-[12px] flex flex-row items-center">
           <span className="font-6semibold text-f-lg">{isKorean ? '실시간 채팅' : 'Live chat'}</span>
           <IoChatbubbles className="ml-[7px] text-[#E55604] text-f-lg" />
@@ -475,8 +486,8 @@ const Modal: React.FC = () => {
         <div className="flex flex-col gap-[8px]">
           {([
             ['staff', isKorean ? '행정실 채팅' : 'Chat with the office', isKorean ? '평일 운영 시간에 행정실 담당자와 연결' : 'Office staff on weekdays'],
-            ['senior', isKorean ? '선배 채팅' : 'Chat with a senior', isKorean ? '근로장학생 선배가 있을 때 연결' : 'When a student assistant is available'],
-          ] as const).map(([chatMode, title, desc]) => (
+            ['senior', isKorean ? '근로장학생 채팅' : 'Chat with a student assistant', isKorean ? '근로장학생이 있을 때 연결' : 'When a student assistant is available'],
+          ] as const).filter(([m]) => chatModes.includes(m)).map(([chatMode, title, desc]) => (
             <button
               key={chatMode}
               type="button"
@@ -493,6 +504,7 @@ const Modal: React.FC = () => {
             </button>
           ))}
         </div>
+        </>)}
 
         <div className="w-full h-[1px] bg-card-2 mt-[24px]" />
 

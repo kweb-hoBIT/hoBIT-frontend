@@ -31,11 +31,11 @@ type Step = 'loading' | 'away' | 'closed' | 'verify' | 'ready' | 'chat' | 'switc
 const T = {
   ko: {
     staff: '행정실 채팅',
-    senior: '선배 채팅',
+    senior: '근로장학생 채팅',
     close: '닫기',
     loading: '확인하고 있어요…',
-    awayTitle: '지금은 채팅할 수 있는 선배가 없어요',
-    awayBody: '근로장학생 선배가 채팅 가능 상태일 때 연결돼요. 잠시 후 다시 시도하거나, 행정실 채팅을 이용해 주세요.',
+    awayTitle: '지금은 채팅할 수 있는 근로장학생이 없어요',
+    awayBody: '근로장학생이 채팅 가능 상태일 때 연결돼요. 잠시 후 다시 시도하거나, 행정실 채팅을 이용해 주세요.',
     offlineTitle: '지금은 행정실 채팅 운영 시간이 아니에요',
     hours: (s: ChatStatus): string =>
       s.hours?.today
@@ -49,7 +49,7 @@ const T = {
     longWaitBody: '연결이 늦어지면 아래로 문의해 주셔도 돼요.',
     consentTitle: '개인정보 수집·이용 동의',
     consent:
-      '채팅을 위해 학교 메일 주소, 채팅 시작 때 입력하는 학생 정보(과정·이름·학번·학과·학적 상태), 채팅 내용, 첨부 파일, 최근 호빗 대화를 수집해요. 채팅 기록은 1년, 첨부 파일은 90일 보관한 뒤 자동으로 삭제돼요. 선배 채팅에서는 이름·학번이 선배에게 보이지 않아요.',
+      '채팅을 위해 학교 메일 주소, 채팅 시작 때 입력하는 학생 정보(과정·이름·학번·학과·학적 상태), 채팅 내용, 첨부 파일, 최근 호빗 대화를 수집해요. 채팅 기록은 1년, 첨부 파일은 90일 보관한 뒤 자동으로 삭제돼요. 근로장학생 채팅에서는 이름·학번이 근로장학생에게 보이지 않아요.',
     agree: '위 내용에 동의해요',
     email: '학교 메일',
     emailHint: '고려대학교 메일(@korea.ac.kr)로만 인증할 수 있어요',
@@ -72,12 +72,12 @@ const T = {
     editSave: '수정',
     showTranslation: '번역 보기',
     sentTo: (e: string): string => `${e}로 인증 코드를 보냈어요. 메일함(스팸함 포함)을 확인해 주세요.`,
-    readyTitle: (m: ChatMode): string => (m === 'senior' ? '선배에게 연결할게요' : '행정실에 연결할게요'),
-    switchTitle: (cur: ChatMode): string => `진행 중인 ${cur === 'senior' ? '선배 채팅' : '행정실 채팅'}이 있어요`,
+    readyTitle: (m: ChatMode): string => (m === 'senior' ? '근로장학생에게 연결할게요' : '행정실에 연결할게요'),
+    switchTitle: (cur: ChatMode): string => `진행 중인 ${cur === 'senior' ? '근로장학생 채팅' : '행정실 채팅'}이 있어요`,
     switchBody: (cur: ChatMode, next: ChatMode): string =>
-      `채팅은 한 번에 하나만 할 수 있어요. ${next === 'senior' ? '선배 채팅' : '행정실 채팅'}을 시작하면 지금 ${cur === 'senior' ? '선배 채팅' : '행정실 채팅'}은 종료돼요.`,
-    switchBack: (cur: ChatMode): string => `${cur === 'senior' ? '선배 채팅' : '행정실 채팅'}으로 돌아가기`,
-    switchGo: (next: ChatMode): string => `종료하고 ${next === 'senior' ? '선배 채팅' : '행정실 채팅'} 시작`,
+      `채팅은 한 번에 하나만 할 수 있어요. ${next === 'senior' ? '근로장학생 채팅' : '행정실 채팅'}을 시작하면 지금 ${cur === 'senior' ? '근로장학생 채팅' : '행정실 채팅'}은 종료돼요.`,
+    switchBack: (cur: ChatMode): string => `${cur === 'senior' ? '근로장학생 채팅' : '행정실 채팅'}으로 돌아가기`,
+    switchGo: (next: ChatMode): string => `종료하고 ${next === 'senior' ? '근로장학생 채팅' : '행정실 채팅'} 시작`,
     readyBody: '아래 정보와 최근 호빗 대화가 함께 전달돼 같은 설명을 반복하지 않아도 돼요.',
     info: {
       title: '학생 정보',
@@ -95,7 +95,7 @@ const T = {
       statuses: ['재학', '휴학', '수료', '졸업유예', '졸업', '기타'],
       edit: '수정',
       mine: '내 정보',
-      seniorNote: '선배에게는 이름·학번이 보이지 않아요.',
+      seniorNote: '근로장학생에게는 이름·학번이 보이지 않아요.',
       required: '필수 항목을 입력해 주세요.',
       badId: '학번은 숫자로 입력해 주세요.',
     },
@@ -123,6 +123,7 @@ const T = {
     mailSend: '메일 보내기',
     mailSent: '메일을 보냈어요. 행정실에서 학교 메일로 답장할 거예요.',
     fileExpired: '보관 기간이 지나 삭제된 파일이에요',
+    disabledChat: '지금은 이 채팅을 운영하지 않아요. 행정실 이메일이나 전화로 문의해 주세요.',
     errors: {
       moderated: '욕설이나 예의에 어긋나는 표현이 있어 보내지 않았어요. 정중하게 다시 보내 주세요.',
       edit_expired: '보낸 지 5분이 지나 고치거나 지울 수 없어요.',
@@ -138,10 +139,10 @@ const T = {
   },
   en: {
     staff: 'Office chat',
-    senior: 'Chat with a senior',
+    senior: 'Chat with a student assistant',
     close: 'Close',
     loading: 'Checking…',
-    awayTitle: 'No senior is available right now',
+    awayTitle: 'No student assistant is available right now',
     awayBody: 'You will be connected when a student assistant is available. Please try again later or use the office chat.',
     offlineTitle: 'The office chat is closed now',
     hours: (s: ChatStatus): string =>
@@ -156,7 +157,7 @@ const T = {
     longWaitBody: 'If it takes too long, you can also contact the office:',
     consentTitle: 'Consent to collect personal information',
     consent:
-      'For this chat we collect your school email, the student details you enter (program, name, student ID, department, status), messages, attachments and your recent hoBIT conversation. Chats are kept for 1 year and files for 90 days, then deleted automatically. In senior chats, your name and student ID are not shown to the senior.',
+      'For this chat we collect your school email, the student details you enter (program, name, student ID, department, status), messages, attachments and your recent hoBIT conversation. Chats are kept for 1 year and files for 90 days, then deleted automatically. In student assistant chats, your name and student ID are not shown to the assistant.',
     agree: 'I agree',
     email: 'School email',
     emailHint: 'Only Korea University (@korea.ac.kr) email can be verified',
@@ -230,6 +231,7 @@ const T = {
     mailSend: 'Send email',
     mailSent: 'Email sent. The office will reply to your school email.',
     fileExpired: 'This file was deleted after the retention period',
+    disabledChat: 'This chat is not available right now. Please contact the office by email or phone.',
     errors: {
       moderated: 'Your message was not sent because it contains rude or inappropriate language. Please rephrase it politely.',
       edit_expired: 'Messages can only be edited or deleted within 5 minutes.',
@@ -563,7 +565,8 @@ const ContactInfo: React.FC<{ t: typeof T.ko; email: string }> = ({ t, email }) 
 /** 서버의 안내 문구(한국어)를 학생 화면 말로 — 학생 입장에서 "학생이 종료했어요"는 어색해서 */
 const SYSTEM_TEXT: Record<string, { ko: string; en: string }> = {
   '행정실 담당자가 연결되었어요.': { ko: '행정실 담당자가 연결되었어요.', en: 'An office staff member joined the chat.' },
-  '선배가 연결되었어요.': { ko: '선배가 연결되었어요.', en: 'A senior joined the chat.' },
+  '선배가 연결되었어요.': { ko: '근로장학생이 연결되었어요.', en: 'A student assistant joined the chat.' },
+  '근로장학생이 연결되었어요.': { ko: '근로장학생이 연결되었어요.', en: 'A student assistant joined the chat.' },
   '학생이 채팅을 종료했어요.': { ko: '채팅을 종료했어요.', en: 'You ended the chat.' },
   '채팅이 종료되었어요.': { ko: '채팅이 종료되었어요.', en: 'The chat has ended.' },
 };
@@ -1130,6 +1133,10 @@ const LiveChat: React.FC = () => {
       }
       const st = await chatApi.status(mode);
       setStatus(st);
+      if (st.reason === 'disabled') {
+        setError(t.disabledChat); // 관리자가 끈 채팅 (메뉴에서는 숨기지만 열려 있던 창 등)
+        return setStep('error');
+      }
       if (!st.open) return setStep(mode === 'senior' ? 'away' : 'closed');
       return setStep(getToken() ? 'ready' : 'verify');
     } catch {

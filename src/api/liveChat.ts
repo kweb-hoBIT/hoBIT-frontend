@@ -14,7 +14,7 @@ export type ChatMode = 'staff' | 'senior';
 export type ChatStatus = {
 	mode: ChatMode;
 	open: boolean;
-	reason: 'open' | 'away' | 'holiday' | 'weekend' | 'lunch' | 'before' | 'after';
+	reason: 'open' | 'away' | 'disabled' | 'holiday' | 'weekend' | 'lunch' | 'before' | 'after';
 	hours: { today: { start: string; end: string } | null; lunch: { start: string; end: string } | null; period: string } | null;
 	officeEmail: string;
 	emailVerification: boolean; // false면 개발 모드 (코드 인증 생략)
@@ -108,6 +108,8 @@ async function call<T>(method: string, path: string, body?: unknown, auth = fals
 
 export const chatApi = {
 	status: (mode: ChatMode) => call<ChatStatus>('GET', `/status?mode=${mode}`),
+	// 관리자가 켜 둔 채팅 (끈 채팅은 메뉴에 버튼을 보이지 않음)
+	features: () => call<{ staff: boolean; senior: boolean; emailVerification: boolean }>('GET', '/features'),
 	sendCode: (email: string) => call<{ ok: true }>('POST', '/email/code', { email }),
 	verify: async (email: string, code: string) => {
 		const r = await call<{ token: string; email: string; expiresIn: number }>('POST', '/email/verify', { email, code });
