@@ -29,8 +29,9 @@ const CARD_WIDTH_1 = 'w-full max-w-[330px] md:max-w-[350px]';
 
 // widthClass: 위 카드 줄과 같은 폭 (기본은 카드 한 장 폭), title이 없으면 제목 줄 없이 칩만 (자주 묻는 질문 답변)
 // stacked: 한 줄에 하나씩 (시작 화면·자주 묻는 질문 — 위에서 아래로 읽는 목록). 대화 중 추천은 가로로 흐르게
-const RecChips: React.FC<{ title?: string; items: RecItem[]; widthClass?: string; stacked?: boolean }> = ({
-  title, items, widthClass = CARD_WIDTH_1, stacked = false,
+// instant: 사용자가 직접 연 목록(카테고리 질문 등) — 답변을 기다릴 필요가 없으니 바로 나타나게
+const RecChips: React.FC<{ title?: string; items: RecItem[]; widthClass?: string; stacked?: boolean; instant?: boolean }> = ({
+  title, items, widthClass = CARD_WIDTH_1, stacked = false, instant = false,
 }) => {
   const dispatch = useDispatch();
   const listRef = useRef<HTMLDivElement>(null);
@@ -52,7 +53,7 @@ const RecChips: React.FC<{ title?: string; items: RecItem[]; widthClass?: string
     window.addEventListener(THEME_CHANGE_EVENT, onTheme);
     return () => window.removeEventListener(THEME_CHANGE_EVENT, onTheme);
   }, []);
-  const baseDelay = replay > 0 ? REPLAY_DELAY : APPEAR_DELAY;
+  const baseDelay = replay > 0 || instant ? REPLAY_DELAY : APPEAR_DELAY;
 
   // 줄바꿈된 칩은 브라우저가 가능한 최대 폭을 잡아 오른쪽이 비어 보임 →
   // 실제로 그려진 줄 중 가장 긴 줄 폭에 맞춰 칩 폭을 줄인다 (화면 크기가 바뀌면 다시 계산)

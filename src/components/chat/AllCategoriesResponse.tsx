@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IoChevronBackOutline } from 'react-icons/io5';
-import { sendFaqById, clearSentValue } from '../../redux/inputSlice';
 import { RootState } from '../../redux/store';
 import HobitProfile from './HobitProfile';
 import SeniorHobitProfile from './SeniorHobitProfile';
@@ -11,7 +10,16 @@ import { SeniorFaqTree } from '../../lib/SeniorFaqTree';
 import { getAllFAQs, getAllSeniorFAQs } from '../../api/query';
 import { Faq, SeniorFAQ } from '../../types/faq';
 import { softBreak } from '../../lib/softBreak';
+import RecChips, { RecItem } from './RecChips';
 import { setSeniorFaqId, clearSeniorFaqId } from '../../redux/SeniorFaqIdSlice';
+
+const faqChip = (faq: Faq): RecItem => ({
+	intent_id: `faq-${faq.id}`,
+	intent_name: '',
+	text: faq.question_ko,
+	text_en: faq.question_en,
+	faq_id: faq.id,
+});
 
 interface AllCategoriesResponseProps {
 	initialSeniorFaqId?: number;
@@ -89,14 +97,6 @@ const AllCategoriesResponse: React.FC<AllCategoriesResponseProps> = ({ initialSe
     currentSeniorCategory,
     currentSeniorSubCategory,
   ]);
-
-	// FAQ 질문 클릭은 id로 행정실 답변을 바로 조회 (LLM 거치지 않음, 즉시 응답)
-	const handleSendFaq = (faq: Faq) => {
-		dispatch(sendFaqById({ id: faq.id, query: isKorean ? faq.question_ko : faq.question_en }));
-		setTimeout(() => {
-			dispatch(clearSentValue());
-		}, 100);
-	};
 
 	const handleSendSeniorFaqId = (id: number) => {
 		dispatch(setSeniorFaqId(id));
@@ -311,28 +311,12 @@ const AllCategoriesResponse: React.FC<AllCategoriesResponseProps> = ({ initialSe
 									: `${currentSubCategory.category_en} |`}
 							</div>
 						</div>
-						<div className="bg-card rounded-[20px] px-[20px] py-[10px] mt-[10px] w-full max-w-md">
-							<div className="w-full flex flex-col gap-2">
-								{faqTree?.tree
-									.get(currentCategory)
-									?.get(currentSubCategory)
-									?.map((faq, index: number) => {
-										return (
-											<div
-												key={index}
-												className="w-full text-left flex flex-col"
-											>
-												<button
-													onClick={() => handleSendFaq(faq)}
-													className="font-5medium text-left text-ink-2 text-f-lg inline-block py-[5px] rounded-[20px] mr-[5px] hover:text-ink break-keep"
-												>
-													{isKorean ? faq.question_ko : faq.question_en}
-												</button>
-											</div>
-										);
-									})}
-							</div>
-						</div>
+						{/* 시작 화면·자주 묻는 질문과 같은 칩 — 누르면 행정실 답변으로 바로 */}
+						<RecChips
+							items={(faqTree?.tree.get(currentCategory)?.get(currentSubCategory) ?? []).map(faqChip)}
+							stacked
+							instant
+						/>
 					</>
 				)}
 
