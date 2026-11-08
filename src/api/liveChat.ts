@@ -1,4 +1,4 @@
-import { io, Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 import { envs } from '../envs';
 
 /**
@@ -141,7 +141,10 @@ export const chatApi = {
 /** 서버가 준 파일 경로(/api/v0/chat/files/…)를 전체 주소로 */
 export const fileUrl = (path: string) => `${BACKEND}${path}`;
 
-export function connectChat(token: string): Socket {
+// socket.io 클라이언트는 채팅 방에 들어갈 때만 받음 (첫 화면 번들에서 제외)
+export const loadSocketIo = () => import('socket.io-client');
+export async function connectChat(token: string): Promise<Socket> {
+	const { io } = await loadSocketIo();
 	return io(BACKEND || window.location.origin, {
 		path: '/api/v0/chat/socket',
 		auth: { kind: 'student', token },

@@ -1,3 +1,4 @@
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { RootState } from '../redux/store';
@@ -5,14 +6,43 @@ import Header from '../components/Header';
 import Input from '../components/Input';
 import AutoComplete from '../components/AutoComplete';
 import Chatting from '../components/Chatting';
-import Modal from '../components/Modal';
+import Modal, { preloadMenuContent } from '../components/Modal';
 import { closeMenu } from '../redux/menuSlice';
-import LiveChat from '../components/livechat/LiveChat';
+import { onIdle, once } from '../lib/idle';
+import { preloadMarkdown } from '../components/chat/Response';
+import { getAllFAQs, getAllSeniorFAQs } from '../api/query';
+import { DelayedSpinner } from '../components/ui/Skeleton';
+
+// 실시간 채팅 창(+ socket.io)은 처음 열 때만 받음 — 첫 화면 번들에서 제외. 메뉴를 열면 미리 받기 시작
+export const preloadLiveChat = once(() => import('../components/livechat/LiveChat'));
+const LiveChat = lazy(preloadLiveChat);
 
 const MainPage: React.FC = () => {
   const isEmpty = useSelector((state: RootState) => state.input.isEmpty);
   const isModalOpen = useSelector((state: RootState) => state.menu.isOpen);
+  const liveChatOpen = useSelector((state: RootState) => state.liveChat.open);
   const dispatch = useDispatch();
+  // 한 번 연 채팅 창은 닫아도 그대로 두어 입력해 둔 정보·너비가 유지됨 (예전처럼 항상 붙어 있던 것과 같은 동작)
+  const [liveChatMounted, setLiveChatMounted] = useState(false);
+  useEffect(() => {
+    if (liveChatOpen) setLiveChatMounted(true);
+  }, [liveChatOpen]);
+
+  // 첫 화면이 그려진 뒤 한가할 때: 답변 마크다운 렌더러·메뉴 내용 코드와 메뉴의 FAQ 목록을 미리 받아 둠
+  useEffect(
+    () =>
+      onIdle(() => {
+        preloadMarkdown().catch(() => undefined);
+        preloadMenuContent().catch(() => undefined);
+        getAllFAQs().catch(() => undefined);
+        getAllSeniorFAQs().catch(() => undefined);
+      }),
+    []
+  );
+  // 메뉴를 열면 실시간 채팅 코드도 미리 (메뉴에 채팅 버튼이 있음)
+  useEffect(() => {
+    if (isModalOpen) preloadLiveChat().catch(() => undefined);
+  }, [isModalOpen]);
 
   const handleOutsideClick = (e: React.MouseEvent) => {
     if (isModalOpen) {
@@ -46,10 +76,24 @@ const MainPage: React.FC = () => {
 
       <Input />
 
-      {/* 실시간 채팅 창 (메뉴에서 열기) */}
-      <LiveChat />
+      {/* 실시간 채팅 창 (메뉴에서 열기) — 코드를 받는 동안은 같은 자리에 빈 창과 회전 표시 */}
+      {liveChatMounted && (
+        <Suspense fallback={liveChatOpen ? <LiveChatFallback /> : null}>
+          <LiveChat />
+        </Suspense>
+      )}
     </div>
   );
 };
+
+// 채팅 창 코드를 받는 동안 — 실제 창과 같은 자리·배경 (0.15초 뒤에야 회전 표시)
+const LiveChatFallback: React.FC = () => (
+  <>
+    <div className="fixed inset-0 z-[79] bg-black/20 hobit-appear" aria-hidden="true" />
+    <div className="fixed inset-y-0 right-0 z-[80] flex w-full flex-col items-center justify-center bg-page shadow-2xl md:w-[440px] md:border-l md:border-line hobit-appear">
+      <DelayedSpinner />
+    </div>
+  </>
+);
 
 export default MainPage;

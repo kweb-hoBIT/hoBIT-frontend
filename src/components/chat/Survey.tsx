@@ -11,7 +11,7 @@ import { clearSentValue } from '../../redux/inputSlice';
 
 import { setFeedbackClicked } from '../../redux/feedbackSlice';
 import { appAlert, appConfirm } from '../ui/Dialog';
-import { check as korcenCheck } from 'korcen';
+import { hasKoreanProfanity } from '../../lib/profanity';
 
 type SurveyProps = {
   id: number;
@@ -102,7 +102,7 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question, isSenior = false, lo
       // feedbackDetail이 있을 때만 검사 수행
       if (detail) {
         // 1차: korcen으로 욕설 검사 (한국어일 때만)
-        if (isKorean && korcenCheck(detail)) {
+        if (isKorean && (await hasKoreanProfanity(detail))) {
           appAlert('부적절한 내용이 포함되어 있습니다.');
           return;
         }

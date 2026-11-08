@@ -5,6 +5,7 @@ import { lang } from '../i18n/lang';
 import { setEnglish, setKorean } from '../redux/languageSlice';
 import { toggleMenu } from '../redux/menuSlice';
 import { Program, setProgram } from '../redux/programSlice';
+import { preloadMenuContent } from './Modal';
 
 
 const THEME_KEY = 'hobit-theme';
@@ -312,6 +313,9 @@ const Header: React.FC = () => {
           type="button"
           aria-label={isKorean ? '메뉴' : 'Menu'}
           onClick={() => dispatch(toggleMenu())}
+          // 손가락·마우스가 닿는 순간 메뉴 내용 코드를 미리 받기 시작 (누를 때쯤이면 준비됨)
+          onPointerEnter={() => preloadMenuContent().catch(() => undefined)}
+          onPointerDown={() => preloadMenuContent().catch(() => undefined)}
           className={actionClass.replace('wiggle ', '')} // 메뉴 아이콘은 흔들지 않음
         >
           <MenuIcon />

@@ -16,6 +16,7 @@ import {
   EDIT_WINDOW_MS,
   fileUrl,
   getToken,
+  loadSocketIo,
 } from '../../api/liveChat';
 import { getRecentExchanges } from '../../lib/recentChat';
 import { IoChatbubbles } from 'react-icons/io5';
@@ -762,39 +763,49 @@ const ChatRoom: React.FC<{
   useEffect(() => {
     const token = getToken();
     if (!token) return;
-    const s = connectChat(token.token);
-    socketRef.current = s;
-    s.on('connect', () => {
-      // 다시 연결될 때마다 놓친 메시지까지 받음
-      s.emit('session:join', { sessionId: initial.session.id }, (r: any) => {
-        if (r?.ok) {
-          setSession(r.session);
-          setMessages(r.messages);
-          setPosition(r.position ?? 0);
-        }
+    // 소켓 라이브러리를 받는 사이 창을 닫으면 연결하지 않음
+    let cancelled = false;
+    let s: Socket | null = null;
+    connectChat(token.token).then((sock) => {
+      if (cancelled) {
+        sock.disconnect();
+        return;
+      }
+      s = sock;
+      socketRef.current = s;
+      sock.on('connect', () => {
+        // 다시 연결될 때마다 놓친 메시지까지 받음
+        sock.emit('session:join', { sessionId: initial.session.id }, (r: any) => {
+          if (r?.ok) {
+            setSession(r.session);
+            setMessages(r.messages);
+            setPosition(r.position ?? 0);
+          }
+        });
+      });
+      sock.on('message', (m: ChatMessage) => m.sessionId === initial.session.id && addMessage(m));
+      sock.on('session:update', (u: ChatSession) => u.id === initial.session.id && setSession(u));
+      // 고치거나 지운 메시지 (나·상대 모두)
+      sock.on('message:updated', (m: ChatMessage) => {
+        if (m.sessionId !== initial.session.id) return;
+        setMessages((prev) => prev.map((x) => (x.id === m.id ? m : x)));
+      });
+      // 자동 번역이 늦게 도착 — 그 메시지에 덧붙임
+      sock.on('message:translated', (p: { id: number; sessionId: string; translation: ChatMessage['translation'] }) => {
+        if (p.sessionId !== initial.session.id) return;
+        setMessages((prev) => prev.map((x) => (x.id === p.id ? { ...x, translation: p.translation } : x)));
+      });
+      sock.on('queue:position', (p: { sessionId: string; position: number }) => p.sessionId === initial.session.id && setPosition(p.position));
+      sock.on('typing', (p: { sessionId: string; from: string }) => {
+        if (p.sessionId !== initial.session.id || p.from !== 'agent') return;
+        setAgentTyping(true);
+        if (typingTimer.current) window.clearTimeout(typingTimer.current);
+        typingTimer.current = window.setTimeout(() => setAgentTyping(false), 3000);
       });
     });
-    s.on('message', (m: ChatMessage) => m.sessionId === initial.session.id && addMessage(m));
-    s.on('session:update', (u: ChatSession) => u.id === initial.session.id && setSession(u));
-    // 고치거나 지운 메시지 (나·상대 모두)
-    s.on('message:updated', (m: ChatMessage) => {
-      if (m.sessionId !== initial.session.id) return;
-      setMessages((prev) => prev.map((x) => (x.id === m.id ? m : x)));
-    });
-    // 자동 번역이 늦게 도착 — 그 메시지에 덧붙임
-    s.on('message:translated', (p: { id: number; sessionId: string; translation: ChatMessage['translation'] }) => {
-      if (p.sessionId !== initial.session.id) return;
-      setMessages((prev) => prev.map((x) => (x.id === p.id ? { ...x, translation: p.translation } : x)));
-    });
-    s.on('queue:position', (p: { sessionId: string; position: number }) => p.sessionId === initial.session.id && setPosition(p.position));
-    s.on('typing', (p: { sessionId: string; from: string }) => {
-      if (p.sessionId !== initial.session.id || p.from !== 'agent') return;
-      setAgentTyping(true);
-      if (typingTimer.current) window.clearTimeout(typingTimer.current);
-      typingTimer.current = window.setTimeout(() => setAgentTyping(false), 3000);
-    });
     return () => {
-      s.disconnect();
+      cancelled = true;
+      s?.disconnect();
       socketRef.current = null;
     };
   }, [initial.session.id, addMessage]);
@@ -1171,6 +1182,10 @@ const LiveChat: React.FC = () => {
   useEffect(() => {
     if (open) decide();
   }, [open, decide]);
+  // 창을 열면 소켓 라이브러리도 미리 받기 시작 (채팅 방에 들어갈 때 기다리지 않게)
+  useEffect(() => {
+    if (open) loadSocketIo().catch(() => undefined);
+  }, [open]);
 
   // 메뉴와 채팅 창은 동시에 열지 않음 — 채팅 창을 열면 메뉴를 닫고, 메뉴를 열면 채팅 창을 닫음
   useEffect(() => {

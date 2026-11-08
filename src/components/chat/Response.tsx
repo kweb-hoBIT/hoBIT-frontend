@@ -1,14 +1,26 @@
-import React from 'react';
+import React, { lazy, memo, Suspense } from 'react';
 import { MdOutlineEmail, MdOpenInNew } from 'react-icons/md';
 import { FaPhoneVolume } from 'react-icons/fa6';
 import { IoIosArrowForward } from 'react-icons/io';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 
 import { useSelector } from 'react-redux';
 import { Faq, FaqCard, SourceItem } from '../../types/faq';
 import { RootState } from '../../redux/store';
 import Survey from './Survey';
+import { once } from '../../lib/idle';
+
+export const preloadMarkdown = once(() => import('./Markdown'));
+const Markdown = lazy(preloadMarkdown);
+
+// 마크다운 렌더러를 받는 동안 — 기호(**, #)만 떼고 줄 단위로
+const PlainAnswer: React.FC<{ text: string }> = ({ text }) => (
+  <>
+    {text.split('\n').map((line, i) => {
+      const clean = line.replace(/\*\*/g, '').replace(/^#{1,6}\s*/, '');
+      return clean.trim() === '' ? <br key={i} /> : <p key={i} className="mb-2">{clean}</p>;
+    })}
+  </>
+);
 
 interface ResponseProps {
   faqs: Faq[];
@@ -170,59 +182,11 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                                     line === '' ? <br key={lineIndex} /> : <p key={lineIndex} className="mb-2">{line}</p>
                                   )
                                 ) : (
-                                  <ReactMarkdown
-                                    remarkPlugins={[[remarkGfm, { singleTilde: false }]]}
-                                    components={{
-                                      h1: ({ children }) => (
-                                        <h1 className="mt-4 mb-2 text-f-base font-7bold text-ink leading-snug">
-                                          {children}
-                                        </h1>
-                                      ),
-                                      h2: ({ children }) => (
-                                        <h2 className="mt-4 mb-2 text-f-base font-7bold text-ink leading-snug">
-                                          {children}
-                                        </h2>
-                                      ),
-                                      h3: ({ children }) => (
-                                        <h3 className="mt-3 mb-2 text-f-base font-7bold text-ink leading-snug">
-                                          {children}
-                                        </h3>
-                                      ),
-                                      p: ({ children }) => <p className="mb-2">{children}</p>,
-                                      ul: ({ children }) => <ul className="list-disc pl-5 mb-2">{children}</ul>,
-                                      ol: ({ children }) => <ol className="list-decimal pl-5 mb-2">{children}</ol>,
-                                      li: ({ children }) => <li className="mb-1">{children}</li>,
-                                      strong: ({ children }) => <strong className="font-7bold">{children}</strong>,
-                                      table: ({ children }) => (
-                                        <div className="mb-3 overflow-x-auto rounded-[12px] border border-line bg-surface">
-                                          <table className="min-w-full border-collapse text-f-sm">{children}</table>
-                                        </div>
-                                      ),
-                                      thead: ({ children }) => <thead className="bg-card">{children}</thead>,
-                                      th: ({ children }) => (
-                                        <th className="border-b border-line px-3 py-2 text-left font-7bold text-ink">
-                                          {children}
-                                        </th>
-                                      ),
-                                      td: ({ children }) => (
-                                        <td className="border-b border-line px-3 py-2 align-top text-ink">
-                                          {children}
-                                        </td>
-                                      ),
-                                      a: ({ href, children }) => (
-                                        <a
-                                          href={href}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="text-link hover:underline break-all"
-                                        >
-                                          {children}
-                                        </a>
-                                      ),
-                                    }}
-                                  >
-                                    {item.answer}
-                                  </ReactMarkdown>
+                                  // 마크다운 렌더러는 따로 받음 (첫 화면 번들에서 제외, 한가할 때 미리 받아 둠).
+                                  // 아직 못 받았으면 같은 글을 줄 단위로 먼저 보여 줌
+                                  <Suspense fallback={<PlainAnswer text={item.answer} />}>
+                                    <Markdown text={item.answer} />
+                                  </Suspense>
                                 )}
                               </div>
                             )}
@@ -364,4 +328,5 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
   );
 };
 
-export default Response;
+// 같은 답변을 다시 그리지 않게 (언어·출처 펼침이 바뀔 때만)
+export default memo(Response);
