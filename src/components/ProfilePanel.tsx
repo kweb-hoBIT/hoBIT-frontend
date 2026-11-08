@@ -7,6 +7,7 @@ import { deleteProfile, getProfile, saveProfile, ProfileData, StoredProfile } fr
 import { appConfirm } from './ui/Dialog';
 import { optionConflict, toDisplayValue, toStoredValue } from './chat/ProfileInput';
 import { FIELD_OPTIONS, useProfileOptions } from './chat/profileOptions';
+import { Skeleton } from './ui/Skeleton';
 
 // 학부/대학원 스위치에 따라 다른 항목 — 두 정보는 따로 저장돼 스위치를 바꿔도 지워지지 않음
 const UNDER_FIELDS = ['department', 'admission_year', 'grade', 'major_type', 'student_status'] as const;
@@ -27,12 +28,15 @@ const ProfilePanel: React.FC = () => {
   const [data, setData] = useState<StoredProfile | null>(null);
   const [editing, setEditing] = useState<Field | null>(null);
   const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(true); // 처음 받는 동안은 항목 줄 자리표시
 
   const load = useCallback(async () => {
     try {
       setData(await getProfile());
     } catch {
       setData(null);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -84,7 +88,13 @@ const ProfilePanel: React.FC = () => {
               : `Used only on this device to tailor answers${hours ? `; erased after about ${hours}h of inactivity` : ''}.`}
           </p>
 
-          {FIELDS.map((field) => {
+          {loading && !data && FIELDS.map((field) => (
+            <div key={field} className="flex items-center justify-between gap-[8px] py-[6px] border-b border-line last:border-b-0" aria-hidden="true">
+              <Skeleton className="h-[18px] w-[72px] rounded-full" />
+              <Skeleton className="h-[18px] w-[96px] rounded-full" />
+            </div>
+          ))}
+          {!(loading && !data) && FIELDS.map((field) => {
             const meta = FIELD_OPTIONS[field];
             const value = profile?.[field];
             const options = isKorean ? meta.options_ko : meta.options_en;

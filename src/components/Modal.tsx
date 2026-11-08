@@ -21,6 +21,18 @@ import { SeniorFaqTree } from '../lib/SeniorFaqTree';
 import { Faq, SeniorFAQ } from '../types/faq';
 import { appAlert } from './ui/Dialog';
 import {check as korcenCheck} from 'korcen';
+import { Skeleton } from './ui/Skeleton';
+
+// 메뉴 카테고리 줄 자리표시 — 목록을 받는 동안 같은 높이의 줄을 미리 그려 둠
+const RowSkeletons: React.FC<{ count: number; senior?: boolean }> = ({ count, senior }) => (
+  <>
+    {Array.from({ length: count }, (_, i) => (
+      <li key={i} className="mb-[10px]" aria-hidden="true">
+        <Skeleton tone={senior ? 'senior' : 'card'} className="h-[34px] lg:h-[41px] rounded-[10px]" />
+      </li>
+    ))}
+  </>
+);
 
 const Modal: React.FC = () => {
   const dispatch = useDispatch();
@@ -51,6 +63,9 @@ const Modal: React.FC = () => {
     [categoryName: string]: string[];
   }>({});
   const faqTreeInitFlag = useRef(false);
+  // 목록 요청이 끝났는지 (실패해도 끝남 — 자리표시가 남지 않게)
+  const [faqsDone, setFaqsDone] = useState(false);
+  const [seniorDone, setSeniorDone] = useState(false);
   const seniorFaqTreeInitFlag = useRef(false);
 
   const [seniorCategories, setSeniorCategories] = useState<
@@ -122,6 +137,8 @@ const Modal: React.FC = () => {
         setAllFaqs(fetchedFaqs.faqs);
       } catch (error) {
         console.error('Failed to fetch all FAQs:', error);
+      } finally {
+        setFaqsDone(true);
       }
     };
 
@@ -135,6 +152,8 @@ const Modal: React.FC = () => {
         setAllSeniorFaqs(fetchedSeniorFaqs.seniorFaqs);
       } catch (error) {
         console.error('Failed to fetch all senior FAQs:', error);
+      } finally {
+        setSeniorDone(true);
       }
     };
 
@@ -268,6 +287,7 @@ const Modal: React.FC = () => {
         </div>
         <ProfilePanel />
         <ul className="mt-4">
+          {(!faqsDone || (allFaqs.length > 0 && categories.length === 0)) && <RowSkeletons count={6} />}
           {categories.map((category, index) => (
             <li key={index} className="mb-[10px] ">
               <div
@@ -377,6 +397,7 @@ const Modal: React.FC = () => {
         </div>
 
         <ul className="mt-4">
+          {(!seniorDone || (allSeniorFaqs.length > 0 && seniorCategories.length === 0)) && <RowSkeletons count={3} senior />}
           {seniorCategories.map((category, index) => (
             <li key={index} className="mb-[10px] ">
               <div

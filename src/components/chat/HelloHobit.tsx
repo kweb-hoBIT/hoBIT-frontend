@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import HobitProfile from './HobitProfile';
@@ -6,19 +6,23 @@ import MainOptions from './MainOptions';
 import Response from './Response';
 import { Faq } from '../../types/faq';
 import { RootState } from '../../redux/store';
-import { getStartRecommendations } from '../../api/query';
-import RecChips, { RecItem } from './RecChips';
+import { getStartRecommendations, peekStartRecommendations } from '../../api/query';
+import RecChips, { RecChipsSkeleton, RecItem } from './RecChips';
 
 const HelloHobit: React.FC = () => {
-  const [faqs, setFaqs] = useState<Faq[]>([]);
+  const [faqs] = useState<Faq[]>([]);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
   const program = useSelector((state: RootState) => state.program.value);
   const grad = program === 'graduate';
-  const [startItems, setStartItems] = useState<RecItem[]>([]);
+  // 앱이 로딩 화면에서 미리 받아 두었으면 첫 그림부터 칩까지 함께 (null = 아직 받는 중 → 자리표시)
+  const [startItems, setStartItems] = useState<RecItem[] | null>(() => peekStartRecommendations(program) ?? null);
 
   // 학부/대학원 스위치를 바꾸면 추천도 그 과정 것으로
   useEffect(() => {
     let alive = true;
+    const ready = peekStartRecommendations(program);
+    setStartItems(ready ?? null);
+    if (ready) return;
     getStartRecommendations(program).then((items) => alive && setStartItems(items));
     return () => {
       alive = false;
@@ -38,9 +42,14 @@ const HelloHobit: React.FC = () => {
         }
         faqs={faqs}
       />
-      <RecChips title={isKorean ? '이런 질문은 어때요?' : 'Try asking'} items={startItems} stacked />
+      {startItems ? (
+        <RecChips title={isKorean ? '이런 질문은 어때요?' : 'Try asking'} items={startItems} stacked />
+      ) : (
+        <RecChipsSkeleton />
+      )}
     </div>
   );
 };
 
-export default HelloHobit;
+// 대화가 늘거나 스트리밍될 때마다 시작 화면까지 다시 그리지 않게 (props 없음, 언어·과정은 store에서 직접)
+export default memo(HelloHobit);

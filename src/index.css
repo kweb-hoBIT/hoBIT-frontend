@@ -61,6 +61,7 @@ code {
     format('woff2');
   font-weight: 900;
   font-style: normal;
+  font-display: swap; /* 글꼴을 받는 동안 기본 글꼴로 먼저 보여 줌 (글자가 안 보이는 시간 없음) */
 }
 
 @font-face {
@@ -69,6 +70,7 @@ code {
     format('woff2');
   font-weight: 800;
   font-style: normal;
+  font-display: swap; /* 글꼴을 받는 동안 기본 글꼴로 먼저 보여 줌 (글자가 안 보이는 시간 없음) */
 }
 
 @font-face {
@@ -77,6 +79,7 @@ code {
     format('woff2');
   font-weight: 700;
   font-style: normal;
+  font-display: swap; /* 글꼴을 받는 동안 기본 글꼴로 먼저 보여 줌 (글자가 안 보이는 시간 없음) */
 }
 
 @font-face {
@@ -85,6 +88,7 @@ code {
     format('woff2');
   font-weight: 600;
   font-style: normal;
+  font-display: swap; /* 글꼴을 받는 동안 기본 글꼴로 먼저 보여 줌 (글자가 안 보이는 시간 없음) */
 }
 
 @font-face {
@@ -93,6 +97,7 @@ code {
     format('woff2');
   font-weight: 500;
   font-style: normal;
+  font-display: swap; /* 글꼴을 받는 동안 기본 글꼴로 먼저 보여 줌 (글자가 안 보이는 시간 없음) */
 }
 
 @font-face {
@@ -101,6 +106,7 @@ code {
     format('woff2');
   font-weight: 400;
   font-style: normal;
+  font-display: swap; /* 글꼴을 받는 동안 기본 글꼴로 먼저 보여 줌 (글자가 안 보이는 시간 없음) */
 }
 
 @font-face {
@@ -109,6 +115,7 @@ code {
     format('woff2');
   font-weight: 300;
   font-style: normal;
+  font-display: swap; /* 글꼴을 받는 동안 기본 글꼴로 먼저 보여 줌 (글자가 안 보이는 시간 없음) */
 }
 
 @font-face {
@@ -117,6 +124,7 @@ code {
     format('woff2');
   font-weight: 200;
   font-style: normal;
+  font-display: swap; /* 글꼴을 받는 동안 기본 글꼴로 먼저 보여 줌 (글자가 안 보이는 시간 없음) */
 }
 
 @font-face {
@@ -125,6 +133,7 @@ code {
     format('woff2');
   font-weight: 100;
   font-style: normal;
+  font-display: swap; /* 글꼴을 받는 동안 기본 글꼴로 먼저 보여 줌 (글자가 안 보이는 시간 없음) */
 }
 
 /* 답변이 끝난 뒤 붙는 출처·피드백·추천 칩이 한 번에 툭 튀어나오지 않게 살짝 나타남 */
@@ -142,6 +151,26 @@ code {
 }
 @media (prefers-reduced-motion: reduce) {
   .hobit-appear, .hobit-appear-late { animation: none; }
+}
+
+/* 자리표시(스켈레톤) — 0.15초 뒤 서서히 나타나 은은하게 깜빡임 (빠른 응답이면 아예 안 보임). opacity만 움직임 */
+@keyframes hobit-skel-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes hobit-skel-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.hobit-skel {
+  animation: hobit-skel-in 0.2s ease-out 0.15s both, hobit-skel-pulse 1.4s ease-in-out 0.35s infinite;
+}
+/* 로딩 문구 — 스피너와 함께 0.15초 뒤에 나타남 */
+.hobit-skel-text {
+  animation: hobit-skel-in 0.2s ease-out 0.15s both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hobit-skel { animation: hobit-skel-in 0.2s ease-out 0.15s both; }
 }
 
 /* 네비바 아이콘 hover 흔들림 (hiyseo.com 블로그 네비바와 같은 모션) */

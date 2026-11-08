@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { sendFaqById, sendRecommendedQuestion } from '../../redux/inputSlice';
 import { RootState } from '../../redux/store';
 import { THEME_CHANGE_EVENT } from '../Header';
+import { Skeleton } from '../ui/Skeleton';
 
 export type RecItem = {
   intent_id: string;
@@ -126,3 +127,18 @@ const RecChips: React.FC<{ title?: string; items: RecItem[]; widthClass?: string
 };
 
 export default memo(RecChips);
+
+// 칩 자리표시 — 추천 질문을 받는 동안 같은 자리·비슷한 높이를 잡아 둠 (도착하면 아래 내용이 밀리지 않게)
+const SKELETON_WIDTHS = ['78%', '62%', '86%', '54%'];
+export const RecChipsSkeleton: React.FC<{ withTitle?: boolean; stacked?: boolean; count?: number; widthClass?: string }> = ({
+  withTitle = true, stacked = true, count = 4, widthClass = CARD_WIDTH_1,
+}) => (
+  <div className={`mt-[14px] md:mt-[18px] ${widthClass}`} aria-hidden="true">
+    {withTitle && <Skeleton className="mb-[8px] md:mb-[10px] h-[18px] w-[120px] rounded-full" />}
+    <div className={`flex gap-[8px] md:gap-[10px] ${stacked ? 'flex-col items-start' : 'flex-wrap'}`}>
+      {SKELETON_WIDTHS.slice(0, count).map((w, i) => (
+        <Skeleton key={i} className="h-[35px] md:h-[41px] rounded-[18px] md:rounded-[22px]" style={{ width: stacked ? w : `${30 + (i % 3) * 12}%` }} />
+      ))}
+    </div>
+  </div>
+);

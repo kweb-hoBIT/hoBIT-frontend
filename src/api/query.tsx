@@ -165,14 +165,21 @@ export const moderateContent = async (content: string) => {
   }
 };
 
-export const getAllFAQs = async () => {
-	try {
-		const response = await apiClient.get('/all_faqs');
-		return response.data;
-	} catch (error: any) {
-		console.error('Error while fetching all faqs:', error);
-		throw error.response?.data || error.message;
+// 전체 FAQ·선배 FAQ 목록은 메뉴와 카테고리 화면이 함께 씀 → 한 번 받은 것을 재사용 (실패하면 다음에 다시 요청)
+// 두 번째로 여는 카테고리 화면·메뉴가 기다림 없이 바로 그려짐
+let allFaqsPromise: Promise<any> | null = null;
+export const getAllFAQs = (): Promise<any> => {
+	if (!allFaqsPromise) {
+		allFaqsPromise = apiClient
+			.get('/all_faqs')
+			.then((response) => response.data)
+			.catch((error: any) => {
+				allFaqsPromise = null;
+				console.error('Error while fetching all faqs:', error);
+				throw error.response?.data || error.message;
+			});
 	}
+	return allFaqsPromise;
 };
 
 export const getFAQs = async () => {
@@ -199,14 +206,19 @@ export const getSeniorFAQById = async ({ id }: GetSeniorFaqByIdRequest) => {
 	}
 };
 
-export const getAllSeniorFAQs = async () => {
-  try {
-    const response = await apiClient.get('/all_senior_faqs');
-    return response.data;
-  } catch (error: any) {
-    console.error('Error while fetching all senior faqs questions:', error);
-    throw error.response?.data || error.message;
+let allSeniorFaqsPromise: Promise<any> | null = null;
+export const getAllSeniorFAQs = (): Promise<any> => {
+  if (!allSeniorFaqsPromise) {
+    allSeniorFaqsPromise = apiClient
+      .get('/all_senior_faqs')
+      .then((response) => response.data)
+      .catch((error: any) => {
+        allSeniorFaqsPromise = null;
+        console.error('Error while fetching all senior faqs questions:', error);
+        throw error.response?.data || error.message;
+      });
   }
+  return allSeniorFaqsPromise;
 };
 
 export type ProfileData = {
@@ -292,11 +304,15 @@ export const deleteProfile = async (field?: string) => {
 
 // 대화 시작 화면 추천 — 학부·대학원별로 페이지당 한 번만 요청 (홈 버튼으로 시작 화면을 여러 번 그려도 재요청하지 않음)
 const startRecommendations: Partial<Record<Program, Promise<any[]>>> = {};
+// 이미 받아 둔 결과 — 시작 화면이 첫 그림부터 칩을 함께 그릴 수 있게 (빈 상태로 한 번 그렸다 다시 그리지 않음)
+const startRecommendationsReady: Partial<Record<Program, any[]>> = {};
+export const peekStartRecommendations = (program: Program = 'undergraduate'): any[] | undefined =>
+	startRecommendationsReady[program];
 export const getStartRecommendations = (program: Program = 'undergraduate'): Promise<any[]> => {
 	if (!startRecommendations[program]) {
 		startRecommendations[program] = apiClient
 			.get('/recommend/start', { params: { program } })
-			.then((r) => r.data.items ?? [])
+			.then((r) => (startRecommendationsReady[program] = r.data.items ?? []))
 			.catch(() => {
 				delete startRecommendations[program];
 				return [];

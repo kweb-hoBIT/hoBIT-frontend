@@ -13,6 +13,16 @@ import { softBreak } from '../../lib/softBreak';
 import RecChips, { RecItem } from './RecChips';
 import { faqFitsProgram } from '../../lib/audience';
 import { setSeniorFaqId, clearSeniorFaqId } from '../../redux/SeniorFaqIdSlice';
+import { Skeleton } from '../ui/Skeleton';
+
+// 카테고리 칸 자리표시 — 목록을 받는 동안 같은 크기의 칸을 미리 그려 둠
+const TileSkeletons: React.FC<{ count: number; senior?: boolean }> = ({ count, senior }) => (
+	<>
+		{Array.from({ length: count }, (_, i) => (
+			<Skeleton key={i} tone={senior ? 'senior' : 'card'} className="min-h-[80px] w-full rounded-[20px]" />
+		))}
+	</>
+);
 
 const faqChip = (faq: Faq): RecItem => ({
 	intent_id: `faq-${faq.id}`,
@@ -57,6 +67,9 @@ const AllCategoriesResponse: React.FC<AllCategoriesResponseProps> = ({ initialSe
 	const [selectedSeniorFaqId, setSelectedSeniorFaqId] = useState<number | null>(initialSeniorFaqId || null);
 
 	const seniorFaqTreeInitFlag = useRef(false);
+	// 목록 요청이 끝났는지 (실패해도 끝남 — 자리표시가 영원히 남지 않게)
+	const [faqsDone, setFaqsDone] = useState(false);
+	const [seniorDone, setSeniorDone] = useState(false);
 
 	useEffect(() => {
 		if (initialSeniorFaqId && allSeniorFaqs.length > 0) {
@@ -97,6 +110,8 @@ const AllCategoriesResponse: React.FC<AllCategoriesResponseProps> = ({ initialSe
 				setAllFaqs(fetchedFaqs.faqs);
 			} catch (error) {
 				console.error('Failed to fetch all FAQs:', error);
+			} finally {
+				setFaqsDone(true);
 			}
 		};
 
@@ -110,6 +125,8 @@ const AllCategoriesResponse: React.FC<AllCategoriesResponseProps> = ({ initialSe
 				setAllSeniorFaqs(fetchedSeniorFaqs.seniorFaqs);
 			} catch (error) {
 				console.error('Failed to fetch all senior FAQs:', error);
+			} finally {
+				setSeniorDone(true);
 			}
 		};
 
@@ -198,6 +215,7 @@ const AllCategoriesResponse: React.FC<AllCategoriesResponseProps> = ({ initialSe
 						</p>
 					)}
 					<div className="grid grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] max-w-[1400px] gap-2 mt-[10px]">
+						{(!faqsDone || (allFaqs.length > 0 && !faqTree)) && <TileSkeletons count={6} />}
 						{categories.map((category, index) => (
 							<div
 								key={index}
@@ -223,6 +241,7 @@ const AllCategoriesResponse: React.FC<AllCategoriesResponseProps> = ({ initialSe
 						</p>
 					</div>
 					<div className="grid grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] max-w-[1400px] gap-2 mt-[10px]">
+						{(!seniorDone || (allSeniorFaqs.length > 0 && !seniorFaqTree)) && <TileSkeletons count={4} senior />}
 						{seniorCategories.map((category, index) => (
 							<div
 								key={index}

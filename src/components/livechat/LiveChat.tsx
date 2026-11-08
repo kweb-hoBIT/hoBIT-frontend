@@ -21,6 +21,7 @@ import { getRecentExchanges } from '../../lib/recentChat';
 import { IoChatbubbles } from 'react-icons/io5';
 import { closeMenu } from '../../redux/menuSlice';
 import { prefersReducedMotion } from '../../lib/motion';
+import { DelayedSpinner } from '../ui/Skeleton';
 
 /**
  * 실시간 채팅 창 (학생)
@@ -1257,9 +1258,10 @@ const LiveChat: React.FC = () => {
       </header>
 
       {step === 'loading' && (
+        // 연결 확인 중 — 금방 끝나면(0.15초 안) 아무것도 번쩍이지 않게 회전 표시·문구가 늦게 나타남
         <div className="flex flex-1 flex-col items-center justify-center gap-[10px] text-f-sm text-ink-3">
-          <span className="h-[26px] w-[26px] animate-spin rounded-full border-[3px] border-line border-t-accent-ink" />
-          {t.loading}
+          <DelayedSpinner label={t.loading} />
+          <span className="hobit-skel-text">{t.loading}</span>
         </div>
       )}
 

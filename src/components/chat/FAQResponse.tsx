@@ -7,12 +7,13 @@ import HobitProfile from './HobitProfile';
 import Response from './Response';
 import { Faq } from '../../types/faq';
 import { getFAQs } from '../../api/query';
-import RecChips, { RecItem } from './RecChips';
+import RecChips, { RecChipsSkeleton, RecItem } from './RecChips';
 import { faqFitsProgram } from '../../lib/audience';
 
 const FAQResponse: React.FC = () => {
   const [mocks, _setMocks] = useState<Faq[]>([]);
   const [faqs, setFaqs] = useState<Faq[]>([]);
+  const [loaded, setLoaded] = useState(false); // 받는 동안은 칩 자리표시
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
   const program = useSelector((state: RootState) => state.program.value);
 
@@ -23,6 +24,8 @@ const FAQResponse: React.FC = () => {
         setFaqs(fetchedFaqs.faqs);
       } catch (error) {
         console.error('Failed to fetch FAQs:', error);
+      } finally {
+        setLoaded(true);
       }
     };
 
@@ -49,7 +52,7 @@ const FAQResponse: React.FC = () => {
         faqs={mocks}
       />
       {/* 시작 화면 "이런 질문은 어때요?"와 같은 칩 모양 — 누르면 FAQ 원문으로 바로 답 */}
-      <RecChips items={chips} stacked />
+      {loaded ? <RecChips items={chips} stacked /> : <RecChipsSkeleton withTitle={false} count={4} />}
     </div>
   );
 };

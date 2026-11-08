@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Provider, useDispatch } from 'react-redux';
-import { useEffect, useState, ReactNode } from 'react';
+import React, { useEffect, useState, ReactNode } from 'react';
 import store from './redux/store';
 import MainPage from './pages/MainPage';
 import ErrorPage from './pages/ErrorPage';
@@ -10,7 +10,8 @@ import profileImage from './assets/profile_image.png';
 import errorImage from './assets/error_image.png';
 import { setImages } from './redux/imageSlice';
 import { DialogHost } from './components/ui/Dialog';
-import './loader.css';
+import { getStartRecommendations } from './api/query';
+import { loadProgram } from './redux/programSlice';
 
 const SERVER_URL =
 	process.env.REACT_APP_HOBIT_BACKEND_ENDPOINT || 'http://localhost:4000';
@@ -47,13 +48,18 @@ const PreloadImages: React.FC<PreloadImagesProps> = ({ children }) => {
 			});
 	}, []);
 
+	// 시작 화면의 추천 질문은 서버 확인과 동시에 미리 요청 (결과는 query.tsx에 캐시됨)
+	const startRecsRef = React.useRef<Promise<unknown> | null>(null);
+	if (!startRecsRef.current) startRecsRef.current = getStartRecommendations(loadProgram());
+
 	// 이미지 preload — 다운로드뿐 아니라 decode()까지 끝내 두어 처음 그릴 때 끊기지 않게.
 	// 하나가 실패해도 로딩 화면에 갇히지 않도록 allSettled.
+	// 추천 질문도 함께 기다림 — 인사말과 칩이 한 번에 보이게 (늦으면 1.2초까지만 기다리고 칩 자리표시로)
 	useEffect(() => {
 		if (serverOk !== true) return;
 
 		const imagesToLoad = { homeImage, helloImage, profileImage, errorImage };
-		Promise.allSettled(
+		const images = Promise.allSettled(
 			Object.entries(imagesToLoad).map(async ([key, src]) => {
 				const img = new Image();
 				img.src = src;
@@ -61,7 +67,12 @@ const PreloadImages: React.FC<PreloadImagesProps> = ({ children }) => {
 				await img.decode();
 				return [key, img.src] as const;
 			})
-		).then((results) => {
+		);
+		const recs = Promise.race([
+			startRecsRef.current!.catch(() => undefined),
+			new Promise((resolve) => window.setTimeout(resolve, 1200)),
+		]);
+		Promise.all([images, recs]).then(([results]) => {
 			const loadedImages: { [key: string]: string } = {};
 			results.forEach((r, i) => {
 				const [key, src] = Object.entries(imagesToLoad)[i];
@@ -72,29 +83,25 @@ const PreloadImages: React.FC<PreloadImagesProps> = ({ children }) => {
 		});
 	}, [dispatch, serverOk]);
 
-	// ⏳ 서버 체크 중
-	if (serverOk === null) {
-		return (
-			<div className="flex items-center justify-center h-screen">
-				<div className="loader"></div>
-			</div>
-		);
-	}
-
 	// 서버 연결 실패
 	if (serverOk === false) {
 		return maintenance ? <ErrorPage title="잠시 쉬어가요" message={maintenance} /> : <ErrorPage />;
 	}
 
-	// 정상
-	return loaded ? (
-		<>{children}</>
-	) : (
-		<div className="flex items-center justify-center h-screen">
-			<div className="loader"></div>
-		</div>
-	);
+	// 서버 확인·이미지 준비 중 — index.html의 첫 로딩 화면과 같은 모양을 이어서 (화면이 바뀌며 깜빡이지 않게)
+	return loaded ? <>{children}</> : <Splash />;
 };
+
+const Splash: React.FC = () => (
+	<div className="hobit-splash hobit-splash--cont" role="status" aria-label="호빗을 불러오는 중">
+		<div className="hobit-splash__mark">hoBIT</div>
+		<div className="hobit-splash__dots" aria-hidden="true">
+			<i />
+			<i />
+			<i />
+		</div>
+	</div>
+);
 
 const App: React.FC = () => {
 	return (
