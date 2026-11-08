@@ -2,6 +2,7 @@ import apiClient, { API_ENDPOINT, getSessionId } from './apiClient';
 import { RateFaqRequest } from '../types/faq';
 import { DirectUserFeedbacksRequest } from '../types/feedback';
 import { GetSeniorFaqByIdRequest } from '../types/seniorFaq';
+import { loadProgram, Program } from '../redux/programSlice';
 
 /**
  * 스트리밍 질문 — 답변을 쓰는 동안 onDelta로 글자 조각을 전달하고, 끝나면 /question과 같은 형식의 최종 응답을 반환.
@@ -18,7 +19,7 @@ export const sendQuestionStream = async (
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json', 'X-Session-ID': getSessionId() },
 		credentials: 'include',
-		body: JSON.stringify({ question, language, standalone: Boolean(options?.standalone) }),
+		body: JSON.stringify({ question, language, standalone: Boolean(options?.standalone), program: loadProgram() }),
 	});
 	if (!res.ok || !res.body) throw new Error(`stream request failed: ${res.status}`);
 
@@ -282,19 +283,19 @@ export const deleteProfile = async (field?: string) => {
 	return response.data;
 };
 
-// 대화 시작 화면 추천 — 페이지당 한 번만 요청 (홈 버튼으로 시작 화면을 여러 번 그려도 재요청하지 않음)
-let startRecommendations: Promise<any[]> | null = null;
-export const getStartRecommendations = (): Promise<any[]> => {
-	if (!startRecommendations) {
-		startRecommendations = apiClient
-			.get('/recommend/start')
+// 대화 시작 화면 추천 — 학부·대학원별로 페이지당 한 번만 요청 (홈 버튼으로 시작 화면을 여러 번 그려도 재요청하지 않음)
+const startRecommendations: Partial<Record<Program, Promise<any[]>>> = {};
+export const getStartRecommendations = (program: Program = 'undergraduate'): Promise<any[]> => {
+	if (!startRecommendations[program]) {
+		startRecommendations[program] = apiClient
+			.get('/recommend/start', { params: { program } })
 			.then((r) => r.data.items ?? [])
 			.catch(() => {
-				startRecommendations = null;
+				delete startRecommendations[program];
 				return [];
 			});
 	}
-	return startRecommendations;
+	return startRecommendations[program]!;
 };
 
 /** 행정실 FAQ를 메뉴·칩으로 바로 열었을 때 — 그 FAQ 주제 기준 다음 추천 */

@@ -16,6 +16,7 @@ export type RateFaqResponse = {
 
 export type Faq = {
 	id: number;
+	audience?: 'undergraduate' | 'graduate' | 'all'; // 관리자 FAQ의 대상 (학부·대학원·공통)
 	log_id?: number; // AI 답변의 질문 기록 번호 (👍·👎를 이 기록에 저장)
 	related_notices?: { title: string; link: string; due_end_date: string; d_day: number; status: 'open' | 'upcoming' }[]; // 출처 옆 '관련 공지' 카드
 	maincategory_ko: string;

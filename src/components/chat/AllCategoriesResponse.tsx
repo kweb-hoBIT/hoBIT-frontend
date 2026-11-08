@@ -11,6 +11,7 @@ import { getAllFAQs, getAllSeniorFAQs } from '../../api/query';
 import { Faq, SeniorFAQ } from '../../types/faq';
 import { softBreak } from '../../lib/softBreak';
 import RecChips, { RecItem } from './RecChips';
+import { faqFitsProgram } from '../../lib/audience';
 import { setSeniorFaqId, clearSeniorFaqId } from '../../redux/SeniorFaqIdSlice';
 
 const faqChip = (faq: Faq): RecItem => ({
@@ -28,6 +29,8 @@ interface AllCategoriesResponseProps {
 const AllCategoriesResponse: React.FC<AllCategoriesResponseProps> = ({ initialSeniorFaqId }) => {
 	const dispatch = useDispatch();
 	const isKorean = useSelector((state: RootState) => state.language.isKorean);
+	const program = useSelector((state: RootState) => state.program.value);
+	const grad = program === 'graduate';
 
 	const [faqTree, setFaqTree] = useState<FaqTree | null>(null);
 	const [seniorFaqTree, setSeniorFaqTree] = useState<SeniorFaqTree | null>(
@@ -53,7 +56,6 @@ const AllCategoriesResponse: React.FC<AllCategoriesResponseProps> = ({ initialSe
 		useState<Category | null>(null);
 	const [selectedSeniorFaqId, setSelectedSeniorFaqId] = useState<number | null>(initialSeniorFaqId || null);
 
-	const faqTreeInitFlag = useRef(false);
 	const seniorFaqTreeInitFlag = useRef(false);
 
 	useEffect(() => {
@@ -131,22 +133,20 @@ const AllCategoriesResponse: React.FC<AllCategoriesResponseProps> = ({ initialSe
 		fetchSeniorFAQs();
 	}, []);
 
+	// 학부/대학원 스위치에 맞는 FAQ로 메뉴를 만듦 (스위치를 바꾸면 다시 만들고 처음 화면으로)
 	useEffect(() => {
-		if (!faqTreeInitFlag.current && allFaqs.length > 0) {
-			const faqTree = new FaqTree(allFaqs);
-			setFaqTree(faqTree);
-
-			const mainCategories = Array.from(faqTree.tree.keys());
-			const extractedCategories = mainCategories.map((mainCategory) => ({
+		if (allFaqs.length === 0) return;
+		const faqTree = new FaqTree(allFaqs.filter((faq) => faqFitsProgram(faq, program)));
+		setFaqTree(faqTree);
+		setCategories(
+			Array.from(faqTree.tree.keys()).map((mainCategory) => ({
 				mainCategory,
 				subCategories: Array.from(faqTree.tree.get(mainCategory)!.keys()),
-			}));
-
-			setCategories(extractedCategories);
-
-			faqTreeInitFlag.current = true;
-		}
-	}, [allFaqs]);
+			}))
+		);
+		setCurrentCategory(null);
+		setCurrentSubCategory(null);
+	}, [allFaqs, program]);
 
 	useEffect(() => {
 		if (!seniorFaqTreeInitFlag.current && allSeniorFaqs.length > 0) {
@@ -206,6 +206,14 @@ const AllCategoriesResponse: React.FC<AllCategoriesResponseProps> = ({ initialSe
 								: 'Click The Categories Below!'}
 						</p>
 					</div>
+					{grad && (
+						<p className="mt-[8px] text-f-caption text-ink-2 break-keep">
+							{isKorean ? '대학원 FAQ와 공통 FAQ만 보여요. 여기에 없는 내용은 질문하면 홈페이지 대학원 자료로 답해요. ' : 'Showing graduate and common FAQs only. Ask me anything else — I answer from the graduate pages. '}
+							<a href="https://info.korea.ac.kr/info/grad/computer_intro.do" target="_blank" rel="noreferrer" className="underline text-ink">
+								{isKorean ? '대학원 홈페이지' : 'Graduate website'}
+							</a>
+						</p>
+					)}
 					<div className="grid grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] max-w-[1400px] gap-2 mt-[10px]">
 						{categories.map((category, index) => (
 							<div

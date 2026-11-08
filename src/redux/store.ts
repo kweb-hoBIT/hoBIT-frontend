@@ -9,6 +9,7 @@ import { SeniorFaqIdReducer } from './SeniorFaqIdSlice';
 import { feedbackReducer } from './feedbackSlice';
 import { imageReducer } from './imageSlice';
 import { liveChatReducer } from './liveChatSlice';
+import { programReducer } from './programSlice';
 
 const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ const store = configureStore({
     seniorFaqId: SeniorFaqIdReducer,
     feedback: feedbackReducer,
     liveChat: liveChatReducer,
+    program: programReducer,
   },
 });
 

@@ -16,6 +16,7 @@ import { clearSent } from '../redux/inputSlice';
 import GreetResponse from './chat/GreetResponse';
 import ProfileInput from './chat/ProfileInput';
 import { setId, setIsLoading } from '../redux/inputSlice';
+import { loadProgram, Program } from '../redux/programSlice';
 import { THEME_CHANGE_EVENT } from './Header';
 import RecChips, { RecItem } from './chat/RecChips';
 import { recordExchanges } from '../lib/recentChat';
@@ -39,7 +40,14 @@ interface ChatItem {
   streamStyle?: string;          // senior면 스트리밍 말풍선도 선배 색
   recommendations?: RecItem[];   // 답변 아래 "이어서 물어볼 만한 질문"
   initialSeniorFaqId?: number;
+  audienceNote?: Program;        // 스위치와 다른 기준으로 답했을 때 (질문에 '대학원'·'학위논문' 같은 말이 있어서)
 }
+
+// 질문 속 말 때문에 스위치와 다른 기준(학부↔대학원)으로 답했으면 그 기준 — 답변 위에 작게 표시
+const noteOf = (res: { audience?: string; audience_by?: string }): Program | undefined =>
+  res.audience_by === 'question' && (res.audience === 'graduate' || res.audience === 'undergraduate') && res.audience !== loadProgram()
+    ? res.audience
+    : undefined;
 
 let chatItemSeq = 0;
 const nextUid = () => `chat-${Date.now()}-${chatItemSeq++}`;
@@ -337,7 +345,8 @@ const Chatting: React.FC = () => {
                 item.uid === uid
                   ? { ...item, response: serverResponse.faqs, loading: false, streamText: undefined,
                       followup_fields: serverResponse.followup_fields ?? [],
-                      recommendations: serverResponse.recommendations ?? [] }
+                      recommendations: serverResponse.recommendations ?? [],
+                      audienceNote: noteOf(serverResponse) }
                   : item
               )
             );
@@ -433,7 +442,7 @@ const Chatting: React.FC = () => {
         } else if (Array.isArray(serverResponse.faqs)) {
           update({ response: serverResponse.faqs, loading: false, streamText: undefined,
                    followup_fields: serverResponse.followup_fields ?? [],
-                   recommendations: serverResponse.recommendations ?? [] });
+                   recommendations: serverResponse.recommendations ?? [], audienceNote: noteOf(serverResponse) });
         } else {
           update({ loading: false });
         }
@@ -496,6 +505,13 @@ const Chatting: React.FC = () => {
                     streamText={chatItem.streamText}
                     streamStyle={chatItem.streamStyle}
                   />
+                  {!chatItem.loading && chatItem.audienceNote && (
+                    <p className="hobit-appear mt-[8px] inline-flex items-center gap-[6px] rounded-full bg-card px-[12px] py-[4px] text-f-caption text-ink-2 break-keep">
+                      {isKorean
+                        ? `질문에 맞춰 ${chatItem.audienceNote === 'graduate' ? '대학원' : '학부'} 기준으로 답했어요`
+                        : `Answered for ${chatItem.audienceNote === 'graduate' ? 'graduate' : 'undergraduate'} students, based on your question`}
+                    </p>
+                  )}
                   {!chatItem.loading && (chatItem.followup_fields?.length ?? 0) > 0 && (
                     <ProfileInput
                       variant="followup"

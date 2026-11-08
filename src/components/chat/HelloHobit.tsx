@@ -12,11 +12,18 @@ import RecChips, { RecItem } from './RecChips';
 const HelloHobit: React.FC = () => {
   const [faqs, setFaqs] = useState<Faq[]>([]);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
+  const program = useSelector((state: RootState) => state.program.value);
+  const grad = program === 'graduate';
   const [startItems, setStartItems] = useState<RecItem[]>([]);
 
+  // 학부/대학원 스위치를 바꾸면 추천도 그 과정 것으로
   useEffect(() => {
-    getStartRecommendations().then(setStartItems);
-  }, []);
+    let alive = true;
+    getStartRecommendations(program).then((items) => alive && setStartItems(items));
+    return () => {
+      alive = false;
+    };
+  }, [program]);
 
   return (
     // 좁은 화면에서 카드 오른쪽 여유 (대화 답변과 같은 28px)
@@ -26,8 +33,8 @@ const HelloHobit: React.FC = () => {
       <Response
         text={
           isKorean
-            ? `안녕하세요\n저는 고려대학교 정보대학 챗봇\n호빗(hoBIT)이에요!\n\n정보대학 학부 관련 궁금한 점이 있다면\n언제든지 저에게 질문해주세요`
-            : `Hello!\nI'm hoBIT, the chatbot of the College of Informatics at Korea University.\n\nIf you have any questions regarding the undergraduate program in the College of Informatics, feel free to ask me anytime!`
+            ? `안녕하세요\n저는 고려대학교 정보대학 챗봇\n호빗(hoBIT)이에요!\n\n정보대학 ${grad ? '대학원' : '학부'} 관련 궁금한 점이 있다면\n언제든지 저에게 질문해주세요`
+            : `Hello!\nI'm hoBIT, the chatbot of the College of Informatics at Korea University.\n\nIf you have any questions regarding the ${grad ? 'graduate' : 'undergraduate'} program in the College of Informatics, feel free to ask me anytime!`
         }
         faqs={faqs}
       />

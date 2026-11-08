@@ -8,11 +8,13 @@ import Response from './Response';
 import { Faq } from '../../types/faq';
 import { getFAQs } from '../../api/query';
 import RecChips, { RecItem } from './RecChips';
+import { faqFitsProgram } from '../../lib/audience';
 
 const FAQResponse: React.FC = () => {
   const [mocks, _setMocks] = useState<Faq[]>([]);
   const [faqs, setFaqs] = useState<Faq[]>([]);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
+  const program = useSelector((state: RootState) => state.program.value);
 
   useEffect(() => {
     const fetchFAQs = async () => {
@@ -27,7 +29,7 @@ const FAQResponse: React.FC = () => {
     fetchFAQs();
   }, []);
 
-  const chips: RecItem[] = faqs.map((faq) => ({
+  const chips: RecItem[] = faqs.filter((faq) => faqFitsProgram(faq, program)).map((faq) => ({
     intent_id: `faq-${faq.id}`,
     intent_name: '',
     text: faq.question_ko,
