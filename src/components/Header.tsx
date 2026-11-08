@@ -105,11 +105,12 @@ const ProgramSwitch: React.FC<{ isKorean: boolean }> = ({ isKorean }) => {
               title={it.label}
               disabled={isLoading}
               onClick={() => choose(it.value)}
-              className={`relative z-[1] flex items-center justify-center rounded-full px-[9px] md:px-[14px] h-[30px] md:h-[34px] text-f-nav transition-colors outline-none focus-visible:ring-2 focus-visible:ring-line disabled:cursor-not-allowed ${
+              className={`relative z-[1] flex items-center justify-center gap-[5px] rounded-full px-[8px] md:px-[10px] xl:px-[14px] h-[30px] md:h-[34px] text-f-nav transition-colors outline-none focus-visible:ring-2 focus-visible:ring-line disabled:cursor-not-allowed ${
                 on ? 'text-accent-ink font-6semibold' : 'text-ink-3 hover:text-ink-2 font-5medium'
               }`}
             >
-              <span className="md:hidden">{it.icon}</span>
+              {/* 아이콘은 항상, 글자는 태블릿 폭부터 (좁을수록 여백·글자 간격을 줄임) */}
+              {it.icon}
               <span className="hidden md:inline whitespace-nowrap">{it.label}</span>
             </button>
           );
@@ -179,8 +180,8 @@ const Header: React.FC = () => {
   const themeLabel = dark ? 'Light' : 'Night'; // 테마 라벨은 언어와 관계없이 항상 영어
 
   return (
-    <div className="h-[60px] md:h-[70px] bg-surface fixed top-0 left-0 w-full border-b border-line flex items-center z-50 px-[16px] md:px-[28px] lg:px-[36px]">
-      <div className="flex-1 basis-0 flex justify-start">
+    <div className="h-[60px] md:h-[70px] bg-surface fixed top-0 left-0 w-full border-b border-line flex items-center z-50 px-[14px] sm:px-[16px] md:px-[22px] xl:px-[36px]">
+      <div className="flex-none sm:flex-1 sm:basis-0 flex justify-start">
         <button
           type="button"
           aria-label={isKorean ? '메뉴' : 'Menu'}
@@ -191,13 +192,14 @@ const Header: React.FC = () => {
         </button>
       </div>
 
-      <p data-hobit-title className="shrink text-center font-7bold text-f-title text-ink whitespace-nowrap overflow-hidden text-ellipsis px-[8px]">
-        <span className="md:hidden">{isKorean ? '정보대학 호빗' : 'hoBIT'}</span>
-        <span className="hidden md:inline">{i18n.headerTitle}</span>
+      {/* 좁은 휴대폰(640px 미만)에서는 양옆이 같은 폭을 차지하지 않게 — 제목이 남는 폭을 쓰고 말줄임이 생기지 않음 */}
+      <p data-hobit-title className="flex-1 sm:flex-none min-w-0 shrink text-center font-7bold text-f-title text-ink whitespace-nowrap overflow-hidden text-ellipsis px-[8px]">
+        <span className="lg:hidden">{isKorean ? '정보대학 호빗' : 'hoBIT'}</span>
+        <span className="hidden lg:inline">{i18n.headerTitle}</span>
       </p>
 
       {/* 오른쪽 끝은 글자라 아이콘(안쪽 여백 있음)보다 바깥에 붙어 보임 → 조금 더 띄워 좌우 균형 */}
-      <nav className="flex-1 basis-0 flex justify-end items-center gap-[12px] md:gap-[24px] lg:gap-[28px] pr-[2px] md:pr-[6px]" aria-label={isKorean ? '설정' : 'Settings'}>
+      <nav className="flex-none sm:flex-1 sm:basis-0 flex justify-end items-center gap-[10px] sm:gap-[14px] md:gap-[16px] xl:gap-[28px] pr-[2px] md:pr-[6px]" aria-label={isKorean ? '설정' : 'Settings'}>
         <ProgramSwitch isKorean={isKorean} />
         <button
           type="button"
@@ -206,7 +208,7 @@ const Header: React.FC = () => {
           className={actionClass}
         >
           <TranslateIcon />
-          <span className="hidden md:inline">{langLabel}</span>
+          <span className="hidden xl:inline">{langLabel}</span>
         </button>
         <button
           type="button"
@@ -215,7 +217,7 @@ const Header: React.FC = () => {
           className={actionClass}
         >
           {dark ? <SunIcon /> : <MoonIcon />}
-          <span className="hidden md:inline">{themeLabel}</span>
+          <span className="hidden xl:inline">{themeLabel}</span>
         </button>
       </nav>
     </div>
