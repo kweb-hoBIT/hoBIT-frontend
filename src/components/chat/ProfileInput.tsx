@@ -21,6 +21,7 @@ export const toStoredValue = (field: string, index: number, option: string): str
 export const toDisplayValue = (field: string, value: string | number, isKorean: boolean): string => {
   if (field === 'grade') return isKorean ? `${value}학년` : `Year ${value}`;
   if (field === 'admission_year') return isKorean ? `${value}학번` : `Admitted 20${value}`;
+  if (field === 'grad_admission_year') return isKorean ? `${value}년 입학` : `Entered ${value}`;
   // 학과·전공 유형·학적 상태: 저장값(한국어, 예전 영어 저장값도 허용)을 화면 언어로
   const meta = FIELD_OPTIONS[field];
   if (meta) {

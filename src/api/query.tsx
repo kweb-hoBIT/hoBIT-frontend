@@ -215,6 +215,9 @@ export type ProfileData = {
 	grade?: number;
 	admission_year?: number;
 	student_status?: string;
+	grad_department?: string;     // 대학원 정보 — 학부 정보와 따로 저장
+	degree?: string;
+	grad_admission_year?: number;
 	language?: string;
 };
 
@@ -252,7 +255,8 @@ export const sendChat = async (message: string, language: 'KO' | 'EN') => {
 };
 
 export type StoredProfile = {
-	profile: Record<'department' | 'major_type' | 'grade' | 'admission_year' | 'student_status', string | number | null>;
+	profile: Record<'department' | 'major_type' | 'grade' | 'admission_year' | 'student_status'
+		| 'grad_department' | 'degree' | 'grad_admission_year', string | number | null>;
 	ttl_seconds: number | null;
 };
 
@@ -263,6 +267,9 @@ export type ProfileOptionsResponse = {
 	student_status: ProfileOptionItem[];
 	grade: number[];
 	admission_year: number[];
+	grad_department?: ProfileOptionItem[];
+	degree?: { value: string; label_en: string }[];
+	grad_admission_year?: number[];
 };
 
 /** 프로필 선택지 — 학과 등은 관리자 사이트 '프로필 항목', 학번은 올해 기준 자동 */

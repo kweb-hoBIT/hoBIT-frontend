@@ -8,8 +8,10 @@ import { appConfirm } from './ui/Dialog';
 import { optionConflict, toDisplayValue, toStoredValue } from './chat/ProfileInput';
 import { FIELD_OPTIONS, useProfileOptions } from './chat/profileOptions';
 
-const FIELDS = ['department', 'admission_year', 'grade', 'major_type', 'student_status'] as const;
-type Field = (typeof FIELDS)[number];
+// 학부/대학원 스위치에 따라 다른 항목 — 두 정보는 따로 저장돼 스위치를 바꿔도 지워지지 않음
+const UNDER_FIELDS = ['department', 'admission_year', 'grade', 'major_type', 'student_status'] as const;
+const GRAD_FIELDS = ['grad_department', 'degree', 'grad_admission_year'] as const;
+type Field = (typeof UNDER_FIELDS)[number] | (typeof GRAD_FIELDS)[number];
 
 /**
  * 메뉴 상단 '내 정보' — 챗봇이 이 세션에 저장한 프로필을 확인·변경·삭제.
@@ -18,6 +20,8 @@ type Field = (typeof FIELDS)[number];
 const ProfilePanel: React.FC = () => {
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
   const isOpen = useSelector((state: RootState) => state.menu.isOpen);
+  const grad = useSelector((state: RootState) => state.program.value) === 'graduate';
+  const FIELDS: readonly Field[] = grad ? GRAD_FIELDS : UNDER_FIELDS;
   useProfileOptions(); // 관리자 사이트 '프로필 항목' 선택지
   const [expanded, setExpanded] = useState(true);
   const [data, setData] = useState<StoredProfile | null>(null);
@@ -50,7 +54,7 @@ const ProfilePanel: React.FC = () => {
   const save = (field: Field, stored: string) =>
     run(() => {
       const payload: ProfileData = { language: isKorean ? 'ko' : 'en' };
-      if (field === 'grade' || field === 'admission_year') payload[field] = parseInt(stored, 10);
+      if (field === 'grade' || field === 'admission_year' || field === 'grad_admission_year') payload[field] = parseInt(stored, 10);
       else payload[field] = stored;
       return saveProfile(payload);
     });
@@ -65,7 +69,10 @@ const ProfilePanel: React.FC = () => {
         onClick={() => setExpanded((v) => !v)}
         className="w-full flex justify-between items-center px-[16px] py-[10px] text-f-lg font-6semibold text-ink"
       >
-        <span>{isKorean ? '내 정보' : 'My Info'}</span>
+        <span>
+          {isKorean ? '내 정보' : 'My Info'}
+          <span className="ml-[8px] text-f-sm font-5medium text-ink-3">{grad ? (isKorean ? '대학원' : 'Graduate') : isKorean ? '학부' : 'Undergraduate'}</span>
+        </span>
         {expanded ? <FaChevronUp className="text-ink-3" /> : <FaChevronDown className="text-ink-3" />}
       </button>
 

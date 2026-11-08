@@ -51,6 +51,28 @@ export const FIELD_OPTIONS: Record<string, FieldMeta> = {
     label_en: 'Admission Year',
     ...yearMeta(Array.from({ length: 7 }, (_, i) => thisYear - 6 + i)),
   },
+  // 대학원 — '내 정보'에서 학부/대학원 스위치가 대학원일 때 보이는 항목 (학부 정보와 따로 저장)
+  grad_department: {
+    label_ko: '대학원 학과',
+    label_en: 'Graduate Dept.',
+    values: ['컴퓨터학과', '인공지능학과', '뇌공학과', '영상정보처리협동과정'],
+    options_ko: ['컴퓨터학과', '인공지능학과', '뇌공학과', '영상정보처리협동과정'],
+    options_en: ['Computer Science', 'Artificial Intelligence', 'Brain and Cognitive Eng.', 'Visual Information Processing'],
+  },
+  degree: {
+    label_ko: '과정',
+    label_en: 'Program',
+    values: ['석사', '박사', '석박사통합'],
+    options_ko: ['석사', '박사', '석박사통합'],
+    options_en: ["Master's", 'Ph.D.', 'Integrated M.S./Ph.D.'],
+  },
+  grad_admission_year: {
+    label_ko: '입학 연도',
+    label_en: 'Entry Year',
+    values: Array.from({ length: 7 }, (_, i) => String(2000 + thisYear - 6 + i)),
+    options_ko: Array.from({ length: 7 }, (_, i) => `${2000 + thisYear - 6 + i}년`),
+    options_en: Array.from({ length: 7 }, (_, i) => String(2000 + thisYear - 6 + i)),
+  },
   student_status: {
     label_ko: '학적 상태',
     label_en: 'Student Status',
@@ -68,7 +90,7 @@ const listeners = new Set<() => void>();
 let loading: Promise<void> | null = null;
 
 function apply(data: ProfileOptionsResponse) {
-  (['department', 'major_type', 'student_status'] as const).forEach((field) => {
+  (['department', 'major_type', 'student_status', 'grad_department'] as const).forEach((field) => {
     const items = data[field];
     if (!Array.isArray(items) || !items.length) return;
     Object.assign(FIELD_OPTIONS[field], {
@@ -77,6 +99,13 @@ function apply(data: ProfileOptionsResponse) {
       options_en: items.map((i) => i.label_en || i.value),
     });
   });
+  if (Array.isArray(data.grad_admission_year) && data.grad_admission_year.length) {
+    Object.assign(FIELD_OPTIONS.grad_admission_year, {
+      values: data.grad_admission_year.map(String),
+      options_ko: data.grad_admission_year.map((y) => `${y}년`),
+      options_en: data.grad_admission_year.map(String),
+    });
+  }
   if (Array.isArray(data.admission_year) && data.admission_year.length) {
     Object.assign(FIELD_OPTIONS.admission_year, yearMeta(data.admission_year));
   }
