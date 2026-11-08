@@ -9,8 +9,8 @@ import { prefersReducedMotion } from './motion';
  * 사용: <div ref={revealRef}> — 상태는 data-reveal 속성으로만 다루므로 React가 바꾸는 className과 부딪히지 않음
  *   wait(숨김) → in(나타나는 중, index.css) → done(효과 끝, 원래 transition 그대로)
  */
-const STAGGER_MS = 50;
-const MAX_DELAY_MS = 400;
+const STAGGER_MS = 70;
+const MAX_DELAY_MS = 560;
 const DURATION_MS = 420;
 
 let observer: IntersectionObserver | null = null;
