@@ -1119,8 +1119,22 @@ const LiveChat: React.FC = () => {
     const target = e.currentTarget;
     target.setPointerCapture(e.pointerId);
     document.body.style.userSelect = 'none';
-    const move = (ev: PointerEvent) => changeWidth(window.innerWidth - ev.clientX);
+    // 끄는 동안 pointermove는 프레임보다 자주 옴 → 한 프레임에 한 번만 너비 반영
+    let raf = 0;
+    let lastX = e.clientX;
+    let moved = false;
+    const move = (ev: PointerEvent) => {
+      lastX = ev.clientX;
+      moved = true;
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        changeWidth(window.innerWidth - lastX);
+      });
+    };
     const end = () => {
+      cancelAnimationFrame(raf);
+      if (moved) changeWidth(window.innerWidth - lastX);
       document.body.style.userSelect = '';
       target.removeEventListener('pointermove', move);
       target.removeEventListener('pointerup', end);
@@ -1134,18 +1148,28 @@ const LiveChat: React.FC = () => {
   // 글자 크기: 채팅 창 너비에 비례 (기본 440px = 1배, 360px ≈ 0.92배 … 넓히면 최대 1.2배)
   // 모바일은 창이 화면을 가득 채우므로 화면 전체 배율 그대로. 위젯 모드(html.embed의 --fs-scale)도 곱함
   const [viewportW, setViewportW] = useState(() => window.innerWidth);
-  const baseScale = Number(getComputedStyle(document.documentElement).getPropertyValue('--fs-scale')) || 1;
+  // 위젯 배율은 시작할 때 정해지므로 한 번만 읽음 (그릴 때마다 getComputedStyle로 스타일 계산을 강제하지 않게)
+  const [baseScale] = useState(() => Number(getComputedStyle(document.documentElement).getPropertyValue('--fs-scale')) || 1);
   const fontScale =
     viewportW < 768 ? baseScale : Number((baseScale * Math.min(1.2, Math.max(0.92, width / DEFAULT_W))).toFixed(3));
 
   // 창 크기가 줄면 채팅 창도 화면 안으로
   useEffect(() => {
+    // 크기 조절 중에는 resize가 프레임보다 자주 오므로 한 프레임에 한 번만 반영
+    let raf = 0;
     const onResize = () => {
-      setViewportW(window.innerWidth);
-      setWidth((w) => Math.min(w, maxWidth()));
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        setViewportW(window.innerWidth);
+        setWidth((w) => Math.min(w, maxWidth()));
+      });
     };
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    window.addEventListener('resize', onResize, { passive: true });
+    return () => {
+      window.removeEventListener('resize', onResize);
+      cancelAnimationFrame(raf);
+    };
   }, []);
 
   const decide = useCallback(async () => {

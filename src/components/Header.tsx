@@ -186,7 +186,7 @@ const ControlsMenu: React.FC<{ isKorean: boolean; dark: boolean; setDark: (d: bo
     const onDown = (e: MouseEvent | TouchEvent) => !ref.current?.contains(e.target as Node) && setOpen(false);
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
     document.addEventListener('mousedown', onDown);
-    document.addEventListener('touchstart', onDown);
+    document.addEventListener('touchstart', onDown, { passive: true }); // 스크롤 시작을 막지 않게
     document.addEventListener('keydown', onKey);
     return () => {
       document.removeEventListener('mousedown', onDown);
