@@ -14,6 +14,7 @@ import RecChips, { RecItem } from './RecChips';
 import { faqFitsProgram } from '../../lib/audience';
 import { setSeniorFaqId, clearSeniorFaqId } from '../../redux/SeniorFaqIdSlice';
 import { Skeleton } from '../ui/Skeleton';
+import { revealRef } from '../../lib/reveal';
 
 // 카테고리 칸 자리표시 — 목록을 받는 동안 같은 크기의 칸을 미리 그려 둠
 const TileSkeletons: React.FC<{ count: number; senior?: boolean }> = ({ count, senior }) => (
@@ -219,6 +220,7 @@ const AllCategoriesResponse: React.FC<AllCategoriesResponseProps> = ({ initialSe
 						{categories.map((category, index) => (
 							<div
 								key={index}
+								ref={revealRef}
 								className="bg-card min-h-[80px] flex flex-col items-center justify-center rounded-[20px] px-[10px] py-[5px] hover:bg-card-2 cursor-pointer w-full"
 								onClick={() => showSubCategory(category.mainCategory)}
 							>
@@ -245,6 +247,7 @@ const AllCategoriesResponse: React.FC<AllCategoriesResponseProps> = ({ initialSe
 						{seniorCategories.map((category, index) => (
 							<div
 								key={index}
+								ref={revealRef}
 								className="bg-senior min-h-[80px] flex flex-col items-center justify-center rounded-[20px] px-[10px] py-[5px] hover:bg-senior-2 cursor-pointer w-full"
 								onClick={() => showSeniorSubCategory(category.mainCategory)}
 							>
@@ -285,6 +288,7 @@ const AllCategoriesResponse: React.FC<AllCategoriesResponseProps> = ({ initialSe
 									(subCategory: Category, index: number) => (
 										<div
 											key={index}
+											ref={revealRef}
 											className="hover:bg-card-2 bg-card min-h-[80px] flex items-center justify-center px-[10px] py-[5px] rounded-[20px] cursor-pointer"
 											onClick={() => showQuestions(subCategory)}
 										>
@@ -325,7 +329,7 @@ const AllCategoriesResponse: React.FC<AllCategoriesResponseProps> = ({ initialSe
 						<RecChips
 							items={(faqTree?.tree.get(currentCategory)?.get(currentSubCategory) ?? []).map(faqChip)}
 							stacked
-							instant
+							reveal
 						/>
 					</>
 				)}
@@ -356,6 +360,7 @@ const AllCategoriesResponse: React.FC<AllCategoriesResponseProps> = ({ initialSe
 								).map((subCategory: Category, index: number) => (
 									<div
 										key={index}
+										ref={revealRef}
 										className="hover:bg-senior-2 bg-senior min-h-[80px] flex items-center justify-center px-[10px] py-[5px] rounded-[20px] cursor-pointer"
 										onClick={() => showSeniorDetailCategory(subCategory)}
 									>
@@ -400,6 +405,7 @@ const AllCategoriesResponse: React.FC<AllCategoriesResponseProps> = ({ initialSe
 									return (
 										<div
 											key={index}
+											ref={revealRef}
 										onClick={() => setSelectedSeniorFaqId(faq.id)}
 											className="hover:bg-senior-2 bg-senior min-h-[80px] flex items-center justify-center px-[10px] py-[5px] rounded-[20px] cursor-pointer"
 										>

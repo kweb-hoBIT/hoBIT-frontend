@@ -5,6 +5,7 @@ import { sendFaqById, sendRecommendedQuestion } from '../../redux/inputSlice';
 import { RootState } from '../../redux/store';
 import { THEME_CHANGE_EVENT } from '../Header';
 import { Skeleton } from '../ui/Skeleton';
+import { revealRef } from '../../lib/reveal';
 
 export type RecItem = {
   intent_id: string;
@@ -31,8 +32,9 @@ const CARD_WIDTH_1 = 'w-full max-w-[330px] md:max-w-[350px]';
 // widthClass: 위 카드 줄과 같은 폭 (기본은 카드 한 장 폭), title이 없으면 제목 줄 없이 칩만 (자주 묻는 질문 답변)
 // stacked: 한 줄에 하나씩 (시작 화면·자주 묻는 질문 — 위에서 아래로 읽는 목록). 대화 중 추천은 가로로 흐르게
 // instant: 사용자가 직접 연 목록(카테고리 질문 등) — 답변을 기다릴 필요가 없으니 바로 나타나게
-const RecChips: React.FC<{ title?: string; items: RecItem[]; widthClass?: string; stacked?: boolean; instant?: boolean }> = ({
-  title, items, widthClass = CARD_WIDTH_1, stacked = false, instant = false,
+// reveal: 긴 목록(카테고리 질문·자주 묻는 질문) — 칩마다 화면에 들어올 때 나타남 (첫 화면 분량은 위에서부터 촤라락)
+const RecChips: React.FC<{ title?: string; items: RecItem[]; widthClass?: string; stacked?: boolean; instant?: boolean; reveal?: boolean }> = ({
+  title, items, widthClass = CARD_WIDTH_1, stacked = false, instant = false, reveal = false,
 }) => {
   const dispatch = useDispatch();
   const listRef = useRef<HTMLDivElement>(null);
@@ -108,14 +110,15 @@ const RecChips: React.FC<{ title?: string; items: RecItem[]; widthClass?: string
           return (
           <button
             key={`${item.intent_id}-${item.text}`}
-            style={{ animationDelay: `${baseDelay + APPEAR_STAGGER * (i + 1)}s` }}
+            ref={reveal ? revealRef : undefined}
+            style={reveal ? undefined : { animationDelay: `${baseDelay + APPEAR_STAGGER * (i + 1)}s` }}
             disabled={isLoading}
             onClick={() =>
               item.faq_id
                 ? dispatch(sendFaqById({ id: item.faq_id, query: label }))
                 : dispatch(sendRecommendedQuestion(label))
             }
-            className="hobit-appear-late max-w-full text-left break-keep px-[14px] md:px-[18px] py-[7px] md:py-[9px] rounded-[18px] md:rounded-[22px] text-f-chip leading-[1.35] font-5medium text-ink bg-surface border border-line hover:border-accent-ink hover:text-accent-ink transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-line disabled:hover:text-ink"
+            className={`${reveal ? '' : 'hobit-appear-late'} max-w-full text-left break-keep px-[14px] md:px-[18px] py-[7px] md:py-[9px] rounded-[18px] md:rounded-[22px] text-f-chip leading-[1.35] font-5medium text-ink bg-surface border border-line hover:border-accent-ink hover:text-accent-ink transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-line disabled:hover:text-ink`}
           >
             {label}
           </button>

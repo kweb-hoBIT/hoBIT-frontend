@@ -8,6 +8,7 @@ import { Faq, FaqCard, SourceItem } from '../../types/faq';
 import { RootState } from '../../redux/store';
 import Survey from './Survey';
 import { once } from '../../lib/idle';
+import { revealRef } from '../../lib/reveal';
 
 export const preloadMarkdown = once(() => import('./Markdown'));
 const Markdown = lazy(preloadMarkdown);
@@ -241,7 +242,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                   </div>
 
                   {(hasSourceCard || related.length > 0) && (
-                    <div className="flex flex-col hobit-appear">
+                    <div ref={revealRef} className="flex flex-col">
                       {hasSourceCard && (
                       <div className={`h-fit ${isSeniorBySource ? 'bg-senior' : 'bg-card'} font-5medium text-f-base mt-[8px] rounded-[20px] px-[20px] py-[15px] w-full max-w-[330px] md:max-w-none md:w-[350px] break-words inline-block`}>
                         <p className="text-sm text-ink-2 font-4regular mb-[8px]">

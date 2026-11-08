@@ -22,6 +22,7 @@ import { Faq, SeniorFAQ } from '../types/faq';
 import { appAlert } from './ui/Dialog';
 import { hasKoreanProfanity, loadKorcen } from '../lib/profanity';
 import { Skeleton } from './ui/Skeleton';
+import { revealRef } from '../lib/reveal';
 
 // 메뉴 카테고리 줄 자리표시 — 목록을 받는 동안 같은 높이의 줄을 미리 그려 둠
 const RowSkeletons: React.FC<{ count: number; senior?: boolean }> = ({ count, senior }) => (
@@ -288,7 +289,7 @@ const MenuContent: React.FC = () => {
         <ul className="mt-4">
           {(!faqsDone || (allFaqs.length > 0 && categories.length === 0)) && <RowSkeletons count={6} />}
           {categories.map((category, index) => (
-            <li key={index} className="mb-[10px] ">
+            <li key={index} ref={revealRef} className="mb-[10px] ">
               <div
                 className="hover:bg-card-2 flex flex-row justify-between items-center cursor-pointer text-f-menu font-5medium text-ink-2 bg-card px-[15px] py-[5px] lg:py-[8px] rounded-[10px]"
                 onClick={() =>
@@ -398,7 +399,7 @@ const MenuContent: React.FC = () => {
         <ul className="mt-4">
           {(!seniorDone || (allSeniorFaqs.length > 0 && seniorCategories.length === 0)) && <RowSkeletons count={3} senior />}
           {seniorCategories.map((category, index) => (
-            <li key={index} className="mb-[10px] ">
+            <li key={index} ref={revealRef} className="mb-[10px] ">
               <div
                 className="hover:bg-senior-2 flex flex-row justify-between items-center cursor-pointer text-f-menu font-5medium text-ink-2 bg-senior px-[15px] py-[5px] lg:py-[8px] rounded-[10px]"
                 onClick={() =>

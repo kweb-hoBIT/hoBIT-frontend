@@ -52,7 +52,7 @@ const FAQResponse: React.FC = () => {
         faqs={mocks}
       />
       {/* 시작 화면 "이런 질문은 어때요?"와 같은 칩 모양 — 누르면 FAQ 원문으로 바로 답 */}
-      {loaded ? <RecChips items={chips} stacked /> : <RecChipsSkeleton withTitle={false} count={4} />}
+      {loaded ? <RecChips items={chips} stacked reveal /> : <RecChipsSkeleton withTitle={false} count={4} />}
     </div>
   );
 };
