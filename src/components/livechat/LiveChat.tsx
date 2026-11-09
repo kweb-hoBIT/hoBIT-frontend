@@ -105,6 +105,8 @@ const T = {
       seniorNote: '근로장학생에게는 이름·학번이 보이지 않아요.',
       required: '필수 항목을 입력해 주세요.',
       badId: '학번은 숫자로 입력해 주세요.',
+      needConsent: '개인정보 수집·이용에 동의해 주세요.',
+      needEmail: '학교 메일 아이디를 입력해 주세요.',
     },
     start: '채팅 요청하기',
     waiting: (n: number): string => (n > 0 ? `대기 중 · 앞에 ${n}명` : '대기 중'),
@@ -215,6 +217,8 @@ const T = {
       seniorNote: 'Your name and student ID are not shown to the senior.',
       required: 'Please fill in the required fields.',
       badId: 'Student ID must be numbers only.',
+      needConsent: 'Please agree to the collection of personal information.',
+      needEmail: 'Please enter your Korea University email ID.',
     },
     start: 'Request chat',
     waiting: (n: number): string => (n > 0 ? `Waiting · ${n} ahead of you` : 'Waiting'),
@@ -1121,6 +1125,10 @@ const LiveChat: React.FC = () => {
   });
   const [infoBad, setInfoBad] = useState<(keyof StudentInfo)[]>([]);
   const [infoError, setInfoError] = useState<string | null>(null);
+  // 메일 인증 꺼짐일 때 학생 정보와 함께 받는 동의·학교 메일
+  const [agreed, setAgreed] = useState(false);
+  const [emailId, setEmailId] = useState('');
+  const [emailBad, setEmailBad] = useState(false);
   const [editInfo, setEditInfo] = useState(() => infoProblems(loadInfo()).length > 0); // 처음이거나 빠진 게 있으면 입력 칸부터
   const [error, setError] = useState<string | null>(null);
   const [width, setWidth] = useState<number>(() => {
@@ -1225,7 +1233,8 @@ const LiveChat: React.FC = () => {
         return setStep('error');
       }
       if (!st.open) return setStep(mode === 'senior' ? 'away' : 'closed');
-      return setStep(getToken() ? 'ready' : 'verify');
+      // 메일 인증이 꺼져 있으면 메일 단계 없이 학생 정보 화면에서 메일도 함께 받음
+      return setStep(getToken() || st.emailVerification === false ? 'ready' : 'verify');
     } catch {
       setError(t.errors.generic);
       return setStep('error');
@@ -1249,6 +1258,15 @@ const LiveChat: React.FC = () => {
   }, [menuOpen, dispatch]);
 
   const start = async () => {
+    const needEmail = status?.emailVerification === false && !getToken();
+    if (needEmail) {
+      // 메일 인증 꺼짐: 동의·학교 메일부터 확인
+      if (!agreed) return setInfoError(t.info.needConsent);
+      if (!emailId.trim()) {
+        setEmailBad(true);
+        return setInfoError(t.info.needEmail);
+      }
+    }
     // 학생 정보 확인 (과정·이름·학번·학과·학적 상태 모두 필수) — 빠진 칸을 표시
     const problems = infoProblems(info);
     setInfoBad(problems);
@@ -1261,6 +1279,17 @@ const LiveChat: React.FC = () => {
     const profile = { ...info, name: info.name.trim(), department: info.department.trim(), student_id: info.student_id.trim() };
     saveInfo(profile);
     setStep('loading');
+    if (needEmail) {
+      try {
+        await chatApi.devLogin(`${emailId.trim()}@korea.ac.kr`);
+      } catch (e) {
+        // 그 사이 메일 인증이 다시 켜졌으면 인증 화면으로
+        if (e instanceof ChatApiError && e.status === 404) return setStep('verify');
+        setStep('ready');
+        setEmailBad(true);
+        return setInfoError(e instanceof ChatApiError && e.message ? e.message : t.errors.generic);
+      }
+    }
     try {
       const r = await chatApi.start({ mode, program: formProgram, language: isKorean ? 'KO' : 'EN', profile, botContext: getRecentExchanges() });
       setRoom({ session: r.session, messages: r.messages, position: r.position });
@@ -1374,13 +1403,54 @@ const LiveChat: React.FC = () => {
           <section className="rounded-[16px] bg-card p-[16px]">
             <p className="font-6semibold text-f-base text-ink">{t.readyTitle(mode, grad)}</p>
             <p className="mt-[4px] text-f-sm leading-relaxed text-ink-2">{t.readyBody}</p>
+            {getToken() && (
             <span className="mt-[10px] inline-flex items-center gap-[6px] rounded-full bg-surface px-[10px] py-[4px] text-f-xs text-ink-2">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-[12px] w-[12px]" aria-hidden="true">
                 <path d="M20 6 9 17l-5-5" />
               </svg>
               {getToken()?.email}
             </span>
+            )}
           </section>
+
+          {/* 메일 인증 꺼짐 — 따로 메일 단계 없이 여기서 동의·학교 메일 */}
+          {status?.emailVerification === false && !getToken() && (
+            <section className="mt-[12px] rounded-[16px] border border-line bg-surface p-[16px]">
+              <p className="font-6semibold text-f-base text-ink">{t.consentTitle}</p>
+              <p className="mt-[6px] text-f-sm leading-relaxed text-ink-2">{t.consent}</p>
+              <label className="mt-[10px] flex cursor-pointer items-center gap-[8px] text-f-base text-ink">
+                <input
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(e) => {
+                    setAgreed(e.target.checked);
+                    if (e.target.checked && infoError === t.info.needConsent) setInfoError(null);
+                  }}
+                  className="h-[18px] w-[18px] accent-[rgb(var(--c-accent))]"
+                />
+                {t.agree}
+              </label>
+              <span className="mb-[6px] mt-[14px] block text-f-xs font-6semibold text-ink-2">{t.email}</span>
+              <label
+                className="flex cursor-text items-stretch overflow-hidden rounded-[10px] border bg-surface focus-within:border-accent-ink"
+                style={emailBad ? { borderColor: DANGER } : undefined}
+              >
+                <input
+                  value={emailId}
+                  onChange={(e) => {
+                    setEmailId(e.target.value.replace(/@.*$/, '').trim());
+                    setEmailBad(false);
+                  }}
+                  placeholder={t.emailId}
+                  inputMode="email"
+                  autoComplete="username"
+                  className="h-[42px] min-w-0 flex-1 bg-transparent px-[12px] text-f-sm text-ink outline-none placeholder:text-ink-3"
+                />
+                <span className="flex items-center border-l border-line bg-card px-[12px] text-f-sm font-5medium text-ink">@korea.ac.kr</span>
+              </label>
+              <p className="mt-[6px] text-f-xs text-ink-3">{t.emailHintNoCode}</p>
+            </section>
+          )}
 
           {/* 학생 정보 */}
           <section className="mt-[12px] rounded-[16px] border border-line bg-surface p-[16px]">
