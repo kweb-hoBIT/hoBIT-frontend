@@ -34,6 +34,7 @@ export type ChatMessage = {
 	translation: { text: string; lang: string } | null; // 자동 번역 (학생이 읽는 언어)
 	editedAt?: string | null; // 보낸 사람이 고침
 	removed?: boolean; // 보낸 사람이 지움 (내용 없음)
+	replyToId?: number | null; // 답글이면 원래 메시지 id
 };
 /** 보낸 뒤 이 시간 안에만 내 메시지 수정·삭제 (서버도 같은 기준) */
 export const EDIT_WINDOW_MS = 5 * 60 * 1000;

@@ -72,6 +72,12 @@ const T = {
     msgEdited: '수정됨',
     msgMenu: '메시지 메뉴',
     msgEdit: '수정',
+    msgReply: '답글',
+    replyTo: (who: string): string => `${who}에게 답글`,
+    replyMe: '나',
+    replyAgent: '담당자',
+    replyPrev: '이전 메시지',
+    replyCancel: '취소',
     msgRemove: '삭제',
     msgRemoveConfirm: '이 메시지를 삭제할까요? 상대방 화면에서도 사라지고 되돌릴 수 없어요.',
     editing: '메시지 수정 중',
@@ -184,6 +190,12 @@ const T = {
     msgEdited: 'edited',
     msgMenu: 'Message menu',
     msgEdit: 'Edit',
+    msgReply: 'Reply',
+    replyTo: (who: string): string => `Replying to ${who}`,
+    replyMe: 'me',
+    replyAgent: 'staff',
+    replyPrev: 'Earlier message',
+    replyCancel: 'Cancel',
     msgRemove: 'Delete',
     msgRemoveConfirm: 'Delete this message? It will also disappear for the other person and can’t be undone.',
     editing: 'Editing message',
@@ -611,8 +623,14 @@ const systemText = (t: typeof T.ko, raw: string) => {
   return t === T.ko ? hit.ko : hit.en;
 };
 
-/** 내 말풍선 옆 ⋯ — 수정(글만)·삭제 (보낸 뒤 5분 안) */
-const MessageMenu: React.FC<{ t: typeof T.ko; canEdit: boolean; onEdit: () => void; onRemove: () => void }> = ({ t, canEdit, onEdit, onRemove }) => {
+/** 말풍선 옆 ⋯ — 답글(누구 메시지든), 내 메시지는 수정(글만)·삭제 (보낸 뒤 5분 안) */
+const MessageMenu: React.FC<{ t: typeof T.ko; canEdit: boolean; onEdit: () => void; onRemove?: () => void; onReply?: () => void }> = ({
+  t,
+  canEdit,
+  onEdit,
+  onRemove,
+  onReply,
+}) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -640,27 +658,48 @@ const MessageMenu: React.FC<{ t: typeof T.ko; canEdit: boolean; onEdit: () => vo
       </button>
       {open && (
         <div role="menu" className="absolute bottom-full right-0 z-10 mb-[4px] min-w-[96px] overflow-hidden rounded-[12px] border border-line bg-surface py-[4px] shadow-lg">
+          {onReply && (
+            <button type="button" role="menuitem" onClick={() => (setOpen(false), onReply())} className="block w-full px-[12px] py-[6px] text-left text-f-xs font-6semibold text-ink hover:bg-card">
+              {t.msgReply}
+            </button>
+          )}
           {canEdit && (
             <button type="button" role="menuitem" onClick={() => (setOpen(false), onEdit())} className="block w-full px-[12px] py-[6px] text-left text-f-xs font-6semibold text-ink hover:bg-card">
               {t.msgEdit}
             </button>
           )}
-          <button type="button" role="menuitem" onClick={() => (setOpen(false), onRemove())} className="block w-full px-[12px] py-[6px] text-left text-f-xs font-6semibold text-[#e5484d] hover:bg-card">
-            {t.msgRemove}
-          </button>
+          {onRemove && (
+            <button type="button" role="menuitem" onClick={() => (setOpen(false), onRemove())} className="block w-full px-[12px] py-[6px] text-left text-f-xs font-6semibold text-[#e5484d] hover:bg-card">
+              {t.msgRemove}
+            </button>
+          )}
         </div>
       )}
     </div>
   );
 };
 
-const Bubble: React.FC<{ m: ChatMessage; t: typeof T.ko; canModify?: boolean; onEdit?: () => void; onRemove?: () => void }> = ({
-  m,
-  t,
-  canModify,
-  onEdit,
-  onRemove,
-}) => {
+/** 답글 인용 한 줄 — 상대 메시지는 번역이 있으면 번역 */
+const quoteText = (t: typeof T.ko, m: ChatMessage) =>
+  m.removed ? t.msgRemoved : m.attachment ? `📎 ${m.attachment.name}` : m.sender !== 'student' && m.translation ? m.translation.text : m.body;
+const quoteWho = (t: typeof T.ko, m: ChatMessage) => (m.sender === 'student' ? t.replyMe : t.replyAgent);
+const jumpTo = (id: number) => {
+  const el = document.getElementById(`livechat-msg-${id}`);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  el.classList.add('chat-flash');
+  window.setTimeout(() => el.classList.remove('chat-flash'), 1200);
+};
+
+const Bubble: React.FC<{
+  m: ChatMessage;
+  t: typeof T.ko;
+  parent?: ChatMessage | null;
+  canModify?: boolean;
+  onEdit?: () => void;
+  onRemove?: () => void;
+  onReply?: () => void;
+}> = ({ m, t, parent, canModify, onEdit, onRemove, onReply }) => {
   const [showOriginal, setShowOriginal] = useState(false);
   if (m.sender === 'system') {
     return <p className="my-[6px] text-center text-f-xs text-ink-3">{systemText(t, m.body)}</p>;
@@ -687,7 +726,17 @@ const Bubble: React.FC<{ m: ChatMessage; t: typeof T.ko; canModify?: boolean; on
     }
   };
   return (
-    <div className={`flex flex-col ${mine ? 'items-end' : 'items-start'} my-[8px]`}>
+    <div id={`livechat-msg-${m.id}`} className={`flex flex-col rounded-[12px] transition-colors ${mine ? 'items-end' : 'items-start'} my-[8px]`}>
+      {m.replyToId && (
+        <button
+          type="button"
+          onClick={() => m.replyToId && jumpTo(m.replyToId)}
+          className={`mb-[2px] flex max-w-[75%] items-center gap-[6px] rounded-[8px] border-l-2 border-ink-3/50 bg-card/70 px-[10px] py-[4px] text-left text-f-xs text-ink-3 hover:bg-card ${mine ? 'mr-[4px]' : 'ml-[4px]'}`}
+        >
+          <span className="shrink-0 font-6semibold text-ink-2">{parent ? quoteWho(t, parent) : t.replyPrev}</span>
+          <span className="truncate">{parent ? quoteText(t, parent) : ''}</span>
+        </button>
+      )}
       <div className={`group flex w-full items-end gap-[6px] ${mine ? 'flex-row-reverse' : ''}`}>
         {m.attachment ? (
           // 첨부는 말풍선 없이 — 사진은 사진만, PDF는 흰 파일 카드 (이름·크기를 봐야 무슨 파일인지 알 수 있어서)
@@ -730,7 +779,15 @@ const Bubble: React.FC<{ m: ChatMessage; t: typeof T.ko; canModify?: boolean; on
           {m.editedAt && `${t.msgEdited} · `}
           {timeOf(m.createdAt)}
         </span>
-        {mine && canModify && onRemove && <MessageMenu t={t} canEdit={!m.attachment && !!onEdit} onEdit={onEdit ?? (() => undefined)} onRemove={onRemove} />}
+        {((mine && canModify && onRemove) || onReply) && (
+          <MessageMenu
+            t={t}
+            canEdit={mine && !!canModify && !m.attachment && !!onEdit}
+            onEdit={onEdit ?? (() => undefined)}
+            onRemove={mine && canModify ? onRemove : undefined}
+            onReply={onReply}
+          />
+        )}
       </div>
       {m.translation && !mine && (
         <button type="button" onClick={() => setShowOriginal((v) => !v)} className="mt-[2px] ml-[4px] text-[calc(var(--fs-scale,1)*11px)] text-ink-3 underline">
@@ -760,6 +817,7 @@ const ChatRoom: React.FC<{
   const [longWait, setLongWait] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [editing, setEditing] = useState<ChatMessage | null>(null); // 고치는 중인 내 메시지
+  const [replying, setReplying] = useState<ChatMessage | null>(null); // 답글을 다는 메시지
   const [now, setNow] = useState(Date.now()); // 5분 지나면 ⋯ 메뉴가 사라지게
   useEffect(() => {
     const id = window.setInterval(() => setNow(Date.now()), 15_000);
@@ -868,7 +926,13 @@ const ChatRoom: React.FC<{
 
   const canModify = (m: ChatMessage) =>
     m.sender === 'student' && !m.removed && session.status !== 'closed' && now - new Date(m.createdAt).getTime() < EDIT_WINDOW_MS;
+  const startReply = (m: ChatMessage) => {
+    setEditing(null);
+    setReplying(m);
+    window.setTimeout(() => inputRef.current?.focus(), 0);
+  };
   const startEdit = (m: ChatMessage) => {
+    setReplying(null);
     setEditing(m);
     setText(m.body);
     setNotice(null);
@@ -901,10 +965,11 @@ const ChatRoom: React.FC<{
       });
       return;
     }
-    socketRef.current.emit('message:send', { sessionId: session.id, body }, (r: any) => {
+    socketRef.current.emit('message:send', { sessionId: session.id, body, replyToId: replying?.id }, (r: any) => {
       if (r?.ok) {
         addMessage(r.message);
         setText('');
+        setReplying(null);
       } else setNotice(t.errors[r?.error] ?? t.errors.generic);
     });
   };
@@ -983,7 +1048,16 @@ const ChatRoom: React.FC<{
 
       <div ref={listRef} className="min-h-0 flex-1 overflow-y-auto px-[16px] py-[12px]" aria-live="polite">
         {messages.map((m) => (
-          <Bubble key={m.id} m={m} t={t} canModify={canModify(m)} onEdit={() => startEdit(m)} onRemove={() => removeMsg(m)} />
+          <Bubble
+            key={m.id}
+            m={m}
+            t={t}
+            parent={m.replyToId ? messages.find((x) => x.id === m.replyToId) ?? null : null}
+            canModify={canModify(m)}
+            onEdit={() => startEdit(m)}
+            onRemove={() => removeMsg(m)}
+            onReply={!closed && m.sender !== 'system' && !m.removed ? () => startReply(m) : undefined}
+          />
         ))}
         {agentTyping && !closed && <p className="ml-[4px] mt-[4px] text-f-xs text-ink-3">{t.typing}</p>}
         {longWait && session.status === 'waiting' && (
@@ -1042,6 +1116,21 @@ const ChatRoom: React.FC<{
       </div>
 
       {notice && <p className="mx-[16px] mb-[6px] rounded-[12px] bg-[rgb(var(--c-senior))] px-[12px] py-[6px] text-f-xs text-accent-ink">{notice}</p>}
+      {!closed && replying && !editing && (
+        <div className="flex items-center justify-between border-t-2 border-line bg-card px-[16px] py-[6px] text-f-xs">
+          <span className="flex min-w-0 items-center gap-[6px] text-ink-2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-[13px] w-[13px] shrink-0" aria-hidden="true">
+              <path d="M9 14 4 9l5-5" />
+              <path d="M4 9h10a6 6 0 0 1 6 6v5" />
+            </svg>
+            <span className="shrink-0 font-6semibold">{t.replyTo(quoteWho(t, replying))}</span>
+            <span className="truncate text-ink-3">{quoteText(t, replying)}</span>
+          </span>
+          <button type="button" onClick={() => setReplying(null)} className="ml-[8px] shrink-0 rounded-full px-[8px] py-[2px] font-6semibold text-ink-2 hover:bg-card-2">
+            {t.replyCancel}
+          </button>
+        </div>
+      )}
       {!closed && editing && (
         <div className="flex items-center justify-between border-t-2 border-line bg-card px-[16px] py-[6px] text-f-xs">
           <span className="flex min-w-0 items-center gap-[6px] text-ink-2">
@@ -1058,7 +1147,7 @@ const ChatRoom: React.FC<{
       )}
       {!closed && (
         // 높이·선 두께를 뒤의 호빗 입력창과 같게 (채팅 창을 열어도 아래 선이 한 줄로 이어짐)
-        <div className={`flex items-end gap-[8px] px-[12px] py-[10px] md:py-[16px] ${editing ? '' : 'border-t-2 border-line'}`}>
+        <div className={`flex items-end gap-[8px] px-[12px] py-[10px] md:py-[16px] ${editing || replying ? '' : 'border-t-2 border-line'}`}>
           <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif,application/pdf" className="hidden" onChange={(e) => upload(e.target.files?.[0])} />
           <button
             type="button"
@@ -1086,6 +1175,7 @@ const ChatRoom: React.FC<{
                 send();
               }
               if (e.key === 'Escape' && editing) cancelEdit();
+              else if (e.key === 'Escape' && replying) setReplying(null);
             }}
             rows={1}
             placeholder={t.placeholder}

@@ -250,3 +250,6 @@ html.embed .bg-card img {
     font-size: 16px !important;
   }
 }
+
+/* 채팅 답글 인용을 눌러 원래 메시지로 갔을 때 잠깐 표시 */
+.chat-flash { background: rgb(var(--c-accent) / 0.12); }
