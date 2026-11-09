@@ -61,7 +61,8 @@ const T = {
     emailHint: '고려대학교 메일(@korea.ac.kr)로만 인증할 수 있어요',
     emailId: '메일 아이디',
     sendCode: '인증 코드 받기',
-    devStart: '바로 시작 (개발 모드 · 메일 인증 생략)',
+    devStart: '채팅 시작',
+    emailHintNoCode: '지금은 인증 코드 없이 학교 메일 주소만 적으면 바로 시작해요. 답장이 필요할 수 있으니 본인 메일을 적어 주세요.',
     resend: (s: number): string => (s > 0 ? `다시 받기 (${s}초)` : '코드 다시 받기'),
     code: '인증 코드 6자리',
     verify: '인증하기',
@@ -170,7 +171,8 @@ const T = {
     emailHint: 'Only Korea University (@korea.ac.kr) email can be verified',
     emailId: 'email ID',
     sendCode: 'Send code',
-    devStart: 'Start (dev mode · no email code)',
+    devStart: 'Start chat',
+    emailHintNoCode: 'No verification code needed right now. Just enter your Korea University email to start (use your own address).',
     resend: (s: number): string => (s > 0 ? `Resend (${s}s)` : 'Resend code'),
     code: '6-digit code',
     verify: 'Verify',
@@ -273,6 +275,12 @@ const timeOf = (iso: string) => new Date(iso).toLocaleTimeString('ko-KR', { hour
 
 // ── 학교 메일 인증 ─────────────────────────────────────────
 const Verify: React.FC<{ t: typeof T.ko; onDone: () => void; skipCode: boolean }> = ({ t, onDone, skipCode }) => {
+  // 관리자 사이트에서 메일 인증을 켜고 끈 게 바로 보이게 — 창을 연 뒤에 바뀌었어도 이 화면에서 다시 확인
+  const [skip, setSkip] = useState(skipCode);
+  useEffect(() => setSkip(skipCode), [skipCode]);
+  useEffect(() => {
+    chatApi.features().then((f) => setSkip(f.emailVerification === false)).catch(() => undefined);
+  }, []);
   const [agreed, setAgreed] = useState(false);
   const [email, setEmail] = useState('');
   const [sentTo, setSentTo] = useState<string | null>(null);
@@ -293,8 +301,11 @@ const Verify: React.FC<{ t: typeof T.ko; onDone: () => void; skipCode: boolean }
     setBusy(true);
     setError(null);
     try {
-      if (skipCode) {
-        // 개발 모드: 코드 없이 바로 (서버가 허용할 때만)
+      // 보내기 직전에도 한 번 더 — 그 사이 관리자가 바꿨을 수 있음
+      const off = await chatApi.features().then((f) => f.emailVerification === false).catch(() => skip);
+      setSkip(off);
+      if (off) {
+        // 메일 인증 꺼짐: 코드 없이 바로 (서버가 허용할 때만)
         await chatApi.devLogin(fullEmail);
         return onDone();
       }
@@ -347,7 +358,7 @@ const Verify: React.FC<{ t: typeof T.ko; onDone: () => void; skipCode: boolean }
         />
         <span className="flex items-center border-l border-line bg-card px-[14px] text-f-base font-5medium text-ink">@korea.ac.kr</span>
       </label>
-      <p className="-mt-[6px] text-f-sm text-ink-3">{t.emailHint}</p>
+      <p className="-mt-[6px] text-f-sm text-ink-3">{skip ? t.emailHintNoCode : t.emailHint}</p>
 
       {!sentTo ? (
         <button
@@ -356,7 +367,7 @@ const Verify: React.FC<{ t: typeof T.ko; onDone: () => void; skipCode: boolean }
           onClick={send}
           className="rounded-full bg-accent py-[10px] text-f-base font-6semibold text-white disabled:opacity-50"
         >
-          {skipCode ? t.devStart : t.sendCode}
+          {skip ? t.devStart : t.sendCode}
         </button>
       ) : (
         <>
