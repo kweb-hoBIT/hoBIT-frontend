@@ -29,7 +29,7 @@ const cleanStreamText = (text: string) =>
 // 스트리밍 중 말풍선 — 받은 글은 바로 보여줌 (글자 단위로 풀어 보여주는 효과는 쓰지 않음)
 const StreamBubble: React.FC<{ text: string; senior: boolean }> = ({ text, senior }) => {
   return (
-    <div className={`${senior ? 'bg-senior' : 'bg-card'} font-5medium text-f-base mt-[10px] rounded-[20px] px-[20px] py-[15px] w-full max-w-[330px] md:max-w-none md:w-[350px] break-words whitespace-pre-wrap`}>
+    <div className={`${senior ? 'bg-senior' : 'bg-card'} font-5medium text-f-base mt-[10px] rounded-[20px] px-[20px] py-[15px] hobit-bubble w-full max-w-[330px] md:max-w-none md:w-[350px] break-words whitespace-pre-wrap`}>
       {cleanStreamText(text)}
       <span className="inline-block w-[6px] h-[1em] ml-[2px] align-middle bg-ink-2 animate-pulse" />
     </div>

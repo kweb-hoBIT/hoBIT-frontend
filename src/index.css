@@ -230,3 +230,23 @@ html.embed .bg-card img {
   width: 110px !important;
   margin-bottom: 6px !important;
 }
+
+/* 휴대폰 화면은 한 단계 촘촘하게 — 글자 0.9배, 말풍선 여백·모서리 축소로 한 화면에 더 많이 (PC는 그대로).
+   위젯 창(html.embed, 0.8)이 이 규칙보다 우선. 입력칸은 16px 유지 — iOS는 16px보다 작은 입력칸을 누르면 화면을 확대함 */
+@media (max-width: 767px) {
+  :root {
+    --fs-scale: 0.9;
+  }
+  html:not(.embed) .hobit-bubble {
+    padding: 11px 15px !important;
+    border-radius: 16px !important;
+  }
+  textarea,
+  input:not([type]),
+  input[type='text'],
+  input[type='email'],
+  input[type='search'],
+  input[type='tel'] {
+    font-size: 16px !important;
+  }
+}
