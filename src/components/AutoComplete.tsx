@@ -16,13 +16,22 @@ const stem = (s: string) => {
  * 관리자 키워드 규칙에 걸리는지 — 입력에 대표 키워드·연관 단어가 들어 있거나,
  * 두 글자 이상 입력이 그 단어의 앞부분일 때 ("현장" → 현장실습)
  */
+/** 영어 단어·약어 (한글 없이 영문이 있는 말) — 단어 단위로 비교 ("cs"가 "physics" 안에서 걸리지 않게) */
+const isLatin = (w: string) => !/[가-힣ㄱ-ㅎㅏ-ㅣ]/.test(w) && /[a-z]/i.test(w);
+const latinRe = (w: string) =>
+	new RegExp(`(^|[^a-z0-9])${w.trim().toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s*')}(?=[^a-z0-9]|$)`);
+
 function matchRules(rules: KeywordRule[], input: string): KeywordRule[] {
 	const text = norm(input);
 	if (!text) return [];
+	const lower = input.toLowerCase();
 	return rules.filter((r) =>
 		[r.keyword, ...r.synonyms].some((w) => {
 			const t = stem(w);
-			return t.length > 0 && (text.includes(t) || (text.length >= 2 && t.startsWith(text)));
+			if (!t.length) return false;
+			// 영어는 단어 단위, 앞부분 입력은 세 글자부터 ("comp" → computer science)
+			if (isLatin(w)) return latinRe(w).test(lower) || (text.length >= 3 && t.startsWith(text));
+			return text.includes(t) || (text.length >= 2 && t.startsWith(text));
 		})
 	);
 }
