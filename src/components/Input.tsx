@@ -101,7 +101,8 @@ const Input: React.FC = () => {
           aria-label={isKorean ? '처음 화면' : 'Home'}
           className="mr-[15px] md:mr-[20px] flex h-[40px] md:h-[48px] shrink-0 items-center text-accent-ink hover:text-ink-2 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-line rounded-full"
         >
-          <AiFillHome className="text-f-display" aria-hidden="true" />
+          {/* 집 모양은 지붕이 가늘어 무게가 아래로 쏠려 보임 → 눈으로 보기에 가운데가 되게 1px 위로 (도형 기준으로는 이미 가운데) */}
+          <AiFillHome className="text-f-display -translate-y-px" aria-hidden="true" />
         </button>
         <div className={`w-full min-h-[40px] md:min-h-[48px] px-4 py-[8px] md:py-[10px] rounded-[24px] flex flex-row items-end transition-colors ${isLoading || suspended ? 'bg-card' : 'bg-card-2'}`}>
           <textarea
