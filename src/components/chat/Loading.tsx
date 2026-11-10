@@ -70,19 +70,19 @@ const Loading: React.FC<{ steps?: ProgressStep[]; written?: boolean; collapsed?:
               {done.map((s) => (
                 <li key={s.key} className="hobit-appear flex items-center gap-[8px] text-f-sm">
                   <Check />
-                  <span className="font-6semibold text-ink-2">{s.label}</span>
+                  <span className="shrink-0 whitespace-nowrap font-6semibold text-ink-2">{s.label}</span>
                   {s.detail && <span className="min-w-0 truncate text-ink-3">· {s.detail}</span>}
                 </li>
               ))}
               {written ? (
                 <li className="hobit-appear flex items-center gap-[8px] text-f-sm">
                   <Check />
-                  <span className="font-6semibold text-ink-2">{writtenLabel}</span>
+                  <span className="shrink-0 whitespace-nowrap font-6semibold text-ink-2">{writtenLabel}</span>
                 </li>
               ) : (
                 <li className="flex items-center gap-[8px] text-f-sm">
                   <span className="h-[18px] w-[18px] shrink-0 animate-spin rounded-full border-[2.5px] border-card-3 border-t-accent-ink" aria-hidden="true" />
-                  <span className="font-6semibold text-ink">{pending}</span>
+                  <span className="whitespace-nowrap font-6semibold text-ink">{pending}</span>
                 </li>
               )}
             </ul>
