@@ -113,6 +113,15 @@ const usePlayer = (poster: string) => {
 
 let activeHome = 0; // 가장 최근에 그려진 시작 화면 호빗
 
+// 아이폰(iOS 13+)은 흔들림을 읽으려면 사용자가 누른 순간에 권한을 물어야 함 — 한 번만 (거절하면 탭으로만 깨움)
+let motionAsked = false;
+const askMotion = () => {
+  const DM = (window as any).DeviceMotionEvent;
+  if (motionAsked || !DM || typeof DM.requestPermission !== 'function') return;
+  motionAsked = true;
+  DM.requestPermission().catch(() => undefined);
+};
+
 export const HomeMascot: React.FC<{ poster: string; className?: string; label: string }> = ({ poster, className = '', label }) => {
   const { src, play } = usePlayer(poster);
   const id = useRef(0);
@@ -164,13 +173,23 @@ export const HomeMascot: React.FC<{ poster: string; className?: string; label: s
     };
     const evs = ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart'] as const;
     evs.forEach((e) => window.addEventListener(e, onActivity, { passive: true }));
-    // 휴대폰을 흔들면 깸 (안드로이드 — 아이폰은 움직임 권한을 물어야 해서 탭으로만)
+    // 휴대폰을 빠르게 몇 번 흔들면 깸 — 1.2초 안에 세게 3번 (걷거나 폰을 집어 드는 정도로는 안 깨게)
+    // 아이폰은 움직임 권한이 있어야 와서, 캐릭터를 처음 탭할 때 권한을 물음 (askMotion)
     let last: { x: number; y: number; z: number } | null = null;
+    let jolts: number[] = [];
     const onMotion = (e: DeviceMotionEvent) => {
       const a = e.accelerationIncludingGravity;
       if (!a || a.x == null || a.y == null || a.z == null) return;
       const cur = { x: a.x, y: a.y, z: a.z };
-      if (last && Math.abs(cur.x - last.x) + Math.abs(cur.y - last.y) + Math.abs(cur.z - last.z) > 25) wakeRef.current();
+      const now = Date.now();
+      if (last && Math.abs(cur.x - last.x) + Math.abs(cur.y - last.y) + Math.abs(cur.z - last.z) > 18) {
+        if (!jolts.length || now - jolts[jolts.length - 1] > 150) jolts.push(now); // 한 번 흔든 것을 여러 번으로 세지 않게
+        jolts = jolts.filter((t) => now - t < 1200);
+        if (jolts.length >= 3) {
+          jolts = [];
+          wakeRef.current();
+        }
+      }
       last = cur;
     };
     window.addEventListener('devicemotion', onMotion);
@@ -195,6 +214,7 @@ export const HomeMascot: React.FC<{ poster: string; className?: string; label: s
   wakeRef.current = wake;
 
   const onClick = async () => {
+    askMotion();
     if (busy.current) return;
     if (pose.current === 'asleep') return wake();
     if (lastAwake.current === 'awake') return; // 놀란 뒤(awake)에는 눌러도 반응 없음 — 가만히 두면 다시 졺(sleep2)
