@@ -5,7 +5,7 @@ import { RootState } from '../../redux/store';
 
 import HobitProfile from './HobitProfile';
 import Response from './Response';
-import { MascotOnce } from './Mascot';
+import { HomeMascot } from './Mascot';
 import { Faq } from '../../types/faq';
 import { clearSentValue, sendInputValue } from '../../redux/inputSlice';
 
@@ -28,8 +28,8 @@ const GreetResponse: React.FC = () => {
     <div>
       <HobitProfile />
       <div className="bg-card w-[300px] max-w-full md:max-w-none md:w-[350px] h-auto mt-[12px] md:mt-[20px] rounded-[16px] md:rounded-[20px] flex flex-col items-center px-[14px] pt-[10px] pb-[6px] md:p-[20px]">
-        {/* 인사 응답 — 손 흔드는 호빗(hi) 한 번 (받기 전·동작 줄이기·관리자가 끄면 hello.png) */}
-        <MascotOnce clip="hi" poster={helloImg} alt="hello image" className="w-[124px] md:w-[200px] h-auto aspect-square mb-[2px] md:mb-[10px]" />
+        {/* 인사 응답 — 손 흔들기(hi)로 시작, 그 뒤는 시작 화면과 같음 (누르면 손 흔들기·가만히 두면 졸음·깨우면 놀람) */}
+        <HomeMascot start="hi" poster={helloImg} label={isKorean ? '호빗 — 눌러서 인사하기' : 'hoBIT — tap to say hi'} className="w-[124px] md:w-[200px] h-auto aspect-square mb-[2px] md:mb-[10px]" />
         <div className="flex w-full justify-between items-center">
           <button
             onClick={() =>

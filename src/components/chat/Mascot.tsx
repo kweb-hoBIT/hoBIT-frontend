@@ -122,12 +122,13 @@ const askMotion = () => {
   DM.requestPermission().catch(() => undefined);
 };
 
-export const HomeMascot: React.FC<{ poster: string; className?: string; label: string }> = ({ poster, className = '', label }) => {
+/** start: 처음 재생할 클립 — 시작 화면은 손인사(main), '안녕' 같은 인사 응답은 손 흔들기(hi). 그 뒤 졸음·깸은 같음 */
+export const HomeMascot: React.FC<{ poster: string; className?: string; label: string; start?: 'main' | 'hi' }> = ({ poster, className = '', label, start = 'main' }) => {
   const { src, play } = usePlayer(poster);
   const id = useRef(0);
   const busy = useRef(true); // 재생 중에는 누름·졸음 무시
   const pose = useRef<'awake' | 'asleep'>('awake');
-  const lastAwake = useRef<'main' | 'hi' | 'awake'>('main');
+  const lastAwake = useRef<'main' | 'hi' | 'awake'>(start);
   const idleTimer = useRef<ReturnType<typeof setTimeout>>();
 
   const run = useCallback(
@@ -154,7 +155,7 @@ export const HomeMascot: React.FC<{ poster: string; className?: string; label: s
     id.current = ++activeHome;
     let stop = false;
     (async () => {
-      await run('main', 'awake');
+      await run(start, 'awake');
       if (stop) return;
       later(() => {
         loadClip('hi');
