@@ -14,7 +14,8 @@ export const loadProgram = (): Program => {
 
 const programSlice = createSlice({
   name: 'program',
-  initialState: { value: loadProgram() as Program },
+  // gradEnabled: 관리자 챗봇 설정에서 대학원 답변을 끄면 false → 스위치를 숨기고 학부로만 (기억해 둔 값은 그대로 둬서 다시 켜면 돌아옴)
+  initialState: { value: loadProgram() as Program, gradEnabled: true },
   reducers: {
     setProgram(state, action: PayloadAction<Program>) {
       state.value = action.payload;
@@ -22,8 +23,12 @@ const programSlice = createSlice({
         localStorage.setItem(PROGRAM_KEY, action.payload);
       } catch {}
     },
+    setGradEnabled(state, action: PayloadAction<boolean>) {
+      state.gradEnabled = action.payload;
+      state.value = action.payload ? loadProgram() : 'undergraduate';
+    },
   },
 });
 
-export const { setProgram } = programSlice.actions;
+export const { setProgram, setGradEnabled } = programSlice.actions;
 export const programReducer = programSlice.reducer;

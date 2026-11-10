@@ -4,7 +4,8 @@ import { RootState } from '../redux/store';
 import { lang } from '../i18n/lang';
 import { setEnglish, setKorean } from '../redux/languageSlice';
 import { toggleMenu } from '../redux/menuSlice';
-import { Program, setProgram } from '../redux/programSlice';
+import { Program, setGradEnabled, setProgram } from '../redux/programSlice';
+import { chatApi } from '../api/liveChat';
 import { preloadMenuContent } from './Modal';
 import { appConfirm } from './ui/Dialog';
 import { deleteProfile, getProfile } from '../api/query';
@@ -235,7 +236,8 @@ const ControlsMenu: React.FC<{ isKorean: boolean; dark: boolean; setDark: (d: bo
   }, [open]);
 
   // id는 고정 — 이름(label)으로 키를 쓰면 언어를 바꿀 때 줄이 새로 그려져 스위치가 미끄러지지 않고 툭 바뀜
-  const rows: { id: string; label: string; control: React.ReactNode }[] = [
+  const gradOn = useSelector((state: RootState) => state.program.gradEnabled);
+  const allRows: { id: string; label: string; control: React.ReactNode }[] = [
     {
       id: 'program',
       label: isKorean ? '과정' : 'Program',
@@ -263,6 +265,7 @@ const ControlsMenu: React.FC<{ isKorean: boolean; dark: boolean; setDark: (d: bo
       ),
     },
   ];
+  const rows = gradOn ? allRows : allRows.filter((r) => r.id !== 'program');
 
   return (
     <div className="relative" ref={ref}>
@@ -346,6 +349,15 @@ const Header: React.FC = () => {
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
   const i18n = isKorean ? lang.ko : lang.en;
   const { dark, toggle, set: setDark } = useTheme();
+  const gradOn = useSelector((state: RootState) => state.program.gradEnabled);
+
+  // 관리자가 대학원 답변을 껐는지 (챗봇 설정) — 끄면 학부/대학원 스위치를 숨기고 학부로만. 못 읽으면 그대로(켜짐)
+  useEffect(() => {
+    chatApi
+      .features()
+      .then((f) => dispatch(setGradEnabled(f.gradEnabled !== false)))
+      .catch(() => undefined);
+  }, [dispatch]);
 
   // 버튼 라벨은 "누르면 바뀔 상태" (블로그와 같은 방식)
   const langLabel = isKorean ? 'English' : '한국어';
@@ -380,7 +392,7 @@ const Header: React.FC = () => {
 
       {/* 오른쪽 끝은 글자라 아이콘(안쪽 여백 있음)보다 바깥에 붙어 보임 → 조금 더 띄워 좌우 균형 */}
       <nav className="hidden min-[480px]:flex flex-1 justify-end items-center gap-[12px] sm:gap-[14px] md:gap-[16px] xl:gap-[28px] pr-[2px] md:pr-[6px]" aria-label={isKorean ? '설정' : 'Settings'}>
-        <ProgramSwitch isKorean={isKorean} />
+        {gradOn && <ProgramSwitch isKorean={isKorean} />}
         <button
           type="button"
           onClick={() => dispatch(isKorean ? setEnglish() : setKorean())}
