@@ -234,8 +234,10 @@ const ControlsMenu: React.FC<{ isKorean: boolean; dark: boolean; setDark: (d: bo
     };
   }, [open]);
 
-  const rows: { label: string; control: React.ReactNode }[] = [
+  // id는 고정 — 이름(label)으로 키를 쓰면 언어를 바꿀 때 줄이 새로 그려져 스위치가 미끄러지지 않고 툭 바뀜
+  const rows: { id: string; label: string; control: React.ReactNode }[] = [
     {
+      id: 'program',
       label: isKorean ? '과정' : 'Program',
       control: (
         <SlideSwitch wide ariaLabel={isKorean ? '학부·대학원 선택' : 'Undergraduate or graduate'} options={options}
@@ -243,6 +245,7 @@ const ControlsMenu: React.FC<{ isKorean: boolean; dark: boolean; setDark: (d: bo
       ),
     },
     {
+      id: 'lang',
       label: isKorean ? '언어' : 'Language',
       control: (
         <SlideSwitch wide ariaLabel={isKorean ? '언어 선택' : 'Language'}
@@ -251,6 +254,7 @@ const ControlsMenu: React.FC<{ isKorean: boolean; dark: boolean; setDark: (d: bo
       ),
     },
     {
+      id: 'theme',
       label: isKorean ? '화면' : 'Theme',
       control: (
         <SlideSwitch wide ariaLabel={isKorean ? '화면 모드' : 'Theme'}
@@ -273,14 +277,15 @@ const ControlsMenu: React.FC<{ isKorean: boolean; dark: boolean; setDark: (d: bo
         {/* 대학원 모드면 작은 점 — 패널을 열지 않아도 지금 기준을 알 수 있게 */}
         {program === 'graduate' && <span className="absolute -right-[2px] -top-[2px] h-[8px] w-[8px] rounded-full bg-accent-ink ring-2 ring-surface" />}
       </button>
+      {/* 여백 줄임 (2026-11-10): 이름 칸은 글자 폭만큼, 줄 사이·안쪽 여백도 좁게 — 한 표로 묶어 이름 칸 폭이 줄마다 같게 */}
       {open && (
-        <div className="hobit-appear absolute right-0 top-[calc(100%+12px)] w-[min(300px,calc(100vw-28px))] rounded-[18px] border border-line bg-surface p-[14px] shadow-lg">
-          <div className="flex flex-col gap-[12px]">
+        <div className="hobit-appear absolute right-0 top-[calc(100%+10px)] w-[min(256px,calc(100vw-28px))] rounded-[16px] border border-line bg-surface p-[10px] pl-[14px] shadow-lg">
+          <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-[12px] gap-y-[6px]">
             {rows.map((r) => (
-              <div key={r.label} className="grid grid-cols-[52px_minmax(0,1fr)] items-center gap-[10px]">
-                <span className="text-f-sm font-6semibold text-ink-2">{r.label}</span>
+              <React.Fragment key={r.id}>
+                <span className="text-f-sm font-6semibold text-ink-2 whitespace-nowrap">{r.label}</span>
                 {r.control}
-              </div>
+              </React.Fragment>
             ))}
           </div>
         </div>
