@@ -587,9 +587,17 @@ const MenuContent: React.FC = () => {
           </button>
         </div>
         <div className="w-full flex flex-col mt-[20px] items-center font-4regular text-[16px] text-ink-3">
-          {/* KWEB이 처음 만들고 IDEA Lab(강성구 교수님 연구실)이 유지보수 */}
-          <span>copyrights@KWEB · IDEA Lab</span>
-          <span className="text-[13px]">{isKorean ? '고려대학교 강성구 교수님 연구실' : 'IDEA Lab, Korea University'}</span>
+          {/* KWEB이 처음 만들고 IDEA Lab이 유지보수 — 이름을 누르면 각 홈페이지 */}
+          <span>
+            copyrights@
+            <a href="https://kwebofficial.com" target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:text-ink-2 hover:underline">
+              KWEB
+            </a>
+            {' · '}
+            <a href="https://idea.korea.ac.kr" target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:text-ink-2 hover:underline">
+              IDEA Lab
+            </a>
+          </span>
         </div>
     </>
   );
