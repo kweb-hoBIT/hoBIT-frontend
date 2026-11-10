@@ -30,8 +30,8 @@ const HelloHobit: React.FC = () => {
   }, [program]);
 
   return (
-    // 좁은 화면에서 카드 오른쪽 여유 8px — 카드가 화면 너비를 쓰도록 (예전 28px·최대 330px은 넓은 휴대폰에서 양옆이 비었음)
-    <div className="pr-[8px] md:pr-0">
+    // 좁은 화면에서 카드 오른쪽 여유 24px·최대 400px — 내 말풍선과 구분되고 넓은 휴대폰에서도 너무 길지 않게
+    <div className="pr-[24px] md:pr-0">
       <HobitProfile />
       <MainOptions />
       <Response

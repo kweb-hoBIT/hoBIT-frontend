@@ -79,7 +79,7 @@ const SeniorResponse: React.FC<SeniorResponseProps> = ({ seniorFaqId, onBack, hi
                 (answer, index) => (
                   <div
                     key={index}
-                    className="font-5medium text-f-base bg-senior mt-[10px] rounded-[20px] px-[20px] py-[15px] hobit-bubble w-full max-w-[520px] md:max-w-none md:w-[350px] break-words md:mr-[10px] flex-shrink-0"
+                    className="font-5medium text-f-base bg-senior mt-[10px] rounded-[20px] px-[20px] py-[15px] hobit-bubble w-full max-w-[400px] md:max-w-none md:w-[350px] break-words md:mr-[10px] flex-shrink-0"
                   >
                     {index === 0 && (
                       <div>

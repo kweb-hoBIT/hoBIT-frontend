@@ -28,6 +28,38 @@ import { applyModeration } from '../lib/moderation';
 const RESUME_PX = 32;
 const SHOW_DOWN_PX = 160;
 
+// 천천히 보여 주기 박자
+const TICK_MS = 32;              // 화면 갱신 간격
+const FIRST_LIST_MS = 300;       // 첫 단계가 안 와도 이만큼 지나면 체크 목록을 띄움 (그 전엔 점 세 개)
+const STEP_GAP_MS = 550;         // 단계 ✓ 사이 최소 간격 — 하나씩 읽히게
+const BASE_CPS = 75;             // 기본 글 속도 (글자/초)
+const CATCHUP_MAX_MS = 2500;     // 응답이 다 온 뒤 남은 글을 보여 주는 데 최대 이만큼
+const COLLAPSE_AFTER_MS = 1600;  // 글이 나오기 시작하고 이만큼 뒤 체크 목록을 한 줄로 접음
+
+type Pacer = {
+  startedAt: number;
+  steps: ProgressStep[];   // 받은 단계
+  shownSteps: number;      // 화면에 보인 단계 수
+  lastStepAt: number;
+  stepsDirty: boolean;     // 이미 보인 단계의 내용이 바뀜
+  target: string;          // 받은 글 전체
+  shown: number;           // 보인 글자 수 (소수 — 박자마다 조금씩)
+  textAt: number;          // 글을 보이기 시작한 시각 (0 = 아직)
+  lastTick: number;
+  finalPatch: Partial<ChatItem> | null; // 응답 끝 — 다 보여 준 뒤 적용할 최종 화면
+  deadline: number;        // 남은 글을 이때까지 다 보여 줌
+  // 마지막으로 화면에 반영한 값 (바뀐 것만 setState)
+  cList: boolean; cSteps: number; cChars: number; cWritten: boolean; cCollapsed: boolean;
+};
+
+// 이모지(서로게이트 쌍) 중간에서 자르지 않게
+const safeCut = (text: string, shown: number) => {
+  let n = Math.min(text.length, Math.floor(shown));
+  const c = text.charCodeAt(n - 1);
+  if (n > 0 && n < text.length && c >= 0xd800 && c <= 0xdbff) n += 1;
+  return n;
+};
+
 
 interface ChatItem {
   uid: string;  // 대화 항목 고유 번호 — 같은 질문을 여러 번 해도 해당 항목만 갱신
@@ -46,6 +78,8 @@ interface ChatItem {
   streamText?: string;           // 스트리밍 중인 답변
   streamStyle?: string;          // senior면 스트리밍 말풍선도 선배 색
   progress?: ProgressStep[];     // 답변 전까지 끝난 단계 (체크 목록)
+  progressWritten?: boolean;     // 글이 나오기 시작함 → '답변 정리 중…'을 ✓로
+  progressCollapsed?: boolean;   // 체크 목록을 한 줄 요약으로 접음
   stopped?: boolean;             // '답변 중지'로 멈춤 — 그때까지 받은 글(streamText)만 남기고 멈췄다는 표시
   recommendations?: RecItem[];   // 답변 아래 "이어서 물어볼 만한 질문"
   initialSeniorFaqId?: number;
@@ -311,24 +345,128 @@ const Chatting: React.FC = () => {
     scrollToEnd();
   }, [chatHistory.length, homeClicked, feedbackClicked, scrollToEnd, resumeFollow]);
 
-  // ── 스트리밍 조각 묶기 ────────────────────────────────────
-  // 조각마다 setState하면 답변 하나에 수백 번 다시 그림 → 약 50ms마다 모아서 한 번에 반영
-  const streamBufferRef = useRef<Record<string, string>>({});
-  const streamTimerRef = useRef<number | null>(null);
-  const appendStream = (uid: string, delta: string) => {
-    streamBufferRef.current[uid] = (streamBufferRef.current[uid] ?? '') + delta;
-    if (streamTimerRef.current !== null) return;
-    streamTimerRef.current = window.setTimeout(() => {
-      const pending = streamBufferRef.current;
-      streamBufferRef.current = {};
-      streamTimerRef.current = null;
-      setChatHistory((prev) =>
-        prev.map((item) =>
-          pending[item.uid] ? { ...item, streamText: (item.streamText ?? '') + pending[item.uid] } : item
-        )
-      );
-    }, 50);
+  // ── 천천히 보여 주기 (체크 목록 → 답변) ──────────────────────
+  // 사용자 의견: "체크가 너무 짧게 지나가고 답변이 화라락 지나간다"
+  // → 받은 단계·글은 여기(pacer)에 모아 두고, 화면에는 일정한 박자로 풀어 보여 줌.
+  //   단계는 하나씩 간격을 두고 ✓, 글은 읽을 만한 속도로, 최종 카드는 다 보여 준 뒤에 바꿈.
+  // 화면 갱신은 한 박자(32ms)에 setState 한 번 — 조각마다 다시 그리지 않게
+  const pacersRef = useRef<Record<string, Pacer>>({});
+  const pacerTimerRef = useRef<number | null>(null);
+
+  const startPacer = (uid: string) => {
+    const now = performance.now();
+    pacersRef.current[uid] = {
+      startedAt: now, steps: [], shownSteps: 0, lastStepAt: now, stepsDirty: false,
+      target: '', shown: 0, textAt: 0, lastTick: now, finalPatch: null, deadline: 0,
+      cList: false, cSteps: 0, cChars: 0, cWritten: false, cCollapsed: false,
+    };
+    ensurePacerTimer();
   };
+  const appendStream = (uid: string, delta: string) => {
+    const p = pacersRef.current[uid];
+    if (p) p.target += delta;
+  };
+  // 진행 단계 추가 (같은 단계가 두 번 오면 그 자리에서 마지막 것으로)
+  const addProgress = (uid: string, step: ProgressStep) => {
+    const p = pacersRef.current[uid];
+    if (!p) return;
+    const idx = p.steps.findIndex((s) => s.key === step.key);
+    if (idx < 0) p.steps.push(step);
+    else {
+      p.steps[idx] = step;
+      if (idx < p.shownSteps) p.stepsDirty = true;
+    }
+  };
+  // 응답 끝 — 아직 보여 줄 글이 남았으면 다 보여 준 뒤에 최종 화면으로 (그동안 입력 잠금·중지 버튼 유지)
+  // 글 없이 끝난 응답(인사·카테고리·경고 안내 등)은 바로
+  const finishPacer = (uid: string, patch: Partial<ChatItem>) => {
+    const p = pacersRef.current[uid];
+    if (p && p.target && !prefersReducedMotion()) {
+      p.finalPatch = patch;
+      return;
+    }
+    delete pacersRef.current[uid];
+    const extra: Partial<ChatItem> =
+      p && p.target ? { progress: p.steps, progressWritten: true, progressCollapsed: true } : {};
+    setChatHistory((prev) => prev.map((item) => (item.uid === uid ? { ...item, ...extra, ...patch } : item)));
+  };
+  const hasPendingFinal = (uid: string) => Boolean(pacersRef.current[uid]?.finalPatch);
+  const dropPacer = (uid: string) => {
+    delete pacersRef.current[uid];
+  };
+
+  const pacerTick = () => {
+    const now = performance.now();
+    const reduce = prefersReducedMotion();
+    const patches: Record<string, Partial<ChatItem>> = {};
+    let unlock = false;
+    for (const [uid, p] of Object.entries(pacersRef.current)) {
+      const patch: Partial<ChatItem> = {};
+      // 1) 단계: 첫 단계는 오자마자, 그다음은 STEP_GAP_MS 간격으로 하나씩 (글이 이미 나오는 중이면 바로)
+      if (p.shownSteps < p.steps.length && (reduce || p.textAt || p.shownSteps === 0 || now - p.lastStepAt >= STEP_GAP_MS)) {
+        p.shownSteps = reduce ? p.steps.length : p.shownSteps + 1;
+        p.lastStepAt = now;
+      }
+      const listOn = reduce || p.shownSteps > 0 || now - p.startedAt >= FIRST_LIST_MS;
+      // 2) 글 시작: 받은 단계를 다 보여 주고, 마지막 ✓ 뒤 '답변 정리 중…'도 한 박자 보인 다음
+      if (!p.textAt && p.target && (reduce || (p.shownSteps === p.steps.length && now - p.lastStepAt >= STEP_GAP_MS))) {
+        p.textAt = now;
+        p.lastTick = now;
+      }
+      // 3) 글 풀기: 기본 BASE_CPS, 밀린 글이 많으면 빨라짐. 응답이 끝났으면 CATCHUP_MAX_MS 안에 끝나게
+      if (p.textAt) {
+        const dt = Math.min(250, now - p.lastTick); // 탭이 뒤로 갔다 오면 한 번에 몰아치지 않게
+        p.lastTick = now;
+        const backlog = p.target.length - p.shown;
+        if (p.finalPatch && !p.deadline) p.deadline = now + Math.min(CATCHUP_MAX_MS, (backlog / BASE_CPS) * 1000);
+        if (backlog > 0) {
+          let cps = BASE_CPS + Math.max(0, backlog - 120) * 0.8;
+          if (p.deadline) cps = Math.max(cps, backlog / Math.max(0.016, (p.deadline - now) / 1000));
+          p.shown = reduce ? p.target.length : Math.min(p.target.length, p.shown + (cps * dt) / 1000);
+        }
+      }
+      const chars = safeCut(p.target, p.shown);
+      const written = p.textAt > 0;
+      const collapsed = written && (reduce || now - p.textAt >= COLLAPSE_AFTER_MS);
+      if (listOn && (!p.cList || p.cSteps !== p.shownSteps || p.stepsDirty)) {
+        patch.progress = p.steps.slice(0, p.shownSteps);
+        p.cList = true;
+        p.cSteps = p.shownSteps;
+        p.stepsDirty = false;
+      }
+      if (chars !== p.cChars) {
+        patch.streamText = p.target.slice(0, chars);
+        p.cChars = chars;
+      }
+      if (written !== p.cWritten) patch.progressWritten = p.cWritten = written;
+      if (collapsed !== p.cCollapsed) patch.progressCollapsed = p.cCollapsed = collapsed;
+      // 4) 끝까지 다 보여 줬으면 최종 카드로 바꿈
+      if (p.finalPatch && written && chars >= p.target.length) {
+        Object.assign(patch, { progress: p.steps, progressWritten: true, progressCollapsed: true }, p.finalPatch);
+        delete pacersRef.current[uid];
+        unlock = true;
+      }
+      if (Object.keys(patch).length) patches[uid] = patch;
+    }
+    if (Object.keys(patches).length) {
+      setChatHistory((prev) => prev.map((item) => (patches[item.uid] ? { ...item, ...patches[item.uid] } : item)));
+    }
+    // 그사이 새 요청이 시작됐으면(프로필 재시도 등) 그 요청의 잠금은 건드리지 않음
+    if (unlock && !activeRef.current) dispatch(setIsLoading(false));
+    if (!Object.keys(pacersRef.current).length && pacerTimerRef.current !== null) {
+      window.clearInterval(pacerTimerRef.current);
+      pacerTimerRef.current = null;
+    }
+  };
+  const pacerTickRef = useRef(pacerTick);
+  pacerTickRef.current = pacerTick;
+  const ensurePacerTimer = () => {
+    if (pacerTimerRef.current === null) pacerTimerRef.current = window.setInterval(() => pacerTickRef.current(), TICK_MS);
+  };
+  useEffect(() => () => {
+    if (pacerTimerRef.current !== null) window.clearInterval(pacerTimerRef.current);
+    pacerTimerRef.current = null;
+  }, []);
 
   // ── 답변 중지 ────────────────────────────────────────────
   // 진행 중인 요청 하나 (질문·프로필 재시도 공통). 중지하면 fetch를 끊고(→ 백엔드 → RAG까지 끊김),
@@ -341,9 +479,13 @@ const Chatting: React.FC = () => {
     return controller;
   };
   // 요청이 끝났을 때 — 이미 중지된 요청이면 입력 잠금을 건드리지 않음 (그사이 보낸 새 질문의 로딩을 끄지 않게)
-  const finishRequest = (controller: AbortController) => {
+  // 아직 보여 주는 중인 답변이 있으면 잠금은 다 보여 준 뒤(pacerTick)에 풂 — 그동안 중지 버튼이 살아 있게
+  const finishRequest = (controller: AbortController, uid: string) => {
     if (activeRef.current?.controller === controller) activeRef.current = null;
-    if (!controller.signal.aborted) dispatch(setIsLoading(false));
+    if (controller.signal.aborted) return;
+    if (hasPendingFinal(uid)) return;
+    dropPacer(uid); // 최종 응답 없이 끝난 경우 — 더 풀 일 없음
+    dispatch(setIsLoading(false));
   };
   const lastStopSeqRef = useRef(stopSeq); // 다시 그려질 때 예전 중지 신호로 오해하지 않게
   useEffect(() => {
@@ -351,18 +493,21 @@ const Chatting: React.FC = () => {
     lastStopSeqRef.current = stopSeq;
     const active = activeRef.current;
     activeRef.current = null;
-    if (active) {
-      active.controller.abort();
-      // 아직 화면에 반영 안 된 조각(최대 50ms 분량)까지 붙여 멈춘 자리 그대로 보여줌
-      const pending = streamBufferRef.current[active.uid] ?? '';
-      delete streamBufferRef.current[active.uid];
-      setChatHistory((prev) =>
-        prev.map((item) =>
-          item.uid === active.uid
-            ? { ...item, loading: false, stopped: true, streamText: (item.streamText ?? '') + pending }
-            : item
-        )
-      );
+    active?.controller.abort();
+    // 화면에 보이던 자리 그대로 멈춤 — 받았지만 아직 안 보여 준 글은 버림 (멈춘 뒤 글이 더 튀어나오지 않게).
+    // 응답이 이미 다 왔고 보여 주는 중이었어도 똑같이 멈춤
+    const frozen: Record<string, Partial<ChatItem>> = {};
+    for (const [uid, p] of Object.entries(pacersRef.current)) {
+      frozen[uid] = {
+        loading: false, stopped: true,
+        streamText: p.target.slice(0, safeCut(p.target, p.shown)),
+        progress: p.steps.slice(0, p.shownSteps),
+      };
+    }
+    pacersRef.current = {};
+    if (active && !frozen[active.uid]) frozen[active.uid] = { loading: false, stopped: true };
+    if (Object.keys(frozen).length) {
+      setChatHistory((prev) => prev.map((item) => (frozen[item.uid] ? { ...item, ...frozen[item.uid] } : item)));
     }
     dispatch(setIsLoading(false));
   }, [stopSeq, dispatch]);
@@ -414,6 +559,7 @@ const Chatting: React.FC = () => {
           return;
         }
 
+        startPacer(uid);
         const serverResponse = await sendQuestionStream(
           sentValue,
           language,
@@ -432,68 +578,35 @@ const Chatting: React.FC = () => {
         }
 
         if (serverResponse) {
+          // 최종 화면 — 받은 글을 아직 보여 주는 중이면 다 보여 준 뒤에 바꿈 (finishPacer)
+          const recommendations = serverResponse.recommendations ?? [];
           if (serverResponse.needs_profile) {
-            setChatHistory((prevHistory) =>
-              prevHistory.map((item) =>
-                item.uid === uid
-                  ? { ...item, loading: false, needs_profile: true, missing_fields: serverResponse.missing_fields ?? [],
-                      recommendations: serverResponse.recommendations ?? [] }
-                  : item
-              )
-            );
+            finishPacer(uid, { loading: false, needs_profile: true, missing_fields: serverResponse.missing_fields ?? [], recommendations });
           } else if (serverResponse.is_greet) {
-            setChatHistory((prevHistory) =>
-              prevHistory.map((item) =>
-                item.uid === uid
-                  ? { ...item, loading: false, is_greet: true, recommendations: serverResponse.recommendations ?? [] }
-                  : item
-              )
-            );
+            finishPacer(uid, { loading: false, is_greet: true, recommendations });
           } else if (serverResponse.is_able) {
-            setChatHistory((prevHistory) =>
-              prevHistory.map((item) =>
-                item.uid === uid
-                  ? { ...item, loading: false, is_able: true, recommendations: serverResponse.recommendations ?? [] }
-                  : item
-              )
-            );
+            finishPacer(uid, { loading: false, is_able: true, recommendations });
           } else if (serverResponse.is_freq) {
-            setChatHistory((prevHistory) =>
-              prevHistory.map((item) =>
-                item.uid === uid
-                  ? { ...item, loading: false, is_freq: true, recommendations: serverResponse.recommendations ?? [] }
-                  : item
-              )
-            );
+            finishPacer(uid, { loading: false, is_freq: true, recommendations });
           } else if (serverResponse.is_smalltalk && Array.isArray(serverResponse.faqs)) {
-            setChatHistory((prevHistory) =>
-              prevHistory.map((item) =>
-                item.uid === uid
-                  ? { ...item, response: serverResponse.faqs, loading: false, is_smalltalk: true,
-                      recommendations: serverResponse.recommendations ?? [] }
-                  : item
-              )
-            );
+            finishPacer(uid, { response: serverResponse.faqs, loading: false, is_smalltalk: true, recommendations });
           } else if (Array.isArray(serverResponse.faqs)) {
-            setChatHistory((prevHistory) =>
-              prevHistory.map((item) =>
-                item.uid === uid
-                  ? { ...item, response: serverResponse.faqs, loading: false, streamText: undefined,
-                      followup_fields: serverResponse.followup_fields ?? [],
-                      recommendations: serverResponse.recommendations ?? [],
-                      audienceNote: noteOf(serverResponse) }
-                  : item
-              )
-            );
+            finishPacer(uid, {
+              response: serverResponse.faqs, loading: false, streamText: undefined,
+              followup_fields: serverResponse.followup_fields ?? [],
+              recommendations,
+              audienceNote: noteOf(serverResponse),
+            });
           } else {
             console.error('Invalid response structure:', serverResponse);
             setError('Invalid response structure');
           }
-          dispatch(setIsLoading(false));
+          // 입력 잠금은 finishRequest(보여 주는 중이면 다 보여 준 뒤)에서 풂
         }
       } catch (err) {
         if (signal.aborted || isAbortError(err)) return; // 중지는 오류가 아님 (화면은 중지 쪽에서 정리)
         console.error('Error while fetching response:', err);
+        dropPacer(uid);
         setError(err as string);
         dispatch(setIsLoading(false));
         setChatHistory((prevHistory) =>
@@ -503,7 +616,7 @@ const Chatting: React.FC = () => {
         );
       } finally {
         // 응답이 비어 와도(null) 입력이 잠긴 채 남지 않게
-        finishRequest(controller);
+        finishRequest(controller, uid);
       }
     };
 
@@ -554,23 +667,17 @@ const Chatting: React.FC = () => {
     }
   }, [homeClicked, dispatch]);
 
-  // 진행 단계 추가 (같은 단계가 두 번 오면 마지막 것으로)
-  const addProgress = (uid: string, step: ProgressStep) =>
-    setChatHistory((prev) =>
-      prev.map((item) =>
-        item.uid === uid ? { ...item, progress: [...(item.progress ?? []).filter((p) => p.key !== step.key), step] } : item
-      )
-    );
-
   // 프로필 저장 후 같은 질문 다시 보내기 — 막는 질문·막지 않는 질문 공통
   const retryWithProfile = (uid: string, retryQuery: string) => {
     const retryLanguage = isKorean ? 'KO' : 'EN';
     const update = (patch: Partial<ChatItem>) =>
       setChatHistory((prev) => prev.map((item) => (item.uid === uid ? { ...item, ...patch } : item)));
     dispatch(setIsLoading(true));
-    update({ loading: true, stopped: false, needs_profile: false, missing_fields: [], followup_fields: [], streamText: '', progress: [] });
+    update({ loading: true, stopped: false, needs_profile: false, missing_fields: [], followup_fields: [], streamText: '',
+             progress: undefined, progressWritten: false, progressCollapsed: false });
     const controller = startRequest(uid);
     const { signal } = controller;
+    startPacer(uid);
     sendQuestionStream(retryQuery, retryLanguage, (delta) => !signal.aborted && appendStream(uid, delta),
       (meta) => update({ streamStyle: meta.style }), { signal, onProgress: (step) => !signal.aborted && addProgress(uid, step) })
       .then((serverResponse) => {
@@ -578,29 +685,30 @@ const Chatting: React.FC = () => {
         applyModeration(serverResponse.moderation, dispatch, isKorean, suspendedRef.current > Date.now());
         if (serverResponse.id >= 0) dispatch(setId(serverResponse.id));
         if (serverResponse.needs_profile) {
-          update({ loading: false, needs_profile: true, missing_fields: serverResponse.missing_fields ?? [] });
+          finishPacer(uid, { loading: false, needs_profile: true, missing_fields: serverResponse.missing_fields ?? [] });
         } else if (serverResponse.is_greet) {
-          update({ loading: false, is_greet: true });
+          finishPacer(uid, { loading: false, is_greet: true });
         } else if (serverResponse.is_able) {
-          update({ loading: false, is_able: true });
+          finishPacer(uid, { loading: false, is_able: true });
         } else if (serverResponse.is_freq) {
-          update({ loading: false, is_freq: true });
+          finishPacer(uid, { loading: false, is_freq: true });
         } else if (serverResponse.is_smalltalk && Array.isArray(serverResponse.faqs)) {
-          update({ response: serverResponse.faqs, loading: false, is_smalltalk: true });
+          finishPacer(uid, { response: serverResponse.faqs, loading: false, is_smalltalk: true });
         } else if (Array.isArray(serverResponse.faqs)) {
-          update({ response: serverResponse.faqs, loading: false, streamText: undefined,
+          finishPacer(uid, { response: serverResponse.faqs, loading: false, streamText: undefined,
                    followup_fields: serverResponse.followup_fields ?? [],
                    recommendations: serverResponse.recommendations ?? [], audienceNote: noteOf(serverResponse) });
         } else {
-          update({ loading: false });
+          finishPacer(uid, { loading: false });
         }
       })
       .catch((err) => {
         if (signal.aborted || isAbortError(err)) return;
         console.error('재시도 중 오류:', err);
+        dropPacer(uid);
         update({ loading: false });
       })
-      .finally(() => finishRequest(controller));
+      .finally(() => finishRequest(controller, uid));
   };
 
   // 대화 항목에 넘기는 함수는 항상 같은 참조로 — 스트리밍 중 지난 대화 항목이 다시 그려지지 않게 (ChatEntry는 memo)
@@ -680,9 +788,9 @@ const ChatEntry = memo(function ChatEntry({ item: chatItem, isKorean, onRetry, o
                 <Query text={chatItem.query} />
               </div>
               {/* 답변 영역: 폭 = 위 카드 줄의 실제 폭 → 안내 문구·추천 칩이 그 폭에 맞춰짐 (카드 1장이든 3장이든).
-                  좁은 화면에서는 호빗 쪽 카드 오른쪽에 여유(8px)를 둠 — 채팅 앱처럼 내 말풍선과 구분 */}
+                  좁은 화면에서는 호빗 쪽 카드 오른쪽에 여유(24px)를 둠 — 채팅 앱처럼 내 말풍선과 구분 */}
               {/* 카테고리 화면은 화면 폭을 다 써서 칸이 늘어나도록 (내용 폭으로 감싸면 칸이 글자 길이에 맞춰 줄어듦) */}
-              <div className={chatItem.is_able ? 'w-full' : 'w-fit max-w-full pr-[8px] md:pr-0'}>
+              <div className={chatItem.is_able ? 'w-full' : 'w-fit max-w-full pr-[24px] md:pr-0'}>
               {chatItem.needs_profile ? (
                 <ProfileInput
                   missingFields={chatItem.missing_fields}
@@ -703,6 +811,8 @@ const ChatEntry = memo(function ChatEntry({ item: chatItem, isKorean, onRetry, o
                     streamStyle={chatItem.streamStyle}
                     stopped={chatItem.stopped}
                     progress={chatItem.progress}
+                    progressWritten={chatItem.progressWritten}
+                    progressCollapsed={chatItem.progressCollapsed}
                   />
                   {!chatItem.loading && chatItem.audienceNote && (
                     <p className="hobit-appear mt-[8px] inline-flex items-center gap-[6px] rounded-full bg-card px-[12px] py-[4px] text-f-caption text-ink-2 break-keep">

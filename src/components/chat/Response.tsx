@@ -112,7 +112,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
   return (
     <div>
       {text && (
-        <div className="h-fit bg-card font-5medium text-f-base mt-[10px] rounded-[20px] px-[20px] py-[15px] hobit-bubble w-full max-w-[520px] md:max-w-none md:w-[350px] break-words inline-block">
+        <div className="h-fit bg-card font-5medium text-f-base mt-[10px] rounded-[20px] px-[20px] py-[15px] hobit-bubble w-full max-w-[400px] md:max-w-none md:w-[350px] break-words inline-block">
           {text &&
             text
               .split('\n')
@@ -156,7 +156,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                             key={itemIndex}
                             // 둘째 카드부터 차례로 나타남 (첫 카드는 스트리밍 말풍선을 이어받으므로 그대로)
                             style={itemIndex > 0 ? { animationDelay: `${0.08 * itemIndex}s` } : undefined}
-                            className={`h-fit ${itemIndex > 0 ? 'hobit-appear' : ''} ${isSeniorBySource ? 'bg-senior' : 'bg-card'} font-5medium text-f-base mt-[8px] rounded-[20px] px-[20px] py-[15px] hobit-bubble w-full max-w-[520px] md:max-w-none md:w-[350px] break-words inline-block`}
+                            className={`h-fit ${itemIndex > 0 ? 'hobit-appear' : ''} ${isSeniorBySource ? 'bg-senior' : 'bg-card'} font-5medium text-f-base mt-[8px] rounded-[20px] px-[20px] py-[15px] hobit-bubble w-full max-w-[400px] md:max-w-none md:w-[350px] break-words inline-block`}
                           >
                             {itemIndex === 0 && (
                               <>
@@ -244,7 +244,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                   {(hasSourceCard || related.length > 0) && (
                     <div ref={revealRef} className="flex flex-col">
                       {hasSourceCard && (
-                      <div className={`h-fit ${isSeniorBySource ? 'bg-senior' : 'bg-card'} font-5medium text-f-base mt-[8px] rounded-[20px] px-[20px] py-[15px] hobit-bubble w-full max-w-[520px] md:max-w-none md:w-[350px] break-words inline-block`}>
+                      <div className={`h-fit ${isSeniorBySource ? 'bg-senior' : 'bg-card'} font-5medium text-f-base mt-[8px] rounded-[20px] px-[20px] py-[15px] hobit-bubble w-full max-w-[400px] md:max-w-none md:w-[350px] break-words inline-block`}>
                         <p className="text-sm text-ink-2 font-4regular mb-[8px]">
                           {isKorean ? '출처' : 'Source'}
                         </p>
@@ -287,7 +287,7 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
                       )}
                       {/* 관련 공지 — 질문 주제와 맞고 아직 신청할 수 있는 공지 (출처 카드와 같은 모양) */}
                       {related.length > 0 && (
-                        <div className="h-fit bg-card font-5medium text-f-base mt-[8px] rounded-[20px] px-[20px] py-[15px] hobit-bubble w-full max-w-[520px] md:max-w-none md:w-[350px] break-words inline-block">
+                        <div className="h-fit bg-card font-5medium text-f-base mt-[8px] rounded-[20px] px-[20px] py-[15px] hobit-bubble w-full max-w-[400px] md:max-w-none md:w-[350px] break-words inline-block">
                           <p className="text-sm text-ink-2 font-4regular mb-[8px]">{isKorean ? '관련 공지' : 'Related notices'}</p>
                           <div className="flex flex-col gap-[12px]">
                             {related.map((n) => (
