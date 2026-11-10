@@ -83,6 +83,7 @@ interface ChatItem {
   stopped?: boolean;             // '답변 중지'로 멈춤 — 그때까지 받은 글(streamText)만 남기고 멈췄다는 표시
   recommendations?: RecItem[];   // 답변 아래 "이어서 물어볼 만한 질문"
   initialSeniorFaqId?: number;
+  notFound?: boolean;            // 자료에서 답을 못 찾음 → 우는 호빗
   audienceNote?: Program;        // 스위치와 다른 기준으로 답했을 때 (질문에 '대학원'·'학위논문' 같은 말이 있어서)
 }
 
@@ -596,6 +597,7 @@ const Chatting: React.FC = () => {
               followup_fields: serverResponse.followup_fields ?? [],
               recommendations,
               audienceNote: noteOf(serverResponse),
+              notFound: !!serverResponse.not_found,
             });
           } else {
             console.error('Invalid response structure:', serverResponse);
@@ -697,7 +699,8 @@ const Chatting: React.FC = () => {
         } else if (Array.isArray(serverResponse.faqs)) {
           finishPacer(uid, { response: serverResponse.faqs, loading: false, streamText: undefined,
                    followup_fields: serverResponse.followup_fields ?? [],
-                   recommendations: serverResponse.recommendations ?? [], audienceNote: noteOf(serverResponse) });
+                   recommendations: serverResponse.recommendations ?? [], audienceNote: noteOf(serverResponse),
+                   notFound: !!serverResponse.not_found });
         } else {
           finishPacer(uid, { loading: false });
         }
@@ -813,6 +816,7 @@ const ChatEntry = memo(function ChatEntry({ item: chatItem, isKorean, onRetry, o
                     progress={chatItem.progress}
                     progressWritten={chatItem.progressWritten}
                     progressCollapsed={chatItem.progressCollapsed}
+                    notFound={chatItem.notFound}
                   />
                   {!chatItem.loading && chatItem.audienceNote && (
                     <p className="hobit-appear mt-[8px] inline-flex items-center gap-[6px] rounded-full bg-card px-[12px] py-[4px] text-f-caption text-ink-2 break-keep">

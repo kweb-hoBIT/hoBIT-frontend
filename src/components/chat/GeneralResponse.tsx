@@ -2,6 +2,7 @@ import { memo, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 import errorImg from '../../assets/error_image.png';
+import { MascotOnce } from './Mascot';
 
 import HobitProfile from './HobitProfile';
 import Response from './Response';
@@ -21,6 +22,7 @@ type HobitResponseProps = {
   progress?: ProgressStep[]; // 답변 전까지 끝난 단계 — 로딩 중 체크 목록
   progressWritten?: boolean; // 글이 나오기 시작함 → '답변 정리' ✓
   progressCollapsed?: boolean; // 체크 목록을 한 줄 요약으로 접음
+  notFound?: boolean; // 자료에서 답을 못 찾음 → 답 위에 우는 호빗 (한 번 재생)
 };
 
 // 스트리밍 표시용 정리: 출처 태그([S1]·[M1]·끝에 잘린 '[S')와 마크다운 강조 기호 제거
@@ -101,6 +103,7 @@ const GeneralResponse: React.FC<HobitResponseProps> = ({
   progress,
   progressWritten,
   progressCollapsed,
+  notFound,
 }) => {
   // props를 state로 옮겨 두면 최종 카드로 바뀌는 순간 한 번 빈 화면이 그려졌음 → 바로 씀
   const faqs = newFaqs ?? [];
@@ -196,6 +199,9 @@ const GeneralResponse: React.FC<HobitResponseProps> = ({
         </>
       ) : (
         <>
+          {notFound && (
+            <MascotOnce clip="sad" poster={errorImg} className="w-[120px] md:w-[150px] h-auto aspect-square mt-[8px] ml-[50px] md:ml-[60px]" />
+          )}
           <Response text="" faqs={faqs} />
         </>
       )}

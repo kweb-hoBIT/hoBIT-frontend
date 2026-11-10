@@ -1,15 +1,10 @@
 import errorImage from '../assets/error_image.png';
+import { MascotOnce } from '../components/chat/Mascot';
 
 const ErrorPage: React.FC<{ title?: string; message?: string }> = ({ title, message }) => {
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-card px-4">
-      <img
-        src={errorImage}
-        alt="Server Error"
-        width={400}
-        height={400}
-        className="w-48 md:w-64 h-auto aspect-square mb-6"
-      />
+      <MascotOnce clip="sad" poster={errorImage} alt="Server Error" className="w-48 md:w-64 h-auto aspect-square mb-6" />
       <h1 className="text-f-xl font-semibold mb-2 text-center">
         {title ?? '서버에 연결할 수 없습니다'}
       </h1>

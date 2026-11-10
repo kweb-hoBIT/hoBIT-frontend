@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { sendInputValue, clearSentValue } from '../../redux/inputSlice';
 import { RootState } from '../../redux/store';
+import { HomeMascot } from './Mascot';
 
 const MainOptions: React.FC = () => {
   const dispatch = useDispatch();
@@ -19,13 +20,11 @@ const MainOptions: React.FC = () => {
 
   return (
     <div className="bg-card w-[300px] max-w-full md:max-w-none md:w-[350px] h-auto mt-[12px] md:mt-[20px] rounded-[16px] md:rounded-[20px] flex flex-col items-center px-[14px] pt-[10px] pb-[6px] md:p-[20px]">
-      <img
-        src={homeImg}
-        alt="home image"
-        width={400}
-        height={400}
+      {/* 움직이는 호빗 — 들어오면 손인사, 누르면 손 흔들기, 가만히 두면 졸고, 졸 때 누르면 깸 (Mascot.tsx) */}
+      <HomeMascot
+        poster={homeImg}
+        label={isKorean ? '호빗 — 눌러서 인사하기' : 'hoBIT — tap to say hi'}
         className="w-[124px] md:w-[200px] h-auto aspect-square mb-[2px] md:mb-[10px]"
-        loading="eager"
       />
       <div className="flex w-full justify-between items-center">
         <button
