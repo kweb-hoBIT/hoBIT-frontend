@@ -20,7 +20,8 @@ export type Clip = 'main' | 'hi' | 'sleep' | 'awake' | 'sleep2' | 'sad';
 
 import { chatApi } from '../../api/liveChat';
 
-const CLIP_MS = 5000;
+// 76장 × 67ms (만들 때 img2webp -d 67) — 5초로 끊으면 마지막 0.1초가 잘려 다음 클립으로 넘어갈 때 툭 끊겼음
+const CLIP_MS = 76 * 67;
 
 // 관리자 사이트 > 챗봇 설정 > 호빗 캐릭터 (움직이기 켜기·끄기, 졸기까지 시간) — /chat/features로 한 번 받음
 const config = { enabled: true, idleMs: 30_000 };
@@ -46,6 +47,22 @@ const loadClip = (clip: Clip): Promise<Blob | null> => {
     blobs.set(clip, p);
   }
   return p;
+};
+/** 미리 받기 + 그릴 준비(decode)까지 — 로딩 화면(App)·다음에 나올 클립 */
+export const preloadClip = async (clip: Clip): Promise<void> => {
+  if (reducedMotion()) return;
+  const blob = await loadClip(clip);
+  if (blob) await decodeBlob(blob).catch(() => undefined);
+};
+const decodeBlob = async (blob: Blob) => {
+  const url = URL.createObjectURL(blob);
+  try {
+    const img = new Image();
+    img.src = url;
+    await img.decode();
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 };
 const later = (fn: () => void) =>
   'requestIdleCallback' in window ? (window as any).requestIdleCallback(fn, { timeout: 4000 }) : setTimeout(fn, 1500);
@@ -77,6 +94,13 @@ const usePlayer = (poster: string) => {
     const blob = await loadClip(clip);
     if (!blob || !alive.current) return false;
     const url = URL.createObjectURL(blob);
+    // 새 그림이 그릴 준비가 된 뒤에 바꿈 — 바로 바꾸면 준비되는 동안 잠깐 비거나 멈춰 보였음
+    try {
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+    } catch {}
+    if (!alive.current) return false;
     const prev = urlRef.current;
     urlRef.current = url;
     setSrc(url);

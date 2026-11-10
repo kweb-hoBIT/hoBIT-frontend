@@ -4,8 +4,10 @@ import React, { useEffect, useState, ReactNode } from 'react';
 import store from './redux/store';
 import MainPage from './pages/MainPage';
 import ErrorPage from './pages/ErrorPage';
-import homeImage from './assets/home_image.png';
-import helloImage from './assets/hello.png';
+// 호빗 대기 그림 = 움직이는 호빗의 첫 장면 (예전 PNG는 렌더가 달라 움직이기 전에 다른 캐릭터처럼 보였음)
+import homeImage from './assets/mascot_main_still.webp';
+import helloImage from './assets/mascot_hi_still.webp';
+import { preloadClip } from './components/chat/Mascot';
 import profileImage from './assets/profile_image.png';
 import errorImage from './assets/error_image.png';
 import { setImages } from './redux/imageSlice';
@@ -68,11 +70,13 @@ const PreloadImages: React.FC<PreloadImagesProps> = ({ children }) => {
 				return [key, img.src] as const;
 			})
 		);
+		// 시작 화면 손인사(main)도 로딩 화면 동안 받아 둠 — 늦으면 1.5초까지만 기다리고 첫 장면 그림으로 시작
+		const mascot = Promise.race([preloadClip('main'), new Promise((resolve) => window.setTimeout(resolve, 1500))]);
 		const recs = Promise.race([
 			startRecsRef.current!.catch(() => undefined),
 			new Promise((resolve) => window.setTimeout(resolve, 1200)),
 		]);
-		Promise.all([images, recs]).then(([results]) => {
+		Promise.all([images, recs, mascot]).then(([results]) => {
 			const loadedImages: { [key: string]: string } = {};
 			results.forEach((r, i) => {
 				const [key, src] = Object.entries(imagesToLoad)[i];

@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 
 import errorImg from '../../assets/error_image.png';
 import { MascotOnce } from './Mascot';
+import sadStill from '../../assets/mascot_sad_still.webp';
 
 import HobitProfile from './HobitProfile';
 import Response from './Response';
@@ -200,7 +201,7 @@ const GeneralResponse: React.FC<HobitResponseProps> = ({
       ) : (
         <>
           {notFound && (
-            <MascotOnce clip="sad" poster={errorImg} className="w-[120px] md:w-[150px] h-auto aspect-square mt-[8px] ml-[50px] md:ml-[60px]" />
+            <MascotOnce clip="sad" poster={sadStill} className="w-[120px] md:w-[150px] h-auto aspect-square mt-[8px] ml-[50px] md:ml-[60px]" />
           )}
           <Response text="" faqs={faqs} />
         </>
