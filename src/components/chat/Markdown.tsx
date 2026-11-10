@@ -56,9 +56,19 @@ const COMPONENTS: Components = {
   ),
 };
 
+/**
+ * AI가 가끔 쓰는 어긋난 모양 정리 — 화면에 '*'가 글자로 보이지 않게
+ * - '### * 안암학사 식당', '### - 메뉴' → 제목 안의 목록 기호는 마크다운이 목록으로 안 봐서 '*'가 그대로 보였음
+ * - '**' 없이 혼자 남은 '*' 줄 머리('*안암학사 식당' — 기호 뒤 띄어쓰기 없음)도 목록으로
+ */
+export const tidyMarkdown = (text: string) =>
+  text
+    .replace(/^(#{1,6})\s*[*•-]\s+/gm, '$1 ')
+    .replace(/^(\s*)\*(?=[^\s*])(?!.*\*)/gm, '$1* '); // 같은 줄에 '*'가 또 있으면 기울임(*강조*)이라 그대로
+
 const Markdown: React.FC<{ text: string }> = ({ text }) => (
   <ReactMarkdown remarkPlugins={REMARK_PLUGINS} components={COMPONENTS}>
-    {text}
+    {tidyMarkdown(text)}
   </ReactMarkdown>
 );
 

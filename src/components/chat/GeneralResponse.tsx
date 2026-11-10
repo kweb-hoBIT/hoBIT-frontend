@@ -29,7 +29,7 @@ const cleanStreamText = (text: string) =>
     .replace(/\s*\[\s*[SM]?\s*\d{1,2}\s*\]/g, '')
     .replace(/\[\s*[SM]?\s*\d*$/, '')
     .replace(/\*\*/g, '')
-    .replace(/^#{1,3}\s*/gm, '');
+    .replace(/^#{1,3}\s*(?:[*•-]\s+)?/gm, ''); // '### * 제목'의 목록 기호도 (최종 카드와 같게)
 
 // 스트리밍 중에도 최종 카드와 비슷하게 나눠 보여 줌 (백엔드 splitResponseIntoCards를 단순화) —
 // 마지막에 최종 카드로 바뀔 때 화면이 덜 출렁이게.
