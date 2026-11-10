@@ -8,7 +8,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
  *   홈 버튼(시작 화면이 새로 그려짐)   기본 → 손인사 (main)
  *   깨어 있을 때 캐릭터 누름          손 흔들기 (hi)
  *   한동안 활동 없음                  손인사 → 졸음 (sleep)
- *   졸고 있을 때 누름                 졸음 → 놀람 (awake)
+ *   졸고 있을 때 누름                 졸음 → 놀람 (awake) — 놀란 뒤에는 눌러도 반응 없음
  *   놀란 뒤 다시 활동 없음            놀람 → 졸음 (sleep2)
  * 답을 못 찾음·오류 화면 → 우는 호빗 (sad, MascotOnce)
  *
@@ -173,6 +173,7 @@ export const HomeMascot: React.FC<{ poster: string; className?: string; label: s
   const onClick = async () => {
     if (busy.current) return;
     if (pose.current === 'asleep') return wake();
+    if (lastAwake.current === 'awake') return; // 놀란 뒤(awake)에는 눌러도 반응 없음 — 가만히 두면 다시 졺(sleep2)
     lastAwake.current = 'hi'; // 깨어 있을 때 누르면 손 흔들기
     await run('hi', 'awake');
     armIdle();
