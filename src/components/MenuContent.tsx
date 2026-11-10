@@ -587,7 +587,9 @@ const MenuContent: React.FC = () => {
           </button>
         </div>
         <div className="w-full flex flex-col mt-[20px] items-center font-4regular text-[16px] text-ink-3">
-          <span>copyrights@KWEB</span>
+          {/* KWEB이 처음 만들고 IDEA Lab(강성구 교수님 연구실)이 유지보수 */}
+          <span>copyrights@KWEB · IDEA Lab</span>
+          <span className="text-[13px]">{isKorean ? '고려대학교 강성구 교수님 연구실' : 'IDEA Lab, Korea University'}</span>
         </div>
     </>
   );
