@@ -20,6 +20,8 @@ import {
   loadSocketIo,
 } from '../../api/liveChat';
 import { getRecentExchanges } from '../../lib/recentChat';
+import { getProfile, StoredProfile } from '../../api/query';
+import { FIELD_OPTIONS } from '../chat/profileOptions';
 import { IoChatbubbles } from 'react-icons/io5';
 import { closeMenu } from '../../redux/menuSlice';
 import { loadProgram } from '../../redux/programSlice';
@@ -39,6 +41,10 @@ const T = {
     staffGrad: '대학원 행정팀 채팅', // 대학원 과정이면 대학원 행정팀으로 연결
     senior: '근로장학생 채팅',
     close: '닫기',
+    minimize: '채팅 창 접기',
+    minimizeHint: '채팅 창 접기 — 채팅은 계속되고, 오른쪽 가장자리 탭으로 돌아올 수 있어요',
+    returnTab: '진행 중인 채팅으로 돌아가기',
+    returnEnded: '종료된 채팅 보기',
     loading: '확인하고 있어요…',
     awayTitle: '지금은 채팅할 수 있는 근로장학생이 없어요',
     awayBody: '근로장학생이 채팅 가능 상태일 때 연결돼요. 잠시 후 다시 시도하거나, 행정실 채팅을 이용해 주세요.',
@@ -73,10 +79,13 @@ const T = {
     msgMenu: '메시지 메뉴',
     msgEdit: '수정',
     msgReply: '답글',
-    replyTo: (who: string): string => `${who}에게 답글`,
-    replyMe: '나',
-    replyAgent: '담당자',
-    replyPrev: '이전 메시지',
+    // 답글 인용 첫 줄 — 누구에게 답장하는지 (내 화면 기준)
+    replyToMe: '나에게 답장',
+    replyToStaff: '상담원에게 답장',
+    replyToSenior: '근로장학생에게 답장',
+    replyToPrev: '이전 메시지에 답장',
+    replyMissing: '원래 메시지를 찾을 수 없어요',
+    replyJump: '원래 메시지로 이동',
     replyCancel: '취소',
     msgRemove: '삭제',
     msgRemoveConfirm: '이 메시지를 삭제할까요? 상대방 화면에서도 사라지고 되돌릴 수 없어요.',
@@ -109,6 +118,11 @@ const T = {
       edit: '수정',
       mine: '내 정보',
       seniorNote: '근로장학생에게는 이름·학번이 보이지 않아요.',
+      prefilled: "일부 칸은 호빗 '내 정보'에서 채웠어요. 바꿀 수 있어요.",
+      extrasTitle: "호빗 '내 정보'에서 함께 보내요",
+      extraRemove: (label: string): string => `${label} 빼기`,
+      grade: (v: string): string => `${v}학년`,
+      admitted: (v: string): string => `${v}년 입학`,
       required: '필수 항목을 입력해 주세요.',
       badId: '학번은 숫자로 입력해 주세요.',
       needConsent: '개인정보 수집·이용에 동의해 주세요.',
@@ -157,6 +171,10 @@ const T = {
     staffGrad: 'Graduate office chat',
     senior: 'Chat with a student assistant',
     close: 'Close',
+    minimize: 'Minimize chat',
+    minimizeHint: 'Minimize — the chat stays open and you can come back from the tab on the right edge',
+    returnTab: 'Back to your chat',
+    returnEnded: 'View the ended chat',
     loading: 'Checking…',
     awayTitle: 'No student assistant is available right now',
     awayBody: 'You will be connected when a student assistant is available. Please try again later or use the office chat.',
@@ -191,10 +209,12 @@ const T = {
     msgMenu: 'Message menu',
     msgEdit: 'Edit',
     msgReply: 'Reply',
-    replyTo: (who: string): string => `Replying to ${who}`,
-    replyMe: 'me',
-    replyAgent: 'staff',
-    replyPrev: 'Earlier message',
+    replyToMe: 'Replying to you',
+    replyToStaff: 'Replying to staff',
+    replyToSenior: 'Replying to student assistant',
+    replyToPrev: 'Replying to an earlier message',
+    replyMissing: 'Original message not found',
+    replyJump: 'Go to original message',
     replyCancel: 'Cancel',
     msgRemove: 'Delete',
     msgRemoveConfirm: 'Delete this message? It will also disappear for the other person and can’t be undone.',
@@ -227,6 +247,11 @@ const T = {
       edit: 'Edit',
       mine: 'My details',
       seniorNote: 'Your name and student ID are not shown to the senior.',
+      prefilled: "Some fields were filled from your hoBIT 'My Info'. You can change them.",
+      extrasTitle: "Also shared from your hoBIT 'My Info'",
+      extraRemove: (label: string): string => `Remove ${label}`,
+      grade: (v: string): string => `Year ${v}`,
+      admitted: (v: string): string => `Entered ${v}`,
       required: 'Please fill in the required fields.',
       badId: 'Student ID must be numbers only.',
       needConsent: 'Please agree to the collection of personal information.',
@@ -456,6 +481,52 @@ const saveInfo = (v: StudentInfo) => {
 const infoProblems = (v: StudentInfo): (keyof StudentInfo)[] =>
   (Object.keys(EMPTY_INFO) as (keyof StudentInfo)[]).filter((k) => !String(v[k]).trim() || (k === 'student_id' && !/^\d{4,12}$/.test(v.student_id.trim())));
 
+/**
+ * 호빗 '내 정보'(챗봇 프로필, 학부·대학원 따로 저장)에서 채팅 학생 정보로 옮길 수 있는 값 — 읽기만 함
+ *  fields: 비어 있는 칸만 채움 (학과·학적 상태) / extras: 입력 칸은 없지만 담당자에게 도움이 되는 값 (학년·입학 연도·전공 유형·학위 과정)
+ * 이름·학번은 프로필에 없어 채우지 않음 (학번 앞 네 자리만 입학 연도로 예시에 보임)
+ */
+type BotProfile = StoredProfile['profile'];
+type Extra = { key: 'grade' | 'admission_year' | 'major_type' | 'degree'; value: string };
+// 채팅 학적 상태 선택지에 있는 것만 — 편입생도 지금은 재학 중
+const STATUS_FROM_PROFILE: Record<string, string> = { 재학: '재학', 편입: '재학', 휴학: '휴학', 수료: '수료' };
+/** 프로필 저장값(한국어, 예전 영어 값도)을 한국어로 */
+const profileKo = (field: string, v: unknown): string => {
+  if (v === null || v === undefined || String(v).trim() === '') return '';
+  const raw = String(v).trim();
+  const meta = FIELD_OPTIONS[field];
+  const i = meta ? meta.options_en.findIndex((o) => o.toLowerCase() === raw.toLowerCase()) : -1;
+  return meta && i >= 0 ? meta.options_ko[i] : raw;
+};
+const fromBotProfile = (p: BotProfile | null, program: 'undergrad' | 'grad'): { fields: Partial<Record<keyof StudentInfo, string>>; extras: Extra[] } => {
+  if (!p) return { fields: {}, extras: [] };
+  const extras: Extra[] = [];
+  const add = (key: Extra['key'], value: string) => value && extras.push({ key, value });
+  if (program === 'grad') {
+    add('degree', profileKo('degree', p.degree));
+    add('admission_year', /^\d{4}$/.test(String(p.grad_admission_year ?? '')) ? String(p.grad_admission_year) : '');
+    return { fields: { department: profileKo('grad_department', p.grad_department) }, extras };
+  }
+  add('grade', /^[1-6]$/.test(String(p.grade ?? '')) ? String(p.grade) : '');
+  // 학부 학번은 두 자리(24)로 저장 → 2024
+  const yy = String(p.admission_year ?? '');
+  add('admission_year', /^\d{2}$/.test(yy) ? String(2000 + Number(yy)) : /^\d{4}$/.test(yy) ? yy : '');
+  add('major_type', profileKo('major_type', p.major_type));
+  return {
+    fields: { department: profileKo('department', p.department), student_status: STATUS_FROM_PROFILE[profileKo('student_status', p.student_status)] ?? '' },
+    extras,
+  };
+};
+/** 함께 보내는 값의 화면 표시 (학년·입학 연도는 화면 언어로, 전공 유형·학위 과정은 선택지의 영어 이름) */
+const extraLabel = (t: typeof T.ko, x: Extra): string => {
+  if (x.key === 'grade') return t.info.grade(x.value);
+  if (x.key === 'admission_year') return t.info.admitted(x.value);
+  if (t === T.ko) return x.value;
+  const meta = FIELD_OPTIONS[x.key];
+  const i = meta ? meta.options_ko.indexOf(x.value) : -1;
+  return meta && i >= 0 ? meta.options_en[i] : x.value;
+};
+
 const DANGER = '#e5484d'; // 오류 표시 (이 화면 색 체계에 빨강이 없어 직접)
 
 /** 한 줄 요약: 학부 · 김호빗 · 2024320001 · 컴퓨터학과 · 재학 (학적 상태는 화면 언어로) */
@@ -470,13 +541,14 @@ const infoParts = (t: typeof T.ko, p: Partial<Record<keyof StudentInfo, string>>
   ].filter((x): x is string => !!x);
 };
 
-const StudentInfoForm: React.FC<{ t: typeof T.ko; mode: ChatMode; value: StudentInfo; onChange: (v: StudentInfo) => void; bad: (keyof StudentInfo)[] }> = ({
-  t,
-  mode,
-  value,
-  onChange,
-  bad,
-}) => {
+const StudentInfoForm: React.FC<{
+  t: typeof T.ko;
+  mode: ChatMode;
+  value: StudentInfo;
+  onChange: (v: StudentInfo) => void;
+  bad: (keyof StudentInfo)[];
+  idPlaceholder?: string;
+}> = ({ t, mode, value, onChange, bad, idPlaceholder }) => {
   const set = (k: keyof StudentInfo, v: string) => onChange({ ...value, [k]: v });
   const err = (k: keyof StudentInfo) => bad.includes(k);
   const input = (k: keyof StudentInfo) =>
@@ -529,7 +601,7 @@ const StudentInfoForm: React.FC<{ t: typeof T.ko; mode: ChatMode; value: Student
           <input
             value={value.student_id}
             onChange={(e) => set('student_id', e.target.value.replace(/\D/g, '').slice(0, 12))}
-            placeholder={t.info.studentIdPh}
+            placeholder={idPlaceholder ?? t.info.studentIdPh}
             inputMode="numeric"
             className={`${input('student_id')} tabular-nums`}
             style={errStyle('student_id')}
@@ -679,27 +751,62 @@ const MessageMenu: React.FC<{ t: typeof T.ko; canEdit: boolean; onEdit: () => vo
   );
 };
 
-/** 답글 인용 한 줄 — 상대 메시지는 번역이 있으면 번역 */
+/** 답글 인용 글 — 상대 메시지는 번역이 있으면 번역 (학생이 말풍선에서 보는 글과 같게) */
 const quoteText = (t: typeof T.ko, m: ChatMessage) =>
   m.removed ? t.msgRemoved : m.attachment ? `📎 ${m.attachment.name}` : m.sender !== 'student' && m.translation ? m.translation.text : m.body;
-const quoteWho = (t: typeof T.ko, m: ChatMessage) => (m.sender === 'student' ? t.replyMe : t.replyAgent);
+/** 누구에게 답장하는지 — 내 메시지면 "나에게", 아니면 상담원(근로장학생) */
+const quoteWho = (t: typeof T.ko, m: ChatMessage | null | undefined, mode: ChatMode) =>
+  !m ? t.replyToPrev : m.sender === 'student' ? t.replyToMe : mode === 'senior' ? t.replyToSenior : t.replyToStaff;
 const jumpTo = (id: number) => {
   const el = document.getElementById(`livechat-msg-${id}`);
   if (!el) return;
-  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  el.classList.add('chat-flash');
-  window.setTimeout(() => el.classList.remove('chat-flash'), 1200);
+  el.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'center' });
+  // 줄 전체에 배경을 깔지 않고 말풍선만 살짝 흔듦 (움직임 줄이기 설정이면 테두리만)
+  const bubble = (el.querySelector('[data-bubble]') as HTMLElement | null) ?? el;
+  bubble.classList.remove('chat-shake');
+  void bubble.offsetWidth; // 연달아 눌러도 다시 흔들리게
+  bubble.classList.add('chat-shake');
+  window.setTimeout(() => bubble.classList.remove('chat-shake'), 1000);
 };
+
+/**
+ * 말풍선 안 맨 위 인용 — 왼쪽 세로 막대 + "상담원에게 답장" + 원래 글 두 줄까지 (누르면 원래 메시지로)
+ * 예전에는 말풍선 위 작은 상자에 "me hi"처럼 이름과 글이 붙어 읽기 어려웠음
+ */
+const ReplyQuote: React.FC<{ t: typeof T.ko; parent: ChatMessage | null | undefined; parentId: number; mode: ChatMode; onMine: boolean }> = ({
+  t,
+  parent,
+  parentId,
+  mode,
+  onMine,
+}) => (
+  <button
+    type="button"
+    onClick={() => jumpTo(parentId)}
+    title={t.replyJump}
+    className={`mb-[6px] block w-full min-w-[8.5rem] whitespace-normal rounded-[10px] border-l-[3px] py-[4px] pl-[9px] pr-[8px] text-left transition-colors ${
+      onMine ? 'border-on-accent-ink/80 bg-on-accent-ink/15 hover:bg-on-accent-ink/25' : 'border-accent-ink bg-surface/80 hover:bg-surface'
+    }`}
+  >
+    <span className={`block text-[calc(var(--fs-scale,1)*11px)] font-6semibold leading-tight ${onMine ? 'text-on-accent-ink/90' : 'text-accent-ink'}`}>
+      {quoteWho(t, parent, mode)}
+    </span>
+    <span className={`mt-[2px] line-clamp-2 break-words text-f-xs leading-snug ${onMine ? 'text-on-accent-ink/80' : 'text-ink-2'}`}>
+      {parent ? quoteText(t, parent) : t.replyMissing}
+    </span>
+  </button>
+);
 
 const Bubble: React.FC<{
   m: ChatMessage;
   t: typeof T.ko;
+  mode: ChatMode;
   parent?: ChatMessage | null;
   canModify?: boolean;
   onEdit?: () => void;
   onRemove?: () => void;
   onReply?: () => void;
-}> = ({ m, t, parent, canModify, onEdit, onRemove, onReply }) => {
+}> = ({ m, t, mode, parent, canModify, onEdit, onRemove, onReply }) => {
   const [showOriginal, setShowOriginal] = useState(false);
   if (m.sender === 'system') {
     return <p className="my-[6px] text-center text-f-xs text-ink-3">{systemText(t, m.body)}</p>;
@@ -727,23 +834,19 @@ const Bubble: React.FC<{
   };
   return (
     <div id={`livechat-msg-${m.id}`} className={`flex flex-col rounded-[12px] transition-colors ${mine ? 'items-end' : 'items-start'} my-[8px]`}>
-      {m.replyToId && (
-        <button
-          type="button"
-          onClick={() => m.replyToId && jumpTo(m.replyToId)}
-          className={`mb-[2px] flex max-w-[75%] items-center gap-[6px] rounded-[8px] border-l-2 border-ink-3/50 bg-card/70 px-[10px] py-[4px] text-left text-f-xs text-ink-3 hover:bg-card ${mine ? 'mr-[4px]' : 'ml-[4px]'}`}
-        >
-          <span className="shrink-0 font-6semibold text-ink-2">{parent ? quoteWho(t, parent) : t.replyPrev}</span>
-          <span className="truncate">{parent ? quoteText(t, parent) : ''}</span>
-        </button>
+      {m.replyToId && m.attachment && (
+        // 첨부에는 말풍선이 없으므로 인용을 위에 따로
+        <div className={`mb-[4px] w-[70%] max-w-[300px] rounded-[14px] bg-card p-[5px] ${mine ? 'mr-[4px]' : 'ml-[4px]'}`}>
+          <ReplyQuote t={t} parent={parent} parentId={m.replyToId} mode={mode} onMine={false} />
+        </div>
       )}
       <div className={`group flex w-full items-end gap-[6px] ${mine ? 'flex-row-reverse' : ''}`}>
         {m.attachment ? (
           // 첨부는 말풍선 없이 — 사진은 사진만, PDF는 흰 파일 카드 (이름·크기를 봐야 무슨 파일인지 알 수 있어서)
           !m.attachment.url ? (
-            <span className="rounded-[14px] border border-line bg-surface px-[12px] py-[8px] text-f-xs text-ink-3">{t.fileExpired}</span>
+            <span data-bubble className="rounded-[14px] border border-line bg-surface px-[12px] py-[8px] text-f-xs text-ink-3">{t.fileExpired}</span>
           ) : m.attachment.mime.startsWith('image/') ? (
-            <button type="button" onClick={openFile} className="block max-w-[70%] overflow-hidden rounded-[16px] border border-line" aria-label={m.attachment.name}>
+            <button type="button" onClick={openFile} data-bubble className="block max-w-[70%] overflow-hidden rounded-[16px] border border-line" aria-label={m.attachment.name}>
               <img
                 src={fileUrl(m.attachment.url)}
                 alt={m.attachment.name}
@@ -757,6 +860,7 @@ const Bubble: React.FC<{
             <button
               type="button"
               onClick={openFile}
+              data-bubble
               className="flex max-w-[78%] items-center gap-[10px] rounded-[14px] border border-line bg-surface px-[12px] py-[10px] text-left hover:bg-card"
             >
               <span className="flex h-[36px] w-[30px] shrink-0 items-end justify-center rounded-[6px] bg-[#e5484d] pb-[4px] text-[calc(var(--fs-scale,1)*9px)] font-7bold text-white">PDF</span>
@@ -768,10 +872,12 @@ const Bubble: React.FC<{
           )
         ) : (
           <div
+            data-bubble
             className={`max-w-[78%] whitespace-pre-wrap break-words rounded-[18px] px-[13px] py-[8px] text-f-sm leading-[1.5] ${
               mine ? 'bg-accent-ink text-on-accent-ink rounded-br-[6px]' : 'bg-card text-ink rounded-bl-[6px]'
             }`}
           >
+            {m.replyToId && <ReplyQuote t={t} parent={parent} parentId={m.replyToId} mode={mode} onMine={mine} />}
             {m.translation && !mine && !showOriginal ? m.translation.text : m.body}
           </div>
         )}
@@ -804,8 +910,21 @@ const ChatRoom: React.FC<{
   initial: { session: ChatSession; messages: ChatMessage[]; position: number };
   officeEmail: string;
   onNew: () => void;
-}> = ({ t, initial, officeEmail, onNew }) => {
+  /** 창이 보이는지 — 접어 둔 동안에도 연결은 유지하고, 그 사이 온 메시지 수를 셈 */
+  visible: boolean;
+  /** 상태·안 읽은 수를 창 밖(돌아가기 탭)에 알림 */
+  onState: (s: { id: string; status: ChatSession['status']; unread: number }) => void;
+}> = ({ t, initial, officeEmail, onNew, visible, onState }) => {
   const [session, setSession] = useState(initial.session);
+  const [unread, setUnread] = useState(0);
+  const visibleRef = useRef(visible);
+  visibleRef.current = visible;
+  useEffect(() => {
+    if (visible) setUnread(0);
+  }, [visible]);
+  useEffect(() => {
+    onState({ id: session.id, status: session.status, unread });
+  }, [session.id, session.status, unread, onState]);
   const [messages, setMessages] = useState(initial.messages);
   const [position, setPosition] = useState(initial.position);
   const [text, setText] = useState('');
@@ -867,7 +986,11 @@ const ChatRoom: React.FC<{
           }
         });
       });
-      sock.on('message', (m: ChatMessage) => m.sessionId === initial.session.id && addMessage(m));
+      sock.on('message', (m: ChatMessage) => {
+        if (m.sessionId !== initial.session.id) return;
+        addMessage(m);
+        if (!visibleRef.current && m.sender !== 'student') setUnread((n) => n + 1); // 접어 둔 사이 온 답장
+      });
       sock.on('session:update', (u: ChatSession) => u.id === initial.session.id && setSession(u));
       // 고치거나 지운 메시지 (나·상대 모두)
       sock.on('message:updated', (m: ChatMessage) => {
@@ -923,6 +1046,13 @@ const ChatRoom: React.FC<{
     firstScrollRef.current = false;
     nearBottomRef.current = true;
   }, [messages.length, agentTyping, session.status]);
+  // 접어 둔 창을 다시 열면 맨 아래로 (숨긴 동안에는 높이가 없어 위 스크롤이 먹지 않음)
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    if (!visible || !list) return;
+    list.scrollTop = list.scrollHeight;
+    nearBottomRef.current = true;
+  }, [visible]);
 
   const canModify = (m: ChatMessage) =>
     m.sender === 'student' && !m.removed && session.status !== 'closed' && now - new Date(m.createdAt).getTime() < EDIT_WINDOW_MS;
@@ -1052,6 +1182,7 @@ const ChatRoom: React.FC<{
             key={m.id}
             m={m}
             t={t}
+            mode={session.mode}
             parent={m.replyToId ? messages.find((x) => x.id === m.replyToId) ?? null : null}
             canModify={canModify(m)}
             onEdit={() => startEdit(m)}
@@ -1123,7 +1254,7 @@ const ChatRoom: React.FC<{
               <path d="M9 14 4 9l5-5" />
               <path d="M4 9h10a6 6 0 0 1 6 6v5" />
             </svg>
-            <span className="shrink-0 font-6semibold">{t.replyTo(quoteWho(t, replying))}</span>
+            <span className="shrink-0 font-6semibold">{quoteWho(t, replying, session.mode)}</span>
             <span className="truncate text-ink-3">{quoteText(t, replying)}</span>
           </span>
           <button type="button" onClick={() => setReplying(null)} className="ml-[8px] shrink-0 rounded-full px-[8px] py-[2px] font-6semibold text-ink-2 hover:bg-card-2">
@@ -1196,6 +1327,29 @@ const ChatRoom: React.FC<{
   );
 };
 
+// ── 돌아가기 탭 ───────────────────────────────────────────
+/**
+ * 채팅 창을 접어 둔 동안 오른쪽 가장자리 가운데에 붙는 작은 탭 — "돌아갈 채팅 화면이 있어요"
+ * 가는 세로선 + ‹ 화살표, 천천히 떠 있는 움직임 (움직임 줄이기 설정이면 멈춤), 새 답장이 오면 점
+ */
+const ReturnTab: React.FC<{ label: string; unread: number; onClick: () => void }> = ({ label, unread, onClick }) => (
+  <div className="fixed right-0 top-1/2 z-[70] -translate-y-1/2">
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={unread > 0 ? `${label} (${unread})` : label}
+      title={label}
+      className="livechat-return-tab group relative flex h-[64px] w-[26px] items-center justify-center gap-[3px] rounded-l-[14px] border border-r-0 border-line bg-surface text-accent-ink shadow-[0_2px_10px_rgba(0,0,0,0.12)] transition-[width,background-color] hover:w-[32px] hover:bg-card focus-visible:w-[32px] md:h-[76px]"
+    >
+      <svg viewBox="0 0 24 24" className="h-[16px] w-[16px] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="m14 6-6 6 6 6" />
+      </svg>
+      <span className="h-[28px] w-[2px] shrink-0 rounded-full bg-accent-ink/45 md:h-[36px]" aria-hidden="true" />
+      {unread > 0 && <span className="absolute -left-[3px] -top-[3px] h-[10px] w-[10px] rounded-full border-2 border-surface bg-[#e5484d]" aria-hidden="true" />}
+    </button>
+  </div>
+);
+
 // ── 창 ───────────────────────────────────────────────────
 const LiveChat: React.FC = () => {
   const dispatch = useDispatch();
@@ -1220,6 +1374,10 @@ const LiveChat: React.FC = () => {
   const [emailId, setEmailId] = useState('');
   const [emailBad, setEmailBad] = useState(false);
   const [editInfo, setEditInfo] = useState(() => infoProblems(loadInfo()).length > 0); // 처음이거나 빠진 게 있으면 입력 칸부터
+  // 호빗 '내 정보'에서 미리 채우기 — 정보 화면에 들어올 때마다 새로 읽음 (읽기만, 프로필은 바꾸지 않음)
+  const [botProfile, setBotProfile] = useState<BotProfile | null>(null);
+  const [prefilled, setPrefilled] = useState<Partial<Record<keyof StudentInfo, string>>>({}); // 프로필에서 채운 칸과 그 값
+  const [droppedExtras, setDroppedExtras] = useState<Extra['key'][]>([]); // 학생이 빼기로 한 항목
   const [error, setError] = useState<string | null>(null);
   const [width, setWidth] = useState<number>(() => {
     try {
@@ -1331,9 +1489,65 @@ const LiveChat: React.FC = () => {
     }
   }, [mode, t, switchProgram]);
 
+  // 진행 중인 채팅 — 창을 접어도(바깥 누름·닫기) 연결을 유지하고 오른쪽 가장자리에 돌아가기 탭을 보임
+  const [roomState, setRoomState] = useState<{ id: string; status: ChatSession['status']; unread: number } | null>(null);
+  const roomStatus = room ? (roomState?.id === room.session.id ? roomState.status : room.session.status) : null;
+  const roomUnread = room && roomState?.id === room.session.id ? roomState.unread : 0;
+  // 끝난 채팅도 접어 둔 사이 끝났으면(안 읽은 안내가 있으면) 탭을 남겨 종료 안내·만족도를 볼 수 있게
+  const keepRoom = step === 'chat' && !!room && (roomStatus !== 'closed' || roomUnread > 0);
+  const keepRoomRef = useRef(keepRoom);
+  // 열고 닫을 때 오른쪽에서 미끄러져 들어오고 나감 — 닫을 때 바로 사라지지 않게 애니메이션 동안(0.3초) 그려 둠
+  const [panelShown, setPanelShown] = useState(open);
+  const [slidIn, setSlidIn] = useState(false);
   useEffect(() => {
-    if (open) decide();
-  }, [open, decide]);
+    if (open) {
+      setPanelShown(true);
+      // 한 프레임 그린 뒤에 위치를 바꿔야 들어오는 움직임이 보임
+      let r2 = 0;
+      const r1 = requestAnimationFrame(() => {
+        r2 = requestAnimationFrame(() => setSlidIn(true));
+      });
+      return () => {
+        cancelAnimationFrame(r1);
+        cancelAnimationFrame(r2);
+      };
+    }
+    setSlidIn(false);
+    const timer = window.setTimeout(() => setPanelShown(false), 300);
+    return () => window.clearTimeout(timer);
+  }, [open]);
+  keepRoomRef.current = keepRoom;
+  const roomModeRef = useRef<ChatMode | null>(null);
+  roomModeRef.current = room?.session.mode ?? null;
+
+  useEffect(() => {
+    if (!open) return;
+    // 접어 둔 채팅을 다시 열면 그대로 (다시 확인하느라 대화가 깜빡이거나 다시 연결하지 않게) — 다른 종류 채팅을 누른 경우만 확인
+    if (keepRoomRef.current && roomModeRef.current === mode) return;
+    decide();
+  }, [open, decide, mode]);
+
+  // "다른 종류 채팅으로 바꿀까요?" 화면에서 그냥 접으면 하던 채팅으로 (돌아가기 탭이 보이게)
+  useEffect(() => {
+    if (!open && step === 'switch' && room && room.session.status !== 'closed') setStep('chat');
+  }, [open, step, room]);
+
+  // 새로고침 뒤에도 진행 중인 채팅이 있으면 (창을 열지 않아도) 다시 붙어 돌아가기 탭을 보임 — 화면이 한가할 때 MainPage가 이 창을 붙임
+  const openRef = useRef(open);
+  openRef.current = open;
+  useEffect(() => {
+    if (open || !getToken()) return;
+    chatApi
+      .me()
+      .then((me) => {
+        if (openRef.current || !me.session || me.session.status === 'closed') return; // 그 사이 창을 열었으면 decide가 처리
+        setRoom({ session: me.session, messages: me.messages, position: me.position ?? 0 });
+        setRoomEmail(me.officeEmail ?? null);
+        setStep('chat');
+      })
+      .catch(() => undefined);
+    // 처음 붙을 때 한 번만
+  }, []);
   // 창을 열면 소켓 라이브러리도 미리 받기 시작 (채팅 방에 들어갈 때 기다리지 않게)
   useEffect(() => {
     if (open) loadSocketIo().catch(() => undefined);
@@ -1368,6 +1582,8 @@ const LiveChat: React.FC = () => {
     setInfoError(null);
     const profile = { ...info, name: info.name.trim(), department: info.department.trim(), student_id: info.student_id.trim() };
     saveInfo(profile);
+    // 호빗 '내 정보'의 학년·입학 연도 등도 담당자에게 (이 기기에는 저장하지 않음 — 다음에도 프로필에서 새로)
+    const sent = { ...Object.fromEntries(extras.map((x) => [x.key, x.value])), ...profile };
     setStep('loading');
     if (needEmail) {
       try {
@@ -1381,7 +1597,7 @@ const LiveChat: React.FC = () => {
       }
     }
     try {
-      const r = await chatApi.start({ mode, program: formProgram, language: isKorean ? 'KO' : 'EN', profile, botContext: getRecentExchanges() });
+      const r = await chatApi.start({ mode, program: formProgram, language: isKorean ? 'KO' : 'EN', profile: sent, botContext: getRecentExchanges() });
       setRoom({ session: r.session, messages: r.messages, position: r.position });
       setRoomEmail(r.officeEmail ?? null);
       setStep('chat');
@@ -1393,21 +1609,88 @@ const LiveChat: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (step !== 'ready') return;
+    let alive = true;
+    getProfile()
+      .then((r) => alive && setBotProfile(r?.profile ?? null))
+      .catch(() => undefined); // 프로필이 없거나 못 읽으면 그냥 빈 칸
+    return () => {
+      alive = false;
+    };
+  }, [step]);
+  const infoProgram = (v: StudentInfo): 'undergrad' | 'grad' => v.program || (switchProgram === 'graduate' ? 'grad' : 'undergrad');
+  // 비어 있는 칸만 채움 (이 기기에 기억된 값·학생이 쓴 값은 그대로)
+  useEffect(() => {
+    if (!botProfile) return;
+    const { fields } = fromBotProfile(botProfile, infoProgram(info));
+    const filled = Object.fromEntries(
+      Object.entries(fields).filter(([k, v]) => v && !String(info[k as keyof StudentInfo]).trim())
+    ) as Partial<Record<keyof StudentInfo, string>>;
+    if (!Object.keys(filled).length) return;
+    setInfo({ ...info, ...filled } as StudentInfo);
+    setPrefilled((p) => ({ ...p, ...filled }));
+    setInfoBad((b) => b.filter((k) => !(k in filled)));
+    // 프로필을 새로 받았을 때만
+  }, [botProfile]);
+  /** 학생 정보 바꾸기 — 과정을 바꾸면 프로필에서 채운 칸(아직 그대로인 것)을 그 과정의 값으로 */
+  const changeInfo = (v: StudentInfo) => {
+    let next = v;
+    if (botProfile && v.program !== info.program) {
+      const { fields } = fromBotProfile(botProfile, infoProgram(v));
+      const nextPrefilled: Partial<Record<keyof StudentInfo, string>> = {};
+      next = { ...v };
+      (Object.keys(prefilled) as (keyof StudentInfo)[]).forEach((k) => {
+        if (next[k] !== prefilled[k]) return; // 학생이 고친 칸은 그대로
+        (next as Record<string, string>)[k] = fields[k] ?? '';
+        if (fields[k]) nextPrefilled[k] = fields[k];
+      });
+      (Object.keys(fields) as (keyof StudentInfo)[]).forEach((k) => {
+        if (fields[k] && !String(next[k]).trim()) {
+          (next as Record<string, string>)[k] = fields[k]!;
+          nextPrefilled[k] = fields[k];
+        }
+      });
+      setPrefilled(nextPrefilled);
+    }
+    setInfo(next);
+    // 고친 칸은 빨간 표시를 지움 (아직 틀린 칸만 남김)
+    const still = infoProblems(next);
+    setInfoBad((b) => b.filter((k) => still.includes(k)));
+  };
+  const extras = fromBotProfile(botProfile, infoProgram(info)).extras.filter((x) => !droppedExtras.includes(x.key));
+  // 학번 예시를 입학 연도에 맞춤 (예: 2023 입학 → 2023320000) — 값은 채우지 않음
+  const admitted = extras.find((x) => x.key === 'admission_year')?.value;
+  const idPlaceholder = admitted ? t.info.studentIdPh.replace('2024', admitted) : undefined;
+
   // 지금 화면의 과정 — 채팅 중이면 그 채팅의 과정, 시작 전이면 학생 정보에서 고른 과정(기본은 헤더 스위치)
   const formProgram: ChatProgram = info.program === 'grad' ? 'graduate' : info.program === 'undergrad' ? 'undergraduate' : switchProgram;
   const grad = (step === 'chat' || step === 'switch' ? room?.session.program : step === 'ready' ? formProgram : switchProgram) === 'graduate';
   const staffTitle = grad ? t.staffGrad : t.staff;
 
-  if (!open) return null;
+  if (!open && !keepRoom && !panelShown) return null;
 
   return (
     <>
-    {/* 배경 — 누르면 채팅 창 닫힘 (채팅은 서버에 있어 다시 열면 이어짐) */}
-    <div className="fixed inset-0 z-[79] bg-black/20 hobit-appear" aria-hidden="true" onClick={() => dispatch(closeLiveChat())} />
+    {/* 접어 둔 진행 중 채팅 — 오른쪽 가장자리 탭 (메뉴가 열려 있으면 숨김) */}
+    {!open && keepRoom && room && !menuOpen && (
+      <ReturnTab
+        label={roomStatus === 'closed' ? t.returnEnded : t.returnTab}
+        unread={roomUnread}
+        onClick={() => dispatch(openLiveChat(room.session.mode))}
+      />
+    )}
+    {/* 배경 — 누르면 채팅 창을 접음 (진행 중인 채팅은 연결된 채로 남고 돌아가기 탭이 보임) */}
     <div
-      className="fixed inset-y-0 right-0 z-[80] flex w-full flex-col bg-page shadow-2xl md:w-[var(--livechat-w)] md:border-l md:border-line hobit-appear"
+      className={`livechat-backdrop fixed inset-0 z-[79] bg-black/20 ${slidIn ? 'is-in' : ''} ${open || panelShown ? '' : 'hidden'} ${open ? '' : 'pointer-events-none'}`}
+      aria-hidden="true"
+      onClick={() => dispatch(closeLiveChat())}
+    />
+    <div
+      className={`fixed inset-y-0 right-0 z-[80] flex w-full flex-col bg-page shadow-2xl md:w-[var(--livechat-w)] md:border-l md:border-line livechat-panel ${slidIn ? 'is-in' : ''} ${open || panelShown ? '' : 'hidden'}`}
       style={{ ['--livechat-w' as string]: `${width}px`, ['--fs-scale' as string]: String(fontScale) }}
       role="dialog"
+      aria-hidden={!open}
       aria-label={mode === 'senior' ? t.senior : staffTitle}
     >
       {/* 너비 조절 (데스크톱) — 끌거나, 키보드 ←→ */}
@@ -1438,14 +1721,16 @@ const LiveChat: React.FC = () => {
           </p>
           {status?.open && status.hours?.today && step !== 'chat' && <p className="text-f-xs text-ink-3">{t.hours(status)}</p>}
         </div>
+        {/* 진행 중인 채팅은 닫아도 끝나지 않으므로 '접기'(›)로 보임 — 접으면 오른쪽 가장자리 탭으로 돌아옴 */}
         <button
           type="button"
           onClick={() => dispatch(closeLiveChat())}
-          aria-label={t.close}
+          aria-label={keepRoom && roomStatus !== 'closed' ? t.minimize : t.close}
+          title={keepRoom && roomStatus !== 'closed' ? t.minimizeHint : undefined}
           className="flex h-[36px] w-[36px] items-center justify-center rounded-full text-ink-2 hover:bg-card"
         >
-          <svg viewBox="0 0 24 24" className="h-[20px] w-[20px]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-            <path d="M6 6l12 12M18 6 6 18" />
+          <svg viewBox="0 0 24 24" className="h-[20px] w-[20px]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            {keepRoom && roomStatus !== 'closed' ? <path d="m9 6 6 6-6 6" /> : <path d="M6 6l12 12M18 6 6 18" />}
           </svg>
         </button>
       </header>
@@ -1570,18 +1855,33 @@ const LiveChat: React.FC = () => {
                 {mode === 'senior' && <p className="mt-[6px] text-f-xs text-ink-3">{t.info.seniorNote}</p>}
               </>
             ) : (
-            <StudentInfoForm
-              t={t}
-              mode={mode}
-              value={info}
-              bad={infoBad}
-              onChange={(v) => {
-                setInfo(v);
-                // 고친 칸은 빨간 표시를 지움 (아직 틀린 칸만 남김)
-                const still = infoProblems(v);
-                setInfoBad((b) => b.filter((k) => still.includes(k)));
-              }}
-            />
+            <>
+              {Object.keys(prefilled).length > 0 && <p className="-mt-[6px] mb-[12px] text-f-xs leading-relaxed text-ink-3">{t.info.prefilled}</p>}
+              <StudentInfoForm t={t} mode={mode} value={info} bad={infoBad} idPlaceholder={idPlaceholder} onChange={changeInfo} />
+            </>
+            )}
+            {/* 호빗 '내 정보'에서 함께 보내는 값 — 빼고 싶으면 × */}
+            {extras.length > 0 && (
+              <div className="mt-[14px] border-t border-line pt-[12px]">
+                <p className="mb-[6px] text-f-xs font-6semibold text-ink-2">{t.info.extrasTitle}</p>
+                <div className="flex flex-wrap gap-[6px]">
+                  {extras.map((x) => (
+                    <span key={x.key} className="inline-flex items-center gap-[2px] rounded-full bg-card py-[2px] pl-[10px] pr-[3px] text-f-xs font-5medium text-ink-2">
+                      {extraLabel(t, x)}
+                      <button
+                        type="button"
+                        onClick={() => setDroppedExtras((d) => [...d, x.key])}
+                        aria-label={t.info.extraRemove(extraLabel(t, x))}
+                        className="flex h-[20px] w-[20px] items-center justify-center rounded-full text-ink-3 hover:bg-card-2 hover:text-ink"
+                      >
+                        <svg viewBox="0 0 24 24" className="h-[11px] w-[11px]" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true">
+                          <path d="M6 6l12 12M18 6 6 18" />
+                        </svg>
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
             )}
           </section>
 
@@ -1624,7 +1924,7 @@ const LiveChat: React.FC = () => {
         </div>
       )}
 
-      {step === 'chat' && room && <ChatRoom t={t} initial={room} officeEmail={roomEmail ?? (room.session.program === 'graduate' ? 'infograd@korea.ac.kr' : 'cscoi@korea.ac.kr')} onNew={decide} />}
+      {step === 'chat' && room && <ChatRoom t={t} initial={room} officeEmail={roomEmail ?? (room.session.program === 'graduate' ? 'infograd@korea.ac.kr' : 'cscoi@korea.ac.kr')} onNew={decide} visible={open} onState={setRoomState} />}
 
 
 

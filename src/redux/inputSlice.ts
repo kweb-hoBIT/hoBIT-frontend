@@ -9,6 +9,7 @@ interface InputState {
 	directFaqId: number | null;  // FAQ 직접 클릭 시 ID
 	standalone: boolean;  // 추천 칩에서 보낸 질문 — 그 자체로 완결된 질문이라 앞 대화와 합쳐 검색하지 않음
 	isLoading: boolean;
+	stopSeq: number;  // '답변 중지'를 누를 때마다 1씩 — Chatting이 보고 진행 중인 요청을 끊음
 
 	// out of ctx
 	id: number;
@@ -22,6 +23,7 @@ const initialState: InputState = {
 	directFaqId: null,
 	standalone: false,
 	isLoading: false,
+	stopSeq: 0,
 
 	id: -1,
 };
@@ -81,6 +83,11 @@ const inputSlice = createSlice({
 			state.isLoading = action.payload;
 		},
 
+		// 답변 중지 — 요청을 끊고 화면을 정리하는 일은 요청을 가진 Chatting이 함 (여기선 신호만)
+		requestStop: (state) => {
+			if (state.isLoading) state.stopSeq += 1;
+		},
+
 		// ooc
 		setId: (state, action: PayloadAction<number>) => {
 			state.id = action.payload;
@@ -97,6 +104,7 @@ export const {
 	clearSent,
 	updateLiveValue,
 	setIsLoading,
+	requestStop,
 	setId,
 } = inputSlice.actions;
 export const inputReducer = inputSlice.reducer;

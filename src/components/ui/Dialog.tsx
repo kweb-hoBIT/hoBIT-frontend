@@ -13,14 +13,15 @@ type DialogRequest = {
   kind: 'alert' | 'confirm';
   message: string;
   danger?: boolean;
+  confirmLabel?: string; // 확인 버튼 문구 (예: '바꾸기')
   resolve: (ok: boolean) => void;
 };
 
 let enqueue: ((request: DialogRequest) => void) | null = null;
 
-export const appConfirm = (message: string, options?: { danger?: boolean }) =>
+export const appConfirm = (message: string, options?: { danger?: boolean; confirmLabel?: string }) =>
   new Promise<boolean>((resolve) => {
-    if (enqueue) enqueue({ kind: 'confirm', message, danger: options?.danger, resolve });
+    if (enqueue) enqueue({ kind: 'confirm', message, danger: options?.danger, confirmLabel: options?.confirmLabel, resolve });
     else resolve(window.confirm(message)); // DialogHost가 아직 없을 때만
   });
 
@@ -90,7 +91,7 @@ export const DialogHost: React.FC = () => {
             onClick={() => close(true)}
             className="rounded-full bg-accent px-[16px] md:px-[20px] py-[8px] md:py-[10px] text-f-sm font-5medium text-white hover:bg-accent/85 outline-none focus-visible:ring-2 focus-visible:ring-accent/30 focus-visible:ring-offset-2"
           >
-            {current.kind === 'confirm' && current.danger ? (isKorean ? '지우기' : 'Delete') : isKorean ? '확인' : 'OK'}
+            {current.confirmLabel ?? (current.kind === 'confirm' && current.danger ? (isKorean ? '지우기' : 'Delete') : isKorean ? '확인' : 'OK')}
           </button>
         </div>
       </div>

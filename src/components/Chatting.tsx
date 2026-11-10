@@ -9,7 +9,8 @@ import SeniorResponse from './chat/SeniorResponse';
 import Query from './chat/Query';
 import { RootState } from '../redux/store';
 import { Faq } from '../types/faq';
-import { sendQuestionStream, getAllQuestions, getFaqById, getRecommendationsAfterFaq } from '../api/query';
+import { getAllQuestions, getFaqById, getRecommendationsAfterFaq } from '../api/query';
+import { sendQuestionStream, isAbortError } from '../api/questionStream';
 import { setQuestions } from '../redux/questionsSlice';
 import { resetHomeClicked } from '../redux/homeSlice';
 import { clearSent } from '../redux/inputSlice';
@@ -21,6 +22,7 @@ import { THEME_CHANGE_EVENT } from './Header';
 import RecChips, { RecItem } from './chat/RecChips';
 import { recordExchanges } from '../lib/recentChat';
 import { prefersReducedMotion } from '../lib/motion';
+import { applyModeration } from '../lib/moderation';
 
 // 맨 아래에서 이만큼 안이면 "바닥에 돌아왔다"로 보고 다시 따라감 / 이보다 위면 '아래로' 버튼을 보임
 const RESUME_PX = 32;
@@ -43,6 +45,7 @@ interface ChatItem {
   followup_fields?: string[]; // 답변과 함께 보여주는 추가 정보 요청 (막지 않는 질문)
   streamText?: string;           // 스트리밍 중인 답변
   streamStyle?: string;          // senior면 스트리밍 말풍선도 선배 색
+  stopped?: boolean;             // '답변 중지'로 멈춤 — 그때까지 받은 글(streamText)만 남기고 멈췄다는 표시
   recommendations?: RecItem[];   // 답변 아래 "이어서 물어볼 만한 질문"
   initialSeniorFaqId?: number;
   audienceNote?: Program;        // 스위치와 다른 기준으로 답했을 때 (질문에 '대학원'·'학위논문' 같은 말이 있어서)
@@ -64,7 +67,12 @@ const Chatting: React.FC = () => {
   const sent = useSelector((state: RootState) => state.input.sent);
   const directFaqId = useSelector((state: RootState) => state.input.directFaqId);
   const standalone = useSelector((state: RootState) => state.input.standalone);
+  const stopSeq = useSelector((state: RootState) => state.input.stopSeq);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
+  // 질문 일시 정지 중인지 — 이미 정지 중이면 알림창을 다시 띄우지 않음 (응답 처리 시점의 최신 값을 보려고 ref)
+  const suspendedUntil = useSelector((state: RootState) => state.moderation.suspendedUntil);
+  const suspendedRef = useRef(suspendedUntil);
+  suspendedRef.current = suspendedUntil;
   const homeClicked = useSelector((state: RootState) => state.home.homeClicked);
   const feedbackClicked = useSelector(
     (state: RootState) => state.feedback.feedbackClicked
@@ -321,6 +329,43 @@ const Chatting: React.FC = () => {
     }, 50);
   };
 
+  // ── 답변 중지 ────────────────────────────────────────────
+  // 진행 중인 요청 하나 (질문·프로필 재시도 공통). 중지하면 fetch를 끊고(→ 백엔드 → RAG까지 끊김),
+  // 받은 데까지의 글은 남긴 채 바로 입력을 풀어 다시 물어볼 수 있게
+  const activeRef = useRef<{ uid: string; controller: AbortController } | null>(null);
+  const startRequest = (uid: string) => {
+    activeRef.current?.controller.abort();
+    const controller = new AbortController();
+    activeRef.current = { uid, controller };
+    return controller;
+  };
+  // 요청이 끝났을 때 — 이미 중지된 요청이면 입력 잠금을 건드리지 않음 (그사이 보낸 새 질문의 로딩을 끄지 않게)
+  const finishRequest = (controller: AbortController) => {
+    if (activeRef.current?.controller === controller) activeRef.current = null;
+    if (!controller.signal.aborted) dispatch(setIsLoading(false));
+  };
+  const lastStopSeqRef = useRef(stopSeq); // 다시 그려질 때 예전 중지 신호로 오해하지 않게
+  useEffect(() => {
+    if (stopSeq === lastStopSeqRef.current) return;
+    lastStopSeqRef.current = stopSeq;
+    const active = activeRef.current;
+    activeRef.current = null;
+    if (active) {
+      active.controller.abort();
+      // 아직 화면에 반영 안 된 조각(최대 50ms 분량)까지 붙여 멈춘 자리 그대로 보여줌
+      const pending = streamBufferRef.current[active.uid] ?? '';
+      delete streamBufferRef.current[active.uid];
+      setChatHistory((prev) =>
+        prev.map((item) =>
+          item.uid === active.uid
+            ? { ...item, loading: false, stopped: true, streamText: (item.streamText ?? '') + pending }
+            : item
+        )
+      );
+    }
+    dispatch(setIsLoading(false));
+  }, [stopSeq, dispatch]);
+
   useEffect(() => {
     if (!sentValue || !sent) return;
 
@@ -345,6 +390,8 @@ const Chatting: React.FC = () => {
     setChatHistory((prevHistory) => [...prevHistory, newChatItem]);
     dispatch(setIsLoading(true));
     const uid = newChatItem.uid;
+    const controller = startRequest(uid);
+    const { signal } = controller;
 
     const fetchResponse = async () => {
       try {
@@ -353,6 +400,7 @@ const Chatting: React.FC = () => {
         // FAQ 직접 클릭: ID로 바로 조회 (classify/RAG 건너뜀)
         if (directFaqId !== null) {
           const [data, recs] = await Promise.all([getFaqById(directFaqId), getRecommendationsAfterFaq(directFaqId)]);
+          if (signal.aborted) return; // 그사이 중지 — 늦게 온 결과는 버림
           const faqs = data.faqs ?? [];
           setChatHistory((prevHistory) =>
             prevHistory.map((item) =>
@@ -368,13 +416,16 @@ const Chatting: React.FC = () => {
         const serverResponse = await sendQuestionStream(
           sentValue,
           language,
-          (delta) => appendStream(uid, delta),
+          (delta) => !signal.aborted && appendStream(uid, delta),
           (meta) =>
             setChatHistory((prev) =>
               prev.map((item) => (item.uid === uid ? { ...item, streamStyle: meta.style } : item))
             ),
-          { standalone }
+          { standalone, signal }
         );
+        if (signal.aborted) return; // 끝나는 순간 중지를 눌렀으면 멈춘 화면 그대로
+        // 경고·정지 안내 — 말풍선은 아래에서 평소처럼, 여기서는 알림창·입력 잠금
+        applyModeration(serverResponse?.moderation, dispatch, isKorean, suspendedRef.current > Date.now());
         if (serverResponse && serverResponse.id >= 0) {
           dispatch(setId(serverResponse.id));
         }
@@ -440,6 +491,7 @@ const Chatting: React.FC = () => {
           dispatch(setIsLoading(false));
         }
       } catch (err) {
+        if (signal.aborted || isAbortError(err)) return; // 중지는 오류가 아님 (화면은 중지 쪽에서 정리)
         console.error('Error while fetching response:', err);
         setError(err as string);
         dispatch(setIsLoading(false));
@@ -450,7 +502,7 @@ const Chatting: React.FC = () => {
         );
       } finally {
         // 응답이 비어 와도(null) 입력이 잠긴 채 남지 않게
-        dispatch(setIsLoading(false));
+        finishRequest(controller);
       }
     };
 
@@ -507,10 +559,14 @@ const Chatting: React.FC = () => {
     const update = (patch: Partial<ChatItem>) =>
       setChatHistory((prev) => prev.map((item) => (item.uid === uid ? { ...item, ...patch } : item)));
     dispatch(setIsLoading(true));
-    update({ loading: true, needs_profile: false, missing_fields: [], followup_fields: [], streamText: '' });
-    sendQuestionStream(retryQuery, retryLanguage, (delta) => appendStream(uid, delta), (meta) => update({ streamStyle: meta.style }))
+    update({ loading: true, stopped: false, needs_profile: false, missing_fields: [], followup_fields: [], streamText: '' });
+    const controller = startRequest(uid);
+    const { signal } = controller;
+    sendQuestionStream(retryQuery, retryLanguage, (delta) => !signal.aborted && appendStream(uid, delta),
+      (meta) => update({ streamStyle: meta.style }), { signal })
       .then((serverResponse) => {
-        if (!serverResponse) return;
+        if (!serverResponse || signal.aborted) return;
+        applyModeration(serverResponse.moderation, dispatch, isKorean, suspendedRef.current > Date.now());
         if (serverResponse.id >= 0) dispatch(setId(serverResponse.id));
         if (serverResponse.needs_profile) {
           update({ loading: false, needs_profile: true, missing_fields: serverResponse.missing_fields ?? [] });
@@ -531,10 +587,11 @@ const Chatting: React.FC = () => {
         }
       })
       .catch((err) => {
+        if (signal.aborted || isAbortError(err)) return;
         console.error('재시도 중 오류:', err);
         update({ loading: false });
       })
-      .finally(() => dispatch(setIsLoading(false)));
+      .finally(() => finishRequest(controller));
   };
 
   // 대화 항목에 넘기는 함수는 항상 같은 참조로 — 스트리밍 중 지난 대화 항목이 다시 그려지지 않게 (ChatEntry는 memo)
@@ -635,6 +692,7 @@ const ChatEntry = memo(function ChatEntry({ item: chatItem, isKorean, onRetry, o
                     loading={chatItem.loading}
                     streamText={chatItem.streamText}
                     streamStyle={chatItem.streamStyle}
+                    stopped={chatItem.stopped}
                   />
                   {!chatItem.loading && chatItem.audienceNote && (
                     <p className="hobit-appear mt-[8px] inline-flex items-center gap-[6px] rounded-full bg-card px-[12px] py-[4px] text-f-caption text-ink-2 break-keep">

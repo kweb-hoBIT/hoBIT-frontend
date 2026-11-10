@@ -12,6 +12,7 @@ import { onIdle, once } from '../lib/idle';
 import { preloadMarkdown } from '../components/chat/Response';
 import { getAllFAQs, getAllSeniorFAQs } from '../api/query';
 import { DelayedSpinner } from '../components/ui/Skeleton';
+import { getToken } from '../api/liveChat';
 
 // 실시간 채팅 창(+ socket.io)은 처음 열 때만 받음 — 첫 화면 번들에서 제외. 메뉴를 열면 미리 받기 시작
 export const preloadLiveChat = once(() => import('../components/livechat/LiveChat'));
@@ -27,6 +28,15 @@ const MainPage: React.FC = () => {
   useEffect(() => {
     if (liveChatOpen) setLiveChatMounted(true);
   }, [liveChatOpen]);
+  // 채팅 인증 토큰이 있으면(진행 중인 채팅이 있을 수 있음) 한가할 때 창을 붙여 둠 — 창은 닫힌 채로 확인만 하고,
+  // 진행 중이면 오른쪽 가장자리에 돌아가기 탭이 보임 (새로고침해도 돌아갈 채팅이 있다는 걸 알 수 있게)
+  useEffect(
+    () =>
+      onIdle(() => {
+        if (getToken()) setLiveChatMounted(true);
+      }),
+    []
+  );
 
   // 첫 화면이 그려진 뒤 한가할 때: 답변 마크다운 렌더러·메뉴 내용 코드와 메뉴의 FAQ 목록을 미리 받아 둠
   useEffect(

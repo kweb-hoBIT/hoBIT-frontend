@@ -9,7 +9,7 @@ import { optionConflict, toDisplayValue, toStoredValue } from './chat/ProfileInp
 import { FIELD_OPTIONS, useProfileOptions } from './chat/profileOptions';
 import { Skeleton } from './ui/Skeleton';
 
-// 학부/대학원 스위치에 따라 다른 항목 — 두 정보는 따로 저장돼 스위치를 바꿔도 지워지지 않음
+// 학부/대학원 스위치에 따라 다른 항목 — 스위치를 바꾸면 저장된 프로필이 모두 지워짐 (Header의 useProgramChooser가 확인 후 삭제)
 const UNDER_FIELDS = ['department', 'admission_year', 'grade', 'major_type', 'student_status'] as const;
 const GRAD_FIELDS = ['grad_department', 'degree', 'grad_admission_year'] as const;
 type Field = (typeof UNDER_FIELDS)[number] | (typeof GRAD_FIELDS)[number];
@@ -40,9 +40,10 @@ const ProfilePanel: React.FC = () => {
     }
   }, []);
 
+  // 메뉴를 열 때, 그리고 스위치를 바꿨을 때(프로필이 지워졌으니) 다시 조회
   useEffect(() => {
     if (isOpen) load();
-  }, [isOpen, load]);
+  }, [isOpen, load, grad]);
 
   const run = async (action: () => Promise<unknown>) => {
     setBusy(true);

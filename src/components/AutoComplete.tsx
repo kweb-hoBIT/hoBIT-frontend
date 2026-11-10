@@ -25,8 +25,9 @@ function matchRules(rules: KeywordRule[], input: string): KeywordRule[] {
 	const text = norm(input);
 	if (!text) return [];
 	const lower = input.toLowerCase();
+	// 한국어·영어 단어 모두 비교 (한국어 모드에서 "CS"를 쳐도, 영어 모드에서 "cs"를 쳐도 걸림)
 	return rules.filter((r) =>
-		[r.keyword, ...r.synonyms].some((w) => {
+		[r.keyword, r.keyword_en ?? '', ...r.synonyms, ...(r.synonyms_en ?? [])].some((w) => {
 			const t = stem(w);
 			if (!t.length) return false;
 			// 영어는 단어 단위, 앞부분 입력은 세 글자부터 ("comp" → computer science)
@@ -92,10 +93,13 @@ const AutoComplete: React.FC = () => {
 
 			// 관리자 키워드 규칙: 고정 FAQ를 맨 위에, 연관 단어로 입력해도 대표 키워드가 든 질문까지
 			// (예: "대여" → "대관" 질문들, "현장실습" → "현장실습이 궁금해!" 맨 위)
+			// 영어 모드: "cs" → 영어 대표 키워드(computer science)가 든 영어 질문까지
 			const matched = isKoreanChosung ? [] : matchRules(rules, inputValue);
 			if (matched.length) {
 				const pinned = matched.flatMap((r) => r.pinned.map((p) => (isKorean ? p.question_ko : p.question_en)));
-				const expanded = isKorean ? matched.flatMap((r) => trieKr.getSuggestionsByTokens(r.keyword)) : [];
+				const expanded = isKorean
+					? matched.flatMap((r) => trieKr.getSuggestionsByTokens(r.keyword))
+					: matched.flatMap((r) => (r.keyword_en ? trieEn.getSuggestionsByTokens(r.keyword_en) : []));
 				suggestions = Array.from(new Set([...pinned, ...suggestions, ...expanded].filter(Boolean)));
 			}
 

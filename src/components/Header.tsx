@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch, useStore } from 'react-redux';
 import { RootState } from '../redux/store';
 import { lang } from '../i18n/lang';
 import { setEnglish, setKorean } from '../redux/languageSlice';
 import { toggleMenu } from '../redux/menuSlice';
 import { Program, setProgram } from '../redux/programSlice';
 import { preloadMenuContent } from './Modal';
+import { appConfirm } from './ui/Dialog';
+import { deleteProfile, getProfile } from '../api/query';
 
 
 const THEME_KEY = 'hobit-theme';
@@ -104,29 +106,66 @@ function SlideSwitch<T extends string>({ ariaLabel, options, value, onChange, di
   );
 }
 
-/** 학부/대학원 바꾸기 — 답변 중에는 바꾸지 않고(보낸 질문과 기준이 달라짐), 바꾸면 짧은 안내 */
+/**
+ * 학부/대학원 바꾸기 — 답변 중에는 바꾸지 않고(보낸 질문과 기준이 달라짐), 바꾸면 짧은 안내.
+ * 바꾸면 저장된 프로필(학과·학번 등)을 지움 — 학부 정보가 대학원 답변에(또는 반대로) 섞여 들어가지 않게.
+ * 지울 정보가 있을 때만 먼저 물어봄 (비어 있으면 바로 바꿈). 대화 기록은 남김
+ */
 const useProgramChooser = (isKorean: boolean) => {
   const dispatch = useDispatch();
+  const store = useStore<RootState>();
   const program = useSelector((state: RootState) => state.program.value);
   const isLoading = useSelector((state: RootState) => state.input.isLoading);
   const [toast, setToast] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false); // 프로필 확인·삭제 중 (두 번 눌러 겹치지 않게)
   const timer = useRef<number | null>(null);
   useEffect(() => () => {
     if (timer.current) window.clearTimeout(timer.current);
   }, []);
-  const choose = (next: Program) => {
-    if (next === program || isLoading) return;
-    dispatch(setProgram(next));
-    const g = next === 'graduate';
-    setToast(isKorean ? `${g ? '대학원' : '학부'} 기준으로 답할게요` : `Answering for ${g ? 'graduate' : 'undergraduate'} students`);
+  const showToast = (text: string) => {
+    setToast(text);
     if (timer.current) window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => setToast(null), 1800);
+  };
+  const choose = async (next: Program) => {
+    if (next === program || isLoading || busy) return;
+    const g = next === 'graduate';
+    setBusy(true);
+    try {
+      // 저장된 프로필은 서버(세션)에 있음 — 바꾸기 직전에 확인 (조회 실패면 지울 수도 없으니 그냥 바꿈)
+      const stored = await getProfile().catch(() => null);
+      const filled = Object.entries(stored?.profile ?? {})
+        .filter(([, v]) => v !== null && v !== '')
+        .map(([field]) => field);
+      if (filled.length > 0) {
+        const ok = await appConfirm(
+          isKorean
+            ? `${g ? '대학원으로' : '학부로'} 바꾸면 입력한 프로필 정보(학과·학번 등)가 초기화돼요. 바꿀까요?`
+            : `Switching to ${g ? 'graduate' : 'undergraduate'} will reset your saved profile (department, admission year, etc.). Switch?`,
+          { confirmLabel: isKorean ? '바꾸기' : 'Switch' }
+        );
+        // 확인을 기다리는 사이 질문을 보냈으면 바꾸지 않음 (보낸 질문과 기준이 달라짐)
+        if (!ok || store.getState().input.isLoading) return;
+        // 항목별로 지움 — 전체 삭제(field 없이)는 대화 기록까지 지워서 쓰지 않음
+        try {
+          await Promise.all(filled.map((field) => deleteProfile(field)));
+        } catch {
+          showToast(isKorean ? '프로필을 지우지 못했어요. 잠시 뒤 다시 시도해 주세요.' : "Couldn't reset your profile. Please try again.");
+          return;
+        }
+      }
+      dispatch(setProgram(next));
+      showToast(isKorean ? `${g ? '대학원' : '학부'} 기준으로 답할게요` : `Answering for ${g ? 'graduate' : 'undergraduate'} students`);
+    } finally {
+      setBusy(false);
+    }
   };
   const options: [SlideOption<Program>, SlideOption<Program>] = [
     { value: 'undergraduate', label: isKorean ? '학부' : 'Undergrad', icon: <BookIcon /> },
     { value: 'graduate', label: isKorean ? '대학원' : 'Graduate', icon: <CapIcon /> },
   ];
-  return { program, isLoading, toast, choose, options };
+  // 확인·삭제 중에도 스위치를 잠금 (답변 중과 같은 모양)
+  return { program, isLoading: isLoading || busy, toast, choose, options };
 };
 
 const Toast: React.FC<{ text: string | null }> = ({ text }) =>

@@ -146,6 +146,26 @@ code {
 }
 /* 추천 칩 — 답변 카드를 먼저 읽을 수 있게 조금 늦게, 하나씩 이어서 나타남 (지연은 칩마다 style로 지정).
    자리는 처음부터 잡혀 있어(투명) 칩이 나타날 때 화면이 다시 밀리지 않음 */
+/* 상담 채팅 창 — 오른쪽에서 미끄러져 들어오고 나감 (배경은 함께 서서히) */
+.livechat-panel {
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s;
+  will-change: transform;
+}
+.livechat-panel.is-in {
+  transform: none;
+}
+.livechat-backdrop {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.livechat-backdrop.is-in {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .livechat-panel { transform: none; opacity: 0; transition: opacity 0.15s; }
+  .livechat-panel.is-in { opacity: 1; }
+}
 .hobit-appear-late {
   animation: hobit-appear 0.45s ease-out both;
 }
@@ -251,5 +271,29 @@ html.embed .bg-card img {
   }
 }
 
-/* 채팅 답글 인용을 눌러 원래 메시지로 갔을 때 잠깐 표시 */
-.chat-flash { background: rgb(var(--c-accent) / 0.12); }
+/* 채팅 답글 인용을 눌러 원래 메시지로 갔을 때 — 줄 전체 배경 대신 그 말풍선만 짧게 흔들고 테두리 */
+@keyframes chat-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(2px); }
+}
+.chat-shake {
+  outline: 2px solid rgb(var(--c-accent) / 0.45);
+  outline-offset: 2px;
+  transition: outline-color 0.3s ease-out;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .chat-shake { animation: chat-shake 0.4s ease-in-out; }
+}
+
+/* 접어 둔 진행 중 채팅으로 돌아가는 오른쪽 가장자리 탭 — 천천히 떠 있는 움직임 (움직임 줄이기 설정이면 멈춤) */
+@keyframes livechat-return-float {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-4px); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .livechat-return-tab { animation: livechat-return-float 2.4s ease-in-out infinite; }
+  .livechat-return-tab:hover, .livechat-return-tab:focus-visible { animation-play-state: paused; }
+}

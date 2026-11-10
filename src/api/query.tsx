@@ -72,7 +72,9 @@ export const getAllQuestions = async () => {
 
 export type KeywordRule = {
 	keyword: string;
+	keyword_en?: string; // 영어 대표 키워드 (예: computer science) — 예전 서버면 없음
 	synonyms: string[];
+	synonyms_en?: string[]; // 영어 단어·약어 (예: cs, comp sci)
 	pinned: { faq_id: number; question_ko: string; question_en: string }[];
 };
 

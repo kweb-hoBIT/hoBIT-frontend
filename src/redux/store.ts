@@ -10,6 +10,7 @@ import { feedbackReducer } from './feedbackSlice';
 import { imageReducer } from './imageSlice';
 import { liveChatReducer } from './liveChatSlice';
 import { programReducer } from './programSlice';
+import { moderationReducer } from './moderationSlice';
 
 const store = configureStore({
   reducer: {
@@ -24,6 +25,7 @@ const store = configureStore({
     feedback: feedbackReducer,
     liveChat: liveChatReducer,
     program: programReducer,
+    moderation: moderationReducer,
   },
 });
 
