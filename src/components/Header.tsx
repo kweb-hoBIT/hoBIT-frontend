@@ -97,7 +97,7 @@ function SlideSwitch<T extends string>({ ariaLabel, options, value, onChange, di
               wide ? 'px-[10px]' : 'px-[8px] md:px-[10px] xl:px-[14px]'
             } ${on ? 'text-accent-ink font-6semibold' : 'text-ink-3 hover:text-ink-2 font-5medium'}`}
           >
-            {it.icon}
+            {it.icon && <span className="flex shrink-0">{it.icon}</span>}
             <span className={`${labels === 'md' ? 'hidden md:inline' : 'inline'} whitespace-nowrap`}>{it.label}</span>
           </button>
         );
@@ -277,9 +277,10 @@ const ControlsMenu: React.FC<{ isKorean: boolean; dark: boolean; setDark: (d: bo
         {/* 대학원 모드면 작은 점 — 패널을 열지 않아도 지금 기준을 알 수 있게 */}
         {program === 'graduate' && <span className="absolute -right-[2px] -top-[2px] h-[8px] w-[8px] rounded-full bg-accent-ink ring-2 ring-surface" />}
       </button>
-      {/* 여백 줄임 (2026-11-10): 이름 칸은 글자 폭만큼, 줄 사이·안쪽 여백도 좁게 — 한 표로 묶어 이름 칸 폭이 줄마다 같게 */}
+      {/* 여백 줄임 (2026-11-10): 이름 칸은 글자 폭만큼, 줄 사이·안쪽 여백도 좁게 — 한 표로 묶어 이름 칸 폭이 줄마다 같게.
+          창 폭은 글자에 맞춰 (영어 'Undergrad'가 좁은 칸에 눌려 아이콘이 0px로 사라졌었음) */}
       {open && (
-        <div className="hobit-appear absolute right-0 top-[calc(100%+10px)] w-[min(256px,calc(100vw-28px))] rounded-[16px] border border-line bg-surface p-[10px] pl-[14px] shadow-lg">
+        <div className="hobit-appear absolute right-0 top-[calc(100%+10px)] w-max min-w-[min(240px,calc(100vw-28px))] max-w-[calc(100vw-28px)] rounded-[16px] border border-line bg-surface p-[10px] pl-[14px] shadow-lg">
           <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-[12px] gap-y-[6px]">
             {rows.map((r) => (
               <React.Fragment key={r.id}>
