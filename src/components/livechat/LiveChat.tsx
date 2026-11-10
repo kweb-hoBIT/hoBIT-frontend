@@ -302,6 +302,7 @@ const LONG_WAIT_MS = 10 * 60 * 1000;
 // 채팅 창 너비 (데스크톱) — 이 기기에 기억
 const WIDTH_KEY = 'hobit-livechat-width';
 const DEFAULT_W = 440;
+const RESIZE_HINT_KEY = 'hobit-livechat-resize-hint';
 const MIN_W = 360;
 /** 최대 너비: 상단 가운데 제목("정보대학(학부) 챗봇 호빗")을 가리지 않는 데까지 */
 const maxWidth = () => {
@@ -1345,7 +1346,13 @@ const ReturnTab: React.FC<{ label: string; unread: number; onClick: () => void }
         <path d="m14 6-6 6 6 6" />
       </svg>
       <span className="h-[28px] w-[2px] shrink-0 rounded-full bg-accent-ink/45 md:h-[36px]" aria-hidden="true" />
-      {unread > 0 && <span className="absolute -left-[3px] -top-[3px] h-[10px] w-[10px] rounded-full border-2 border-surface bg-[#e5484d]" aria-hidden="true" />}
+      {/* 접어 둔 사이 새 답장 — 초록 점 (퍼지는 테두리로 눈에 띄게) */}
+      {unread > 0 && (
+        <span className="absolute -left-[4px] -top-[4px] flex h-[12px] w-[12px]" aria-hidden="true">
+          <span className="livechat-unread-ping absolute inset-0 rounded-full bg-[#22a55a]/60" />
+          <span className="relative h-[12px] w-[12px] rounded-full border-2 border-surface bg-[#22a55a]" />
+        </span>
+      )}
     </button>
   </div>
 );
@@ -1397,9 +1404,33 @@ const LiveChat: React.FC = () => {
     }
   }, []);
 
+  // 너비를 바꿀 수 있다는 걸 처음 한 번 알려 줌 (가장자리 손잡이 + 말풍선, 6초 뒤 사라짐) — 이 기기에 기억
+  const [resizeHint, setResizeHint] = useState(false);
+  const dismissResizeHint = useCallback(() => {
+    setResizeHint(false);
+    try {
+      localStorage.setItem(RESIZE_HINT_KEY, '1');
+    } catch {}
+  }, []);
+  useEffect(() => {
+    if (!open || !window.matchMedia('(min-width: 768px)').matches) return;
+    let seen = false;
+    try {
+      seen = localStorage.getItem(RESIZE_HINT_KEY) === '1';
+    } catch {}
+    if (seen) return;
+    const show = window.setTimeout(() => setResizeHint(true), 500); // 창이 다 들어온 뒤
+    const hide = window.setTimeout(dismissResizeHint, 6500);
+    return () => {
+      window.clearTimeout(show);
+      window.clearTimeout(hide);
+    };
+  }, [open, dismissResizeHint]);
+
   // 왼쪽 가장자리를 끌면 너비 변경 (오른쪽에 붙은 창이라 왼쪽으로 끌수록 넓어짐)
   const startResize = (e: React.PointerEvent<HTMLDivElement>) => {
     e.preventDefault();
+    if (resizeHint) dismissResizeHint();
     const target = e.currentTarget;
     target.setPointerCapture(e.pointerId);
     document.body.style.userSelect = 'none';
@@ -1711,6 +1742,20 @@ const LiveChat: React.FC = () => {
         className="group absolute inset-y-0 -left-[4px] z-10 hidden w-[8px] cursor-ew-resize md:block"
       >
         <span className="absolute inset-y-0 left-[3px] w-[2px] bg-transparent transition-colors group-hover:bg-accent-ink/40 group-focus-visible:bg-accent-ink/60" />
+        {/* 가운데 손잡이 — 마우스를 올리면 보이고, 처음 열 때는 안내와 함께 */}
+        <span
+          className={`absolute left-[-2px] top-1/2 flex h-[44px] w-[12px] -translate-y-1/2 items-center justify-center rounded-full border border-line bg-surface shadow-sm transition-opacity ${
+            resizeHint ? 'livechat-resize-nudge opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100'
+          }`}
+          aria-hidden="true"
+        >
+          <span className="h-[18px] w-[2px] rounded-full bg-ink-3" />
+        </span>
+        {resizeHint && (
+          <span className="hobit-appear pointer-events-none absolute right-[18px] top-[calc(50%-15px)] whitespace-nowrap rounded-[10px] bg-ink px-[10px] py-[6px] text-f-xs font-6semibold text-surface shadow-lg" role="status">
+            {isKorean ? '← 끌어서 창 너비를 바꿀 수 있어요' : '← Drag to resize the chat'}
+          </span>
+        )}
       </div>
       {/* 호빗 상단 바와 같은 높이 → 아래 테두리가 한 줄로 이어짐 */}
       <header className="flex h-[60px] shrink-0 items-center justify-between border-b border-line px-[20px] md:h-[70px]">

@@ -147,6 +147,23 @@ code {
 /* 추천 칩 — 답변 카드를 먼저 읽을 수 있게 조금 늦게, 하나씩 이어서 나타남 (지연은 칩마다 style로 지정).
    자리는 처음부터 잡혀 있어(투명) 칩이 나타날 때 화면이 다시 밀리지 않음 */
 /* 상담 채팅 창 — 오른쪽에서 미끄러져 들어오고 나감 (배경은 함께 서서히) */
+/* 접어 둔 채팅의 새 답장 표시 — 초록 점 둘레가 퍼짐 */
+@keyframes livechat-unread-ping {
+  0% { transform: scale(1); opacity: 0.9; }
+  80%, 100% { transform: scale(2.2); opacity: 0; }
+}
+.livechat-unread-ping { animation: livechat-unread-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite; }
+/* 너비 조절 손잡이 — 처음 열 때 좌우로 살짝 움직여 끌 수 있다는 걸 보여 줌 */
+@keyframes livechat-resize-nudge {
+  0%, 100% { transform: translate(0, -50%); }
+  25% { transform: translate(-5px, -50%); }
+  50% { transform: translate(0, -50%); }
+  75% { transform: translate(-5px, -50%); }
+}
+.livechat-resize-nudge { animation: livechat-resize-nudge 1.4s ease-in-out 2; }
+@media (prefers-reduced-motion: reduce) {
+  .livechat-unread-ping, .livechat-resize-nudge { animation: none; }
+}
 .livechat-panel {
   transform: translateX(100%);
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s;
