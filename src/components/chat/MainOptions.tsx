@@ -18,19 +18,19 @@ const MainOptions: React.FC = () => {
   };
 
   return (
-    <div className="bg-card w-full max-w-[330px] md:max-w-none md:w-[350px] h-auto mt-[20px] rounded-[20px] flex flex-col items-center p-[20px]">
+    <div className="bg-card w-full max-w-[330px] md:max-w-none md:w-[350px] h-auto mt-[12px] md:mt-[20px] rounded-[16px] md:rounded-[20px] flex flex-col items-center px-[14px] pt-[10px] pb-[6px] md:p-[20px]">
       <img
         src={homeImg}
         alt="home image"
         width={400}
         height={400}
-        className="w-[150px] md:w-[200px] h-auto aspect-square mb-[10px]"
+        className="w-[124px] md:w-[200px] h-auto aspect-square mb-[2px] md:mb-[10px]"
         loading="eager"
       />
       <div className="flex w-full justify-between items-center">
         <button
           onClick={() => handleSendOption(isKorean ? '자주 묻는 질문' : 'FAQs')}
-          className="w-full text-ink-2 font-6semibold text-f-base py-[5px] hover:text-ink"
+          className="w-full text-ink-2 font-6semibold text-f-base py-[4px] md:py-[5px] hover:text-ink"
         >
           {isKorean ? '자주 묻는 질문' : 'FAQs'}
         </button>
@@ -39,7 +39,7 @@ const MainOptions: React.FC = () => {
           onClick={() =>
             handleSendOption(isKorean ? '할 수 있는 일' : 'What I Can Do')
           }
-          className="w-full text-ink-2 font-6semibold text-f-base py-[5px] hover:text-ink"
+          className="w-full text-ink-2 font-6semibold text-f-base py-[4px] md:py-[5px] hover:text-ink"
         >
           {isKorean ? '할 수 있는 일' : 'What I Can Do'}
         </button>
