@@ -120,7 +120,7 @@ const ProfileInput: React.FC<ProfileInputProps> = ({ missingFields, onSaved, var
   return (
     <div>
       {variant === 'blocking' && <HobitProfile />}
-      <div className={`bg-card w-full max-w-[330px] md:max-w-none md:w-[350px] h-auto ${variant === 'blocking' ? 'mt-[20px]' : 'mt-[10px]'} rounded-[20px] p-[20px]`}>
+      <div className={`bg-card w-full max-w-[520px] md:max-w-none md:w-[350px] h-auto ${variant === 'blocking' ? 'mt-[20px]' : 'mt-[10px]'} rounded-[20px] p-[20px]`}>
         <p className="text-ink-2 font-6semibold text-f-sm mb-[12px]">
           {variant === 'blocking'
             ? isKorean

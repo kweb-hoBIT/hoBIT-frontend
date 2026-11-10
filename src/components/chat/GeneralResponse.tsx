@@ -34,7 +34,7 @@ const cleanStreamText = (text: string) =>
 const StreamBubble: React.FC<{ text: string; senior: boolean; stoppedNote?: string }> = ({ text, senior, stoppedNote }) => {
   const shown = cleanStreamText(text).trimEnd();
   return (
-    <div className={`${senior ? 'bg-senior' : 'bg-card'} font-5medium text-f-base mt-[10px] rounded-[20px] px-[20px] py-[15px] hobit-bubble ${stoppedNote && !shown ? 'w-fit' : 'w-full max-w-[330px] md:max-w-none md:w-[350px]'} break-words whitespace-pre-wrap`}>
+    <div className={`${senior ? 'bg-senior' : 'bg-card'} font-5medium text-f-base mt-[10px] rounded-[20px] px-[20px] py-[15px] hobit-bubble ${stoppedNote && !shown ? 'w-fit' : 'w-full max-w-[520px] md:max-w-none md:w-[350px]'} break-words whitespace-pre-wrap`}>
       {stoppedNote ? shown : cleanStreamText(text)}
       {stoppedNote ? (
         <span className={`${shown ? 'ml-[4px]' : ''} text-f-caption text-ink-3`}>{stoppedNote}</span>

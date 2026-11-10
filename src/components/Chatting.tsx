@@ -680,9 +680,9 @@ const ChatEntry = memo(function ChatEntry({ item: chatItem, isKorean, onRetry, o
                 <Query text={chatItem.query} />
               </div>
               {/* 답변 영역: 폭 = 위 카드 줄의 실제 폭 → 안내 문구·추천 칩이 그 폭에 맞춰짐 (카드 1장이든 3장이든).
-                  좁은 화면에서는 호빗 쪽 카드 오른쪽에 여유(28px)를 둠 — 채팅 앱처럼 내 말풍선과 구분 */}
+                  좁은 화면에서는 호빗 쪽 카드 오른쪽에 여유(8px)를 둠 — 채팅 앱처럼 내 말풍선과 구분 */}
               {/* 카테고리 화면은 화면 폭을 다 써서 칸이 늘어나도록 (내용 폭으로 감싸면 칸이 글자 길이에 맞춰 줄어듦) */}
-              <div className={chatItem.is_able ? 'w-full' : 'w-fit max-w-full pr-[28px] md:pr-0'}>
+              <div className={chatItem.is_able ? 'w-full' : 'w-fit max-w-full pr-[8px] md:pr-0'}>
               {chatItem.needs_profile ? (
                 <ProfileInput
                   missingFields={chatItem.missing_fields}

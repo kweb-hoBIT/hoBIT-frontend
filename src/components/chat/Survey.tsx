@@ -157,7 +157,7 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question, isSenior = false, lo
 
   return (
     <div>
-      <div className={`flex flex-row w-full max-w-[330px] md:max-w-none md:w-[350px] items-center ${isSenior ? 'bg-senior' : 'bg-card'} font-5medium text-ink-2 text-f-base mt-[8px] rounded-[20px] px-[20px] py-[10px]`}>
+      <div className={`flex flex-row w-full max-w-[520px] md:max-w-none md:w-[350px] items-center ${isSenior ? 'bg-senior' : 'bg-card'} font-5medium text-ink-2 text-f-base mt-[8px] rounded-[20px] px-[20px] py-[10px]`}>
         <p>
           {isKorean ? '호빗의 응답이 도움이 되었어요!' : 'Was hoBIT helpful?'}
         </p>
@@ -182,7 +182,7 @@ const Survey: React.FC<SurveyProps> = ({ id, user_question, isSenior = false, lo
         </div>
       </div>
       {thumbDown && !flag && (
-        <div className={`flex flex-col w-full max-w-[330px] md:max-w-none md:w-[350px] ${isSenior ? 'bg-senior' : 'bg-card'} font-4regular text-ink-2 text-f-base mt-[8px] rounded-[20px] px-[20px] py-[10px]`}>
+        <div className={`flex flex-col w-full max-w-[520px] md:max-w-none md:w-[350px] ${isSenior ? 'bg-senior' : 'bg-card'} font-4regular text-ink-2 text-f-base mt-[8px] rounded-[20px] px-[20px] py-[10px]`}>
           <p className="font-5medium">
             {isKorean
               ? '도움이 되지 않은 이유가 무엇인가요?'
