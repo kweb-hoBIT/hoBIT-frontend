@@ -10,6 +10,7 @@ import Survey from './Survey';
 import { Faq } from '../../types/faq';
 import { RootState } from '../../redux/store';
 import Loading from './Loading';
+import { ProgressStep } from '../../api/questionStream';
 
 type HobitResponseProps = {
   faqs: Faq[];
@@ -17,6 +18,7 @@ type HobitResponseProps = {
   streamText?: string; // 스트리밍 중인 답변 (완료되면 faqs로 최종 카드를 그림)
   streamStyle?: string; // senior면 선배 답변 색
   stopped?: boolean; // '답변 중지'로 멈춤 — 받은 데까지의 글 + 멈췄다는 표시
+  progress?: ProgressStep[]; // 답변 전까지 끝난 단계 — 로딩 중 체크 목록
 };
 
 // 스트리밍 표시용 정리: 출처 태그([S1]·[M1]·끝에 잘린 '[S')와 마크다운 강조 기호 제거
@@ -49,6 +51,7 @@ const GeneralResponse: React.FC<HobitResponseProps> = ({
   streamText,
   streamStyle,
   stopped,
+  progress,
 }) => {
   const [faqs, setFaqs] = useState<Faq[]>([]);
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
@@ -104,7 +107,7 @@ const GeneralResponse: React.FC<HobitResponseProps> = ({
     return (
       <div>
         <HobitProfile />
-        <Loading />
+        <Loading steps={loading ? progress : undefined} />
       </div>
     );
   }

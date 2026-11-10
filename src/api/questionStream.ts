@@ -11,7 +11,11 @@ export const sendQuestionStream = async (
 	language: string,
 	onDelta: (text: string) => void,
 	onMeta?: (meta: { style?: string }) => void,
-	options?: { standalone?: boolean; signal?: AbortSignal }  // standalone: 추천 칩 질문 (앞 대화와 합쳐 검색하지 않음)
+	options?: {
+		standalone?: boolean; // 추천 칩 질문 (앞 대화와 합쳐 검색하지 않음)
+		signal?: AbortSignal;
+		onProgress?: (step: ProgressStep) => void; // 끝난 단계 (질문 이해·자료 찾기·학식·주변 장소) — 화면의 체크 목록
+	}
 ) => {
 	const res = await fetch(`${API_ENDPOINT}/question/stream`, {
 		method: 'POST',
@@ -39,11 +43,14 @@ export const sendQuestionStream = async (
 			if (!event || data === undefined) continue;
 			if (event === 'delta') onDelta(JSON.parse(data).text ?? '');
 			else if (event === 'meta') onMeta?.(JSON.parse(data));
+			else if (event === 'progress') options?.onProgress?.(JSON.parse(data));
 			else if (event === 'done') final = JSON.parse(data);
 		}
 	}
 	if (!final) throw new Error('stream ended without final response');
 	return final;
 };
+
+export type ProgressStep = { key: string; label: string; detail?: string };
 
 export const isAbortError = (err: unknown) => (err as { name?: string } | null)?.name === 'AbortError';

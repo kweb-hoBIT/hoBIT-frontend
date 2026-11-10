@@ -10,7 +10,7 @@ import Query from './chat/Query';
 import { RootState } from '../redux/store';
 import { Faq } from '../types/faq';
 import { getAllQuestions, getFaqById, getRecommendationsAfterFaq } from '../api/query';
-import { sendQuestionStream, isAbortError } from '../api/questionStream';
+import { sendQuestionStream, isAbortError, ProgressStep } from '../api/questionStream';
 import { setQuestions } from '../redux/questionsSlice';
 import { resetHomeClicked } from '../redux/homeSlice';
 import { clearSent } from '../redux/inputSlice';
@@ -45,6 +45,7 @@ interface ChatItem {
   followup_fields?: string[]; // 답변과 함께 보여주는 추가 정보 요청 (막지 않는 질문)
   streamText?: string;           // 스트리밍 중인 답변
   streamStyle?: string;          // senior면 스트리밍 말풍선도 선배 색
+  progress?: ProgressStep[];     // 답변 전까지 끝난 단계 (체크 목록)
   stopped?: boolean;             // '답변 중지'로 멈춤 — 그때까지 받은 글(streamText)만 남기고 멈췄다는 표시
   recommendations?: RecItem[];   // 답변 아래 "이어서 물어볼 만한 질문"
   initialSeniorFaqId?: number;
@@ -421,7 +422,7 @@ const Chatting: React.FC = () => {
             setChatHistory((prev) =>
               prev.map((item) => (item.uid === uid ? { ...item, streamStyle: meta.style } : item))
             ),
-          { standalone, signal }
+          { standalone, signal, onProgress: (step) => !signal.aborted && addProgress(uid, step) }
         );
         if (signal.aborted) return; // 끝나는 순간 중지를 눌렀으면 멈춘 화면 그대로
         // 경고·정지 안내 — 말풍선은 아래에서 평소처럼, 여기서는 알림창·입력 잠금
@@ -553,17 +554,25 @@ const Chatting: React.FC = () => {
     }
   }, [homeClicked, dispatch]);
 
+  // 진행 단계 추가 (같은 단계가 두 번 오면 마지막 것으로)
+  const addProgress = (uid: string, step: ProgressStep) =>
+    setChatHistory((prev) =>
+      prev.map((item) =>
+        item.uid === uid ? { ...item, progress: [...(item.progress ?? []).filter((p) => p.key !== step.key), step] } : item
+      )
+    );
+
   // 프로필 저장 후 같은 질문 다시 보내기 — 막는 질문·막지 않는 질문 공통
   const retryWithProfile = (uid: string, retryQuery: string) => {
     const retryLanguage = isKorean ? 'KO' : 'EN';
     const update = (patch: Partial<ChatItem>) =>
       setChatHistory((prev) => prev.map((item) => (item.uid === uid ? { ...item, ...patch } : item)));
     dispatch(setIsLoading(true));
-    update({ loading: true, stopped: false, needs_profile: false, missing_fields: [], followup_fields: [], streamText: '' });
+    update({ loading: true, stopped: false, needs_profile: false, missing_fields: [], followup_fields: [], streamText: '', progress: [] });
     const controller = startRequest(uid);
     const { signal } = controller;
     sendQuestionStream(retryQuery, retryLanguage, (delta) => !signal.aborted && appendStream(uid, delta),
-      (meta) => update({ streamStyle: meta.style }), { signal })
+      (meta) => update({ streamStyle: meta.style }), { signal, onProgress: (step) => !signal.aborted && addProgress(uid, step) })
       .then((serverResponse) => {
         if (!serverResponse || signal.aborted) return;
         applyModeration(serverResponse.moderation, dispatch, isKorean, suspendedRef.current > Date.now());
@@ -693,6 +702,7 @@ const ChatEntry = memo(function ChatEntry({ item: chatItem, isKorean, onRetry, o
                     streamText={chatItem.streamText}
                     streamStyle={chatItem.streamStyle}
                     stopped={chatItem.stopped}
+                    progress={chatItem.progress}
                   />
                   {!chatItem.loading && chatItem.audienceNote && (
                     <p className="hobit-appear mt-[8px] inline-flex items-center gap-[6px] rounded-full bg-card px-[12px] py-[4px] text-f-caption text-ink-2 break-keep">
