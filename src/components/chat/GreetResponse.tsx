@@ -26,7 +26,7 @@ const GreetResponse: React.FC = () => {
   return (
     <div>
       <HobitProfile />
-      <div className="bg-card w-full max-w-[400px] md:max-w-none md:w-[350px] h-auto mt-[12px] md:mt-[20px] rounded-[16px] md:rounded-[20px] flex flex-col items-center px-[14px] pt-[10px] pb-[6px] md:p-[20px]">
+      <div className="bg-card w-[300px] max-w-full md:max-w-none md:w-[350px] h-auto mt-[12px] md:mt-[20px] rounded-[16px] md:rounded-[20px] flex flex-col items-center px-[14px] pt-[10px] pb-[6px] md:p-[20px]">
         <img
           src={helloImg}
           alt="hello image"

@@ -111,8 +111,9 @@ const Response: React.FC<ResponseProps> = ({ faqs, text }) => {
 
   return (
     <div>
+      {/* 첫 화면 인사처럼 글만 있는 카드 — 휴대폰에서는 글 길이에 맞춰 (가로로 비는 곳 없이), PC는 그대로 350px */}
       {text && (
-        <div className="h-fit bg-card font-5medium text-f-base mt-[10px] rounded-[20px] px-[20px] py-[15px] hobit-bubble w-full max-w-[400px] md:max-w-none md:w-[350px] break-words inline-block">
+        <div className="h-fit bg-card font-5medium text-f-base mt-[10px] rounded-[20px] px-[20px] py-[15px] hobit-bubble w-fit max-w-full md:max-w-none md:w-[350px] break-words inline-block">
           {text &&
             text
               .split('\n')
