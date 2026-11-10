@@ -93,10 +93,16 @@ const Input: React.FC = () => {
   return (
     <div className="bg-surface border-t-2 fixed bottom-0 left-0 z-50 w-full py-[10px] md:py-[16px] px-[15px] md:px-[20px]">
       <div className="flex items-end w-full">
-        <AiFillHome
-          className="text-f-display text-accent-ink mr-[15px] md:mr-[20px] mb-[6px] md:mb-[8px] shrink-0 hover:text-ink-2 cursor-pointer"
+        {/* 입력칸 한 줄 높이(40/48px)의 칸 안에서 가운데 — 글자 크기 배율에 따라 아이콘 높이가 달라 아래 여백만으로는 어긋났음.
+            여러 줄로 늘어나도 아래쪽(첫 줄) 높이에 맞춰 있음 */}
+        <button
+          type="button"
           onClick={handleHomeClick}
-        />
+          aria-label={isKorean ? '처음 화면' : 'Home'}
+          className="mr-[15px] md:mr-[20px] flex h-[40px] md:h-[48px] shrink-0 items-center text-accent-ink hover:text-ink-2 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-line rounded-full"
+        >
+          <AiFillHome className="text-f-display" aria-hidden="true" />
+        </button>
         <div className={`w-full min-h-[40px] md:min-h-[48px] px-4 py-[8px] md:py-[10px] rounded-[24px] flex flex-row items-end transition-colors ${isLoading || suspended ? 'bg-card' : 'bg-card-2'}`}>
           <textarea
             rows={1}
@@ -124,7 +130,7 @@ const Input: React.FC = () => {
             disabled={suspended && !isLoading}
             aria-label={isLoading ? (isKorean ? '답변 중지' : 'Stop') : isKorean ? '보내기' : 'Send'}
             title={isLoading ? (isKorean ? '답변 중지' : 'Stop') : isKorean ? '보내기' : 'Send'}
-            className="ml-[10px] mb-[2px] shrink-0 text-f-xl text-ink-3 hover:text-ink transition-colors cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-line disabled:cursor-not-allowed disabled:opacity-40"
+            className="ml-[10px] flex h-[24px] md:h-[28px] items-center shrink-0 text-f-xl text-ink-3 hover:text-ink transition-colors cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-line disabled:cursor-not-allowed disabled:opacity-40"
           >
             {isLoading ? <TbPlayerStopFilled aria-hidden="true" /> : <TbSend2 aria-hidden="true" />}
           </button>
