@@ -29,7 +29,7 @@ const RowSkeletons: React.FC<{ count: number; senior?: boolean }> = ({ count, se
   <>
     {Array.from({ length: count }, (_, i) => (
       <li key={i} className="mb-[10px]" aria-hidden="true">
-        <Skeleton tone={senior ? 'senior' : 'card'} className="h-[34px] lg:h-[41px] rounded-[10px]" />
+        <Skeleton tone={senior ? 'senior' : 'card'} className="h-[44px] lg:h-[46px] rounded-[10px]" />
       </li>
     ))}
   </>
@@ -291,7 +291,7 @@ const MenuContent: React.FC = () => {
           {categories.map((category, index) => (
             <li key={index} ref={revealRef} className="mb-[10px] ">
               <div
-                className="hover:bg-card-2 flex flex-row justify-between items-center cursor-pointer text-f-menu font-5medium text-ink-2 bg-card px-[15px] py-[5px] lg:py-[8px] rounded-[10px]"
+                className="hover:bg-card-2 flex flex-row justify-between items-center cursor-pointer text-f-menu font-5medium text-ink-2 bg-card px-[16px] py-[10px] rounded-[10px]"
                 onClick={() =>
                   toggleCategory(
                     isKorean
@@ -401,7 +401,7 @@ const MenuContent: React.FC = () => {
           {seniorCategories.map((category, index) => (
             <li key={index} ref={revealRef} className="mb-[10px] ">
               <div
-                className="hover:bg-senior-2 flex flex-row justify-between items-center cursor-pointer text-f-menu font-5medium text-ink-2 bg-senior px-[15px] py-[5px] lg:py-[8px] rounded-[10px]"
+                className="hover:bg-senior-2 flex flex-row justify-between items-center cursor-pointer text-f-menu font-5medium text-ink-2 bg-senior px-[16px] py-[10px] rounded-[10px]"
                 onClick={() =>
                   toggleSeniorMainCategory(
                     isKorean
