@@ -109,7 +109,7 @@ const ProfilePanel: React.FC = () => {
                   <button
                     disabled={busy}
                     onClick={() => setEditing(editing === field ? null : field)}
-                    className="text-f-sm text-link hover:underline disabled:opacity-50"
+                    className="text-f-base text-link hover:underline disabled:opacity-50"
                   >
                     {isKorean ? '변경' : 'Edit'}
                   </button>
@@ -117,7 +117,7 @@ const ProfilePanel: React.FC = () => {
                     <button
                       disabled={busy}
                       onClick={() => run(() => deleteProfile(field))}
-                      className="text-f-sm text-accent-ink hover:underline disabled:opacity-50"
+                      className="text-f-base text-accent-ink hover:underline disabled:opacity-50"
                     >
                       {isKorean ? '삭제' : 'Delete'}
                     </button>
