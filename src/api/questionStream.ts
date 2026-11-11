@@ -24,6 +24,14 @@ export const sendQuestionStream = async (
 		body: JSON.stringify({ question, language, standalone: Boolean(options?.standalone), program: loadProgram() }),
 		signal: options?.signal,
 	});
+	// 관리자가 챗봇을 끈 경우 — 새로 불러오면 첫 화면이 '잠시 쉬어가요' 오류 화면을 보여 줌
+	if (res.status === 503) {
+		const body = await res.json().catch(() => null);
+		if (body?.botOff) {
+			window.location.reload();
+			return null;
+		}
+	}
 	if (!res.ok || !res.body) throw new Error(`stream request failed: ${res.status}`);
 
 	const reader = res.body.getReader();

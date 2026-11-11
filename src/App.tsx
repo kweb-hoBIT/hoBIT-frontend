@@ -44,6 +44,12 @@ const PreloadImages: React.FC<PreloadImagesProps> = ({ children }) => {
 					if (body?.maintenance) setMaintenance(body.message || '서비스 점검 중이에요.');
 				}
 				if (!res.ok) throw new Error();
+				// 관리자가 챗봇을 꺼 두었으면 '잠시 쉬어가요' 오류 화면 (우는 호빗)
+				const body = await res.json().catch(() => null);
+				if (body?.botEnabled === false) {
+					setMaintenance(body.message || '호빗이 잠시 쉬고 있어요.');
+					throw new Error('bot off');
+				}
 				setServerOk(true);
 			})
 			.catch(() => {
