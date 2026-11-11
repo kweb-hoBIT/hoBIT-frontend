@@ -7,6 +7,7 @@ import ErrorPage from './pages/ErrorPage';
 // 호빗 대기 그림 = 움직이는 호빗의 첫 장면 (예전 PNG는 렌더가 달라 움직이기 전에 다른 캐릭터처럼 보였음)
 import homeImage from './assets/mascot_main_still.webp';
 import helloImage from './assets/mascot_hi_still.webp';
+import sadImage from './assets/mascot_sad_still.webp';
 import { preloadClip } from './components/chat/Mascot';
 import profileImage from './assets/profile_image.png';
 import errorImage from './assets/error_image.png';
@@ -60,7 +61,8 @@ const PreloadImages: React.FC<PreloadImagesProps> = ({ children }) => {
 	useEffect(() => {
 		if (serverOk !== true) return;
 
-		const imagesToLoad = { homeImage, helloImage, profileImage, errorImage };
+		// sadImage: 답을 못 찾은 답·오류 답의 우는 호빗 첫 장면 — 미리 디코드해 두어 답 카드와 같이 뜨게
+		const imagesToLoad = { homeImage, helloImage, profileImage, errorImage, sadImage };
 		const images = Promise.allSettled(
 			Object.entries(imagesToLoad).map(async ([key, src]) => {
 				const img = new Image();

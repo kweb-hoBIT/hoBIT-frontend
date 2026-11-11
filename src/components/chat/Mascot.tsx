@@ -163,6 +163,8 @@ export const HomeMascot: React.FC<{ poster: string; className?: string; label: s
       if (stop) return;
       later(() => {
         loadClip('hi');
+        // 우는 호빗은 답을 못 찾았을 때 답 카드와 같이 움직이게 미리 (받는 시간·그릴 준비까지)
+        preloadClip('sad');
         loadClip('sleep');
         loadClip('sleep2');
       });
@@ -247,5 +249,5 @@ export const MascotOnce: React.FC<{ clip: Clip; poster: string; className?: stri
   useEffect(() => {
     play(clip);
   }, [clip, play]);
-  return <img src={src} alt={alt} width={400} height={400} className={className} decoding="async" draggable={false} />;
+  return <img src={src} alt={alt} width={400} height={400} className={className} draggable={false} />;
 };
