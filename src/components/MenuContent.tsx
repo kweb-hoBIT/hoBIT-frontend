@@ -291,7 +291,7 @@ const MenuContent: React.FC = () => {
           {categories.map((category, index) => (
             <li key={index} ref={revealRef} className="mb-[10px] ">
               <div
-                className="hover:bg-card-2 flex flex-row justify-between items-center cursor-pointer text-f-menu font-5medium text-ink-2 bg-card px-[16px] py-[10px] rounded-[10px]"
+                className="hover:bg-card-2 flex flex-row justify-between items-center cursor-pointer text-f-lg lg:text-f-menu font-5medium text-ink-2 bg-card px-[16px] py-[10px] rounded-[10px]"
                 onClick={() =>
                   toggleCategory(
                     isKorean
@@ -401,7 +401,7 @@ const MenuContent: React.FC = () => {
           {seniorCategories.map((category, index) => (
             <li key={index} ref={revealRef} className="mb-[10px] ">
               <div
-                className="hover:bg-senior-2 flex flex-row justify-between items-center cursor-pointer text-f-menu font-5medium text-ink-2 bg-senior px-[16px] py-[10px] rounded-[10px]"
+                className="hover:bg-senior-2 flex flex-row justify-between items-center cursor-pointer text-f-lg lg:text-f-menu font-5medium text-ink-2 bg-senior px-[16px] py-[10px] rounded-[10px]"
                 onClick={() =>
                   toggleSeniorMainCategory(
                     isKorean

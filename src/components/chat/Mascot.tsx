@@ -121,6 +121,10 @@ const askMotion = () => {
   motionAsked = true;
   DM.requestPermission().catch(() => undefined);
 };
+// 접속 후 화면을 처음 터치할 때 바로 물음 — 아이폰은 사용자가 누르는 순간에만 물을 수 있어 '들어오자마자'는 불가능
+if (typeof window !== 'undefined' && typeof (window as any).DeviceMotionEvent?.requestPermission === 'function') {
+  window.addEventListener('touchend', askMotion, { once: true, passive: true });
+}
 
 /** start: 처음 재생할 클립 — 시작 화면은 손인사(main), '안녕' 같은 인사 응답은 손 흔들기(hi). 그 뒤 졸음·깸은 같음 */
 export const HomeMascot: React.FC<{ poster: string; className?: string; label: string; start?: 'main' | 'hi' }> = ({ poster, className = '', label, start = 'main' }) => {

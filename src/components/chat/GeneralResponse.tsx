@@ -200,7 +200,8 @@ const GeneralResponse: React.FC<HobitResponseProps> = ({
         </>
       ) : (
         <>
-          {notFound && (
+          {/* 답을 못 찾음 또는 오류 답(백엔드 오류·안내 응답은 대분류 '오류') → 우는 호빗 */}
+          {(notFound || faqs[0]?.maincategory_ko === '오류') && (
             <MascotOnce clip="sad" poster={sadStill} className="w-[120px] md:w-[150px] h-auto aspect-square mt-[8px] ml-[50px] md:ml-[60px]" />
           )}
           <Response text="" faqs={faqs} />
