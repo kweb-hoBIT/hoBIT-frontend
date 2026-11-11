@@ -597,7 +597,7 @@ const Chatting: React.FC = () => {
               followup_fields: serverResponse.followup_fields ?? [],
               recommendations,
               audienceNote: noteOf(serverResponse),
-              notFound: !!serverResponse.not_found,
+              notFound: !!serverResponse.not_found && !serverResponse.web_searched, // 웹에서 찾았으면 우는 호빗 없이
             });
           } else {
             console.error('Invalid response structure:', serverResponse);
@@ -700,7 +700,7 @@ const Chatting: React.FC = () => {
           finishPacer(uid, { response: serverResponse.faqs, loading: false, streamText: undefined,
                    followup_fields: serverResponse.followup_fields ?? [],
                    recommendations: serverResponse.recommendations ?? [], audienceNote: noteOf(serverResponse),
-                   notFound: !!serverResponse.not_found });
+                   notFound: !!serverResponse.not_found && !serverResponse.web_searched });
         } else {
           finishPacer(uid, { loading: false });
         }
