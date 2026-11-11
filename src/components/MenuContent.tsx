@@ -342,7 +342,7 @@ const MenuContent: React.FC = () => {
                               : subCategory.category_en
                           )
                         }
-                        className="cursor-pointer font-5medium text-[17px] lg:text-f-base text-ink-2 hover:text-ink my-[7px] lg:my-[5px]"
+                        className="cursor-pointer font-5medium text-[17px] lg:text-f-base-xl text-ink-2 hover:text-ink my-[7px] lg:my-[5px]"
                       >
                         <div>
                           {isKorean
@@ -371,7 +371,7 @@ const MenuContent: React.FC = () => {
                                       isKorean ? faq.question_ko : faq.question_en
                                     )
                                   }
-                                  className="cursor-pointer text-[17px] lg:text-f-base text-ink font-3light px-[10px] py-[6px] lg:py-[5px] rounded-[10px] bg-card mb-[5px] hover:bg-card-2"
+                                  className="cursor-pointer text-[17px] lg:text-f-base-xl text-ink font-3light px-[10px] py-[6px] lg:py-[5px] rounded-[10px] bg-card mb-[5px] hover:bg-card-2"
                                 >
                                   {isKorean ? faq.question_ko : faq.question_en}
                                 </li>
@@ -452,7 +452,7 @@ const MenuContent: React.FC = () => {
                               : subCategory.category_en
                           )
                         }
-                        className="cursor-pointer font-5medium text-[17px] lg:text-f-base text-ink-2 hover:text-ink my-[7px] lg:my-[5px]"
+                        className="cursor-pointer font-5medium text-[17px] lg:text-f-base-xl text-ink-2 hover:text-ink my-[7px] lg:my-[5px]"
                       >
                         <div>
                           {isKorean
@@ -478,7 +478,7 @@ const MenuContent: React.FC = () => {
                                   onClick={() => {
                                     handleSendSeniorFaqId(faq.id);
                                   }}
-                                  className="cursor-pointer text-[17px] lg:text-f-base text-ink font-3light px-[10px] py-[6px] lg:py-[5px] rounded-[10px] bg-senior mb-[5px] hover:bg-senior-2"
+                                  className="cursor-pointer text-[17px] lg:text-f-base-xl text-ink font-3light px-[10px] py-[6px] lg:py-[5px] rounded-[10px] bg-senior mb-[5px] hover:bg-senior-2"
                                 >
                                   {isKorean
                                     ? faq.detailcategory_ko
