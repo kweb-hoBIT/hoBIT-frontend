@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * 움직이는 호빗 — public/mascot/*.webp (5초, 한 번 재생 후 마지막 장면에서 멈춤, 배경 투명)
- * 원본 영상: hobit_renewal/mascot_src/*.mp4 → 280px·초당 15장 WebP (흰 배경은 테두리와 이어진 부분만 지움)
+ * 원본 영상: hobit_renewal/mascot_src/*.mp4 → 400px·초당 15장 WebP (흰 배경은 테두리와 이어진 부분만 지움)
  *
  * 시작 화면 규칙 (HomeMascot)
  *   홈 버튼(시작 화면이 새로 그려짐)   기본 → 손인사 (main)
