@@ -5,11 +5,12 @@ import { RootState } from '../redux/store';
 import mascotHi from '../assets/mascot_hi.webp';
 
 /**
- * 새 호빗(beta.hobit.kr) 베타 오픈 안내 — 처음 접속했을 때 한 번만
- * 닫으면 이 브라우저에 기록해 다시 띄우지 않음 (저장이 막힌 브라우저면 매번 뜰 수 있음)
+ * 새 호빗(beta.hobit.kr) 베타 오픈 안내 — 접속할 때마다 띄움
+ * '다시 보지 않기'를 누르면 이 브라우저에 기록해 더 띄우지 않음. 닫기(X·바깥·ESC)는 이번만 닫음
  */
 const BETA_URL = 'https://beta.hobit.kr';
-const SEEN_KEY = 'hobit_beta_notice_seen_v1';
+// v2: '한 번만'(v1)에서 '다시 보지 않기를 누를 때까지'로 바꾸며 새 이름 — v1로 닫은 사람에게도 다시 보임
+const SEEN_KEY = 'hobit_beta_notice_hidden_v2';
 
 const seen = () => {
   try {
@@ -50,7 +51,8 @@ const BetaNotice: React.FC = () => {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
-  const close = () => {
+  const close = () => setOpen(false); // 이번만 닫기
+  const hideForever = () => {
     markSeen();
     setOpen(false);
   };
@@ -96,9 +98,14 @@ const BetaNotice: React.FC = () => {
         >
           {isKorean ? '베타 써 보기' : 'Try the beta'}
         </a>
-        <button type="button" onClick={close} className="mt-2 w-full py-2 text-[14px] text-gray-500 hover:text-gray-700">
-          {isKorean ? '지금은 괜찮아요' : 'Not now'}
-        </button>
+        <div className="mt-3 flex items-center justify-between text-[14px] text-gray-500">
+          <button type="button" onClick={hideForever} className="py-1 hover:text-gray-700 hover:underline">
+            {isKorean ? '다시 보지 않기' : "Don't show again"}
+          </button>
+          <button type="button" onClick={close} className="py-1 hover:text-gray-700">
+            {isKorean ? '닫기' : 'Close'}
+          </button>
+        </div>
       </div>
     </div>
   );
