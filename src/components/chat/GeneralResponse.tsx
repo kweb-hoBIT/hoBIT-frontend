@@ -202,9 +202,9 @@ const GeneralResponse: React.FC<HobitResponseProps> = ({
         <>
           {/* 답을 못 찾음 또는 오류 답(백엔드 오류·안내 응답은 대분류 '오류') → 우는 호빗 */}
           {(notFound || faqs[0]?.maincategory_ko === '오류') && (
-            // 시작 화면처럼 회색 캐릭터 카드 안에 (예전엔 카드 밖에 크게 떠서 답 카드와 따로 놀았음)
-            <div className="hobit-appear mt-[12px] md:mt-[20px] w-fit rounded-[16px] md:rounded-[20px] bg-card px-[18px] pt-[10px] pb-[2px]">
-              <MascotOnce clip="sad" poster={sadStill} alt="" className="w-[96px] md:w-[120px] h-auto aspect-square" />
+            // 캐릭터 카드 — 아래 답 카드와 같은 색 (선배 말투 답이면 분홍, 아니면 회색)
+            <div className={`hobit-appear mt-[12px] md:mt-[20px] w-fit rounded-[20px] ${faqs[0]?.subcategory_ko === 'senior' ? 'bg-senior' : 'bg-card'} px-[16px] pt-[10px] pb-[2px]`}>
+              <MascotOnce clip="sad" poster={sadStill} alt="" className="w-[136px] md:w-[168px] h-auto aspect-square" />
             </div>
           )}
           <Response text="" faqs={faqs} />
