@@ -8,6 +8,7 @@ import homeImage from './assets/home_image.png';
 import helloImage from './assets/hello.png';
 import profileImage from './assets/profile_image.png';
 import errorImage from './assets/error_image.png';
+import mascotHi from './assets/mascot_hi.webp'; // 베타 안내 모달 그림 — 미리 받아 두어 모달과 함께 바로 보이게
 import { setImages } from './redux/imageSlice';
 import './loader.css';
 
@@ -43,13 +44,15 @@ const PreloadImages: React.FC<PreloadImagesProps> = ({ children }) => {
 	useEffect(() => {
 		if (serverOk !== true) return;
 
-		const imagesToLoad = { homeImage, helloImage, profileImage, errorImage };
+		const imagesToLoad = { homeImage, helloImage, profileImage, errorImage, mascotHi };
 		const loadedImages: { [key: string]: string } = {};
 		let loadedCount = 0;
 
 		Object.entries(imagesToLoad).forEach(([key, src]) => {
 			const img = new Image();
 			img.src = src;
+			// 그림을 다 받은 뒤(실패해도) 셈 — 하나가 실패해도 화면이 멈추지 않게
+			img.onerror = () => img.onload?.(new Event('load'));
 			img.onload = () => {
 				loadedImages[key] = img.src;
 				loadedCount++;

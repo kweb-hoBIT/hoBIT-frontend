@@ -30,8 +30,17 @@ const BetaNotice: React.FC = () => {
   const isKorean = useSelector((state: RootState) => state.language.isKorean);
   const [open, setOpen] = useState(false);
 
+  // 그림을 디코딩까지 마친 뒤 열어 모달과 그림이 한 번에 보이게 (App에서 미리 받아 두어 보통 바로 끝남)
   useEffect(() => {
-    if (!seen()) setOpen(true);
+    if (seen()) return;
+    let alive = true;
+    const img = new Image();
+    img.src = mascotHi;
+    const show = () => alive && setOpen(true);
+    (img.decode ? img.decode() : Promise.resolve()).then(show, show);
+    return () => {
+      alive = false;
+    };
   }, []);
 
   useEffect(() => {
